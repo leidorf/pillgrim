@@ -16,6 +16,7 @@ import {
 } from "./types/navigation";
 import Step1Screen from "./screens/AddMedication/Step1Screen";
 import SettingsScreen from "./screens/Settings/SettingsScreen";
+import { AppTheme } from "./theme/theme";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -28,7 +29,13 @@ const MainTabs = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "green",
+        tabBarActiveTintColor: "#689F38",
+        tabBarStyle: {
+          backgroundColor: "#F1F8E9",
+          borderTopWidth: 0,
+          boxShadow: "none",
+          elevation: 0,
+        },
       }}
     >
       <Tab.Screen
@@ -83,7 +90,7 @@ const SettingsNavigator = () => {
 export default function App() {
   return (
     <SafeAreaProvider>
-      <NavigationContainer>
+      <NavigationContainer theme={AppTheme}>
         <RootStack.Navigator>
           <RootStack.Screen
             name="MainTabs"
