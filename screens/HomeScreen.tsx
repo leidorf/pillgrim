@@ -1,19 +1,21 @@
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
+import { Button, StatusBar, StyleSheet, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RootStackParamList } from "../App";
+import AddMedicationButton from "../components/AddMedicationButton";
 
-type HomeScreenNavigationProp = BottomTabScreenProps<
-  RootStackParamList,
-  "Home"
->;
-
-const HomeScreen = ({ navigation, route }: HomeScreenNavigationProp) => {
+const HomeScreen = () => {
   return (
-    <SafeAreaView>
+    <SafeAreaView style={styles.container}>
       <Text>Home Screen</Text>
+      <AddMedicationButton />
     </SafeAreaView>
   );
 };
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    paddingTop: StatusBar.currentHeight,
+  },
+});
 
 export default HomeScreen;

@@ -1,17 +1,19 @@
-import { BottomTabScreenProps } from "@react-navigation/bottom-tabs";
-import { Text } from "react-native";
+import { Button, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { RootStackParamList } from "../App";
+import { NavProp } from "../types/navigation";
+import { useNavigation } from "@react-navigation/native";
 
-type LogsScreenNavigationProp = BottomTabScreenProps<
-  RootStackParamList,
-  "Logs"
->;
-
-const LogsScreen = ({ navigation, route }: LogsScreenNavigationProp) => {
+const LogsScreen = () => {
+  const navigation = useNavigation<NavProp>();
   return (
     <SafeAreaView>
       <Text>Logs Screen</Text>
+      <Button
+        title="Settings"
+        onPress={() =>
+          navigation.navigate("Settings", { screen: "SettingsMain" })
+        }
+      />
     </SafeAreaView>
   );
 };
