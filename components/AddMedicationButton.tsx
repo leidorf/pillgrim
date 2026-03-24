@@ -1,7 +1,7 @@
 import { useNavigation } from "@react-navigation/native";
-import { Button, Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text } from "react-native";
 import { NavProp } from "../types/navigation";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import CirclePlusIcon from "../assets/icons//circle-plus.svg";
 
 const AddMedicationButton = () => {
   const navigation = useNavigation<NavProp>();
@@ -11,7 +11,7 @@ const AddMedicationButton = () => {
       onPress={() => navigation.navigate("AddMedication", { screen: "Step1" })}
     >
       <Text style={styles.text}>Add medication</Text>
-      <FontAwesome6 name="circle-plus" color="#689F38" size={24} />
+      <CirclePlusIcon height={24} width={24} color="#689F38" />
     </Pressable>
   );
 };

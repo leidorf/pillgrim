@@ -2,7 +2,9 @@ export type Medication = {
   id?: string;
   name: string;
   dose?: string;
+  stock?: number;
   time?: string;
+  schedule?: string;
   note?:
     | "Before Meal"
     | "With Meal"
@@ -14,11 +16,11 @@ export type Medication = {
 };
 
 export type MedicationLog = {
-    medicationId: string;
-    takenAt: Date;
-    action: "taken" | "untaken";
-  };
+  medicationId: string;
+  takenAt: Date;
+  action: "taken" | "untaken";
+};
 
 export type MedicationProps = Medication & {
-    onToggle?: (id: string) => void;
-  };
+  onToggle?: (id: string) => void;
+};

@@ -12,7 +12,7 @@ import MedicationCard from "../components/MedicationCard";
 import { useState } from "react";
 import { Medication, MedicationLog } from "../types/medication";
 import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-
+0
 const HomeScreen = () => {
   const [medications, setMedications] = useState<Medication[]>([
     {
@@ -48,8 +48,9 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <Text>Home Screen</Text>
+      <View style={styles.box}></View>
       <FlatList
+        style={styles.medList}
         data={medications}
         keyExtractor={(item, index) => item.id ?? index.toString()}
         renderItem={({ item }) => (
@@ -76,7 +77,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     paddingTop: StatusBar.currentHeight,
+  },
+  medList: {
     paddingHorizontal: 32,
+    borderTopLeftRadius: 24,
+    borderTopRightRadius: 24,
+    paddingTop: 16,
+    backgroundColor: "#e0ead6",
+  },
+  box: {
+    height: 240,
   },
 });
 

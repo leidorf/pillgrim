@@ -1,12 +1,7 @@
-import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { StyleSheet } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import HomeScreen from "./screens/HomeScreen";
-import MedsScreen from "./screens/MedsScreen";
-import LogsScreen from "./screens/LogsScreen";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import { StyleSheet } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import {
   AddMedicationParamList,
@@ -14,9 +9,18 @@ import {
   RootStackParamList,
   SettingsParamList,
 } from "./types/navigation";
+
+import HomeScreen from "./screens/HomeScreen";
+import MedsScreen from "./screens/MedsScreen";
+import LogsScreen from "./screens/LogsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen";
 import SettingsScreen from "./screens/Settings/SettingsScreen";
+
 import { AppTheme } from "./theme/theme";
+
+import PillIcon from "./assets/icons/pill.svg";
+import HouseIcon from "./assets/icons/house.svg";
+import LogsIcon from "./assets/icons/logs.svg";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -31,7 +35,7 @@ const MainTabs = () => {
         tabBarShowLabel: false,
         tabBarActiveTintColor: "#689F38",
         tabBarStyle: {
-          backgroundColor: "#F1F8E9",
+          backgroundColor: "rgba(0, 0, 0, 0)",
           borderTopWidth: 0,
           boxShadow: "none",
           elevation: 0,
@@ -43,7 +47,7 @@ const MainTabs = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="house" size={24} color={color} />
+            <HouseIcon height={24} width={24} color={color} />
           ),
         }}
       />
@@ -52,7 +56,7 @@ const MainTabs = () => {
         component={MedsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="prescription-bottle" size={24} color={color} />
+            <PillIcon height={24} width={24} color={color} />
           ),
         }}
       />
@@ -61,7 +65,7 @@ const MainTabs = () => {
         component={LogsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <FontAwesome6 name="chart-simple" size={24} color={color} />
+            <LogsIcon height={24} width={24} color={color} />
           ),
         }}
       />

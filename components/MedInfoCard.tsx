@@ -1,51 +1,31 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { MedicationProps } from "../types/medication";
-
 import PillIcon from "../assets/icons/pill.svg";
-import CheckIcon from "../assets/icons/circle-check-big.svg";
-import CircleIcon from "../assets/icons/circle.svg";
 
-const MedicationCard = ({
-  id,
-  name,
-  note,
-  dose,
-  time,
-  isTaken = false,
-  onToggle,
-}: MedicationProps) => {
+const MedInfoCard = ({ id, name, dose, schedule, onToggle }: MedicationProps) => {
   return (
-    <Pressable style={styles.container} onPress={() => id && onToggle?.(id)}>
+    <Pressable style={styles.container}>
       <View style={styles.gapView}>
         <PillIcon height={24} width={24} />
         <View>
           <Text style={styles.text}>{name}</Text>
-          <Text style={styles.note}>({note})</Text>
+          <Text style={styles.note}>
+            {dose} | {schedule}
+          </Text>
         </View>
-      </View>
-      <Text style={styles.text}>{dose}</Text>
-      <View style={styles.gapView}>
-        <Text style={styles.timeText}>{time}</Text>
-        <Pressable>
-          {isTaken ? (
-            <CheckIcon height={24} width={24} color="#689F38" />
-          ) : (
-            <CircleIcon height={24} width={24} color="#689F38" />
-          )}
-        </Pressable>
       </View>
     </Pressable>
   );
 };
 
-export default MedicationCard;
+export default MedInfoCard;
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    height: 56,
+    height: 64,
     paddingHorizontal: 16,
     borderRadius: 16,
     backgroundColor: "white",
@@ -53,8 +33,8 @@ const styles = StyleSheet.create({
   text: { fontSize: 20, fontWeight: 500 },
   timeText: { fontSize: 24, fontWeight: 600 },
   note: {
-    fontSize: 10,
     color: "#757575",
+    textTransform: "capitalize",
   },
   gapView: {
     flexDirection: "row",

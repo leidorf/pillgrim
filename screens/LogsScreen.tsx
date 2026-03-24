@@ -1,4 +1,4 @@
-import { Button, Text } from "react-native";
+import { Button, Image, Text } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { NavProp } from "../types/navigation";
 import { useNavigation } from "@react-navigation/native";
