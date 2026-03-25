@@ -1,6 +1,7 @@
 export type Medication = {
   id?: string;
   name: string;
+  form?: "pill" | "tablet" | "syringe" | string;
   dose?: string;
   stock?: number;
   time?: string;

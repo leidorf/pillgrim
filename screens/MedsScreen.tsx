@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../components/AddMedicationButton";
 import { useState } from "react";
 import { Medication } from "../types/medication";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import PillBottleIcon from "../assets/icons/pill-bottle.svg";
 import MedInfoCard from "../components/MedInfoCard";
 
 const MedsScreen = () => {
@@ -29,10 +29,11 @@ const MedsScreen = () => {
         }
         ListEmptyComponent={
           <View>
-            <FontAwesome6
-              name="prescription-bottle-medical"
-              size={64}
-              color="black"
+            <PillBottleIcon
+              height={64}
+              width={64}
+              stroke="#000000"
+              strokeWidth={1}
             />
             <Text>No medications found</Text>
           </View>

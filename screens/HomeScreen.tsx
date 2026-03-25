@@ -11,8 +11,8 @@ import AddMedicationButton from "../components/AddMedicationButton";
 import MedicationCard from "../components/MedicationCard";
 import { useState } from "react";
 import { Medication, MedicationLog } from "../types/medication";
-import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
-0
+import PillBottleIcon from "../assets/icons/pill-bottle.svg";
+0;
 const HomeScreen = () => {
   const [medications, setMedications] = useState<Medication[]>([
     {
@@ -58,13 +58,14 @@ const HomeScreen = () => {
         )}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View>
-            <FontAwesome6
-              name="prescription-bottle-medical"
-              size={64}
-              color="black"
+          <View style={styles.emptyContainer}>
+            <PillBottleIcon
+              height={64}
+              width={64}
+              stroke="#000000"
+              strokeWidth={1}
             />
-            <Text>No medications found</Text>
+            <Text style={styles.emptyText}>No medications for today!</Text>
           </View>
         }
       />
@@ -87,6 +88,16 @@ const styles = StyleSheet.create({
   },
   box: {
     height: 240,
+  },
+  emptyContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    paddingTop: 32,
+    gap: 16,
+  },
+  emptyText: {
+    fontSize: 18,
+    fontWeight: 500,
   },
 });
 

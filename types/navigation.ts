@@ -8,7 +8,6 @@ export type SettingsParamList = {
 };
 
 export type AddMedicationParamList = {
-  AddMedication: undefined;
   Step1: { mode?: "edit"; medicationId?: string };
   Step2: { name: string };
   Step3: { name: string; time: string };

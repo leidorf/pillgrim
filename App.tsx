@@ -21,6 +21,7 @@ import { AppTheme } from "./theme/theme";
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
 import LogsIcon from "./assets/icons/logs.svg";
+import Step2Screen from "./screens/AddMedication/Step2Screen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -47,7 +48,7 @@ const MainTabs = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <HouseIcon height={24} width={24} color={color} />
+            <HouseIcon height={24} width={24} stroke={color} />
           ),
         }}
       />
@@ -56,7 +57,7 @@ const MainTabs = () => {
         component={MedsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <PillIcon height={24} width={24} color={color} />
+            <PillIcon height={24} width={24} stroke={color} />
           ),
         }}
       />
@@ -65,7 +66,7 @@ const MainTabs = () => {
         component={LogsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <LogsIcon height={24} width={24} color={color} />
+            <LogsIcon height={24} width={24} stroke={color} />
           ),
         }}
       />
@@ -75,8 +76,9 @@ const MainTabs = () => {
 
 const AddMedicationNavigator = () => {
   return (
-    <AddMedStack.Navigator>
+    <AddMedStack.Navigator screenOptions={{ headerShown: false }}>
       <AddMedStack.Screen name="Step1" component={Step1Screen} />
+      <AddMedStack.Screen name="Step2" component={Step2Screen} />
       {/* ------------------- other add med screen will be added ------------------  */}
     </AddMedStack.Navigator>
   );
@@ -104,12 +106,17 @@ export default function App() {
           <RootStack.Screen
             name="AddMedication"
             component={AddMedicationNavigator}
-            options={{ headerShown: false }}
+            options={{
+              presentation: "transparentModal",
+              headerShown: false,
+              animation: "fade",
+              title: "Add Medication",
+            }}
           />
           <RootStack.Screen
             name="Settings"
             component={SettingsNavigator}
-            options={{ headerShown: false }}
+            options={{ headerShown: false, title: "Settings" }}
           />
         </RootStack.Navigator>
       </NavigationContainer>
