@@ -15,13 +15,31 @@ import { useRef, useState } from "react";
 import { Medication } from "../../types/medication";
 import { MED_FORMS } from "../../constants/medication-forms";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useMedicationStore } from "../../store/medicationStore";
+
+type FormErrors = {
+  medName?: Medication["name"];
+  selectedForm?: Medication["form"];
+};
 
 const Step1Screen = () => {
   const navigation = useNavigation<NavProp>();
   const [selectedForm, setSelectedForm] = useState<Medication["form"]>("pill");
   const [medName, setMedName] = useState<Medication["name"]>("");
+  const [errors, setErrors] = useState<FormErrors>();
   const [showFormPicker, setShowFormPicker] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const { draft, setDraft } = useMedicationStore();
+
+  const validateForm = () => {
+    let errors: FormErrors = {};
+    if (!medName) errors.medName = "Medication name is required";
+    if (!selectedForm) errors.selectedForm = "Medication form is required";
+
+    setErrors(errors);
+
+    return Object.keys(errors).length === 0;
+  };
 
   const togglePicker = () => {
     const toValue = showFormPicker ? 0 : 1;
@@ -39,8 +57,10 @@ const Step1Screen = () => {
   };
 
   const handleNextButton = () => {
-    console.log(selectedForm, medName);
-    navigation.navigate("AddMedication", { screen: "Step2" });
+    if (validateForm()) {
+      setDraft({ name: medName, form: selectedForm });
+      navigation.navigate("AddMedication", { screen: "Step2" });
+    }
   };
 
   const SelectedIcon =
@@ -118,6 +138,11 @@ const Step1Screen = () => {
                     >
                       {label}
                     </Text>
+                    {errors?.selectedForm ? (
+                      <Text style={styles.errorText}>
+                        {errors?.selectedForm}
+                      </Text>
+                    ) : null}
                   </Pressable>
                 );
               })}
@@ -133,15 +158,16 @@ const Step1Screen = () => {
                 value={medName}
                 onChangeText={setMedName}
               />
+              {errors?.medName ? (
+                <Text style={styles.errorText}>{errors?.medName}</Text>
+              ) : null}
             </View>
           </View>
 
           {/* ------------------------------- Next Button ------------------------------ */}
           <Pressable
             style={styles.nextButton}
-            onPress={() =>
-              navigation.navigate("AddMedication", { screen: "Step2" })
-            }
+            onPress={() => handleNextButton()}
           >
             <Text style={styles.buttonText}>Next</Text>
           </Pressable>
@@ -262,6 +288,12 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     marginTop: 8,
     textAlign: "center",
+  },
+  errorText: {
+    fontSize: 16,
+    marginTop: 8,
+    textAlign: "center",
+    color: Colors.error,
   },
 });
 

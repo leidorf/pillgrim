@@ -1,11 +1,28 @@
+export type ScheduleType =
+  | "daily"
+  | "weekly"
+  | "interval"
+  | "prn"
+  | "monthly"
+  | "biweekly"
+  | "specificmonth";
+
+export type Schedule = {
+  type: ScheduleType;
+  days?: number[];
+  interval?: number;
+  startDate: string;
+};
+
 export type Medication = {
   id?: string;
   name: string;
   form?: "pill" | "tablet" | "syringe" | string;
+  schedule?: Schedule;
+  times?: string[];
   dose?: string;
+  /* -------------------------------- Optional -------------------------------- */
   stock?: number;
-  time?: string;
-  schedule?: string;
   note?:
     | "Before Meal"
     | "With Meal"

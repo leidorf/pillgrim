@@ -12,7 +12,6 @@ const MedsScreen = () => {
       id: "1",
       name: "Test",
       dose: "1 pill",
-      schedule: "daily",
     },
   ]);
   return (

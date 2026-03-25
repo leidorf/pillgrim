@@ -20,7 +20,7 @@ const HomeScreen = () => {
       name: "Test",
       note: "After Meal",
       dose: "1 pill",
-      time: "16:00",
+      times: ["16:00"],
       isTaken: false,
     },
   ]);
