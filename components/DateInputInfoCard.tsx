@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../constants/theme";
+import InlineContainer from "./InlineContainer";
 
 type InfoCardProps = {
   cardText: string;
@@ -15,8 +16,7 @@ const DateInputInfoCard = ({
   isEmpty,
 }: InfoCardProps) => {
   return (
-    <View style={styles.expandedContainer}>
-      <Text style={styles.expandedLabel}>{cardLabel}</Text>
+    <InlineContainer containerText={cardLabel}>
       <Pressable style={styles.dateInput} onPress={onPress}>
         <Text
           style={[styles.dateText, isEmpty && { color: Colors.textSecondary }]}
@@ -24,7 +24,7 @@ const DateInputInfoCard = ({
           {cardText}
         </Text>
       </Pressable>
-    </View>
+    </InlineContainer>
   );
 };
 
