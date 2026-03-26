@@ -8,16 +8,10 @@ export type SettingsParamList = {
 };
 
 export type AddMedicationParamList = {
-  Step1: { mode?: "edit"; medicationId?: string };
-  Step2: { name: string };
-  Step3: { name: string; time: string };
-  Step4: {
-    name: string;
-    time: string;
-    scheduleType: string;
-    frequency?: number;
-    days?: number[];
-  };
+  Step1: undefined;
+  Step2: undefined;
+  Step3: undefined;
+  Step4: undefined;
 };
 
 export type MainScreenParamList = {

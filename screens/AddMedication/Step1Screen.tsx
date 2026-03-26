@@ -16,6 +16,7 @@ import { Medication } from "../../types/medication";
 import { MED_FORMS } from "../../constants/medication-forms";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useMedicationStore } from "../../store/medicationStore";
+import NextButton from "../../components/NextButton";
 
 type FormErrors = {
   medName?: Medication["name"];
@@ -165,12 +166,8 @@ const Step1Screen = () => {
           </View>
 
           {/* ------------------------------- Next Button ------------------------------ */}
-          <Pressable
-            style={styles.nextButton}
-            onPress={() => handleNextButton()}
-          >
-            <Text style={styles.buttonText}>Next</Text>
-          </Pressable>
+
+          <NextButton disabled={!validateForm} onPress={handleNextButton} />
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -241,20 +238,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     fontSize: 16,
     textAlign: "center",
-  },
-  nextButton: {
-    justifyContent: "center",
-    alignItems: "center",
-    width: "100%",
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-  },
-  buttonText: {
-    textAlign: "center",
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: 600,
   },
   formPicker: {
     flexDirection: "row",

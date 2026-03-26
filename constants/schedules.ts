@@ -12,3 +12,13 @@ export const TIER2_SCHEDULES: { id: ScheduleType; label: string }[] = [
   { id: "biweekly", label: "Every 2 Weeks" },
   { id: "specificmonth", label: "Specific Days of the Month" },
 ];
+
+export const WEEKDAYS = [
+  { id: 0, label: "Mon" },
+  { id: 1, label: "Tue" },
+  { id: 2, label: "Wed" },
+  { id: 3, label: "Thu" },
+  { id: 4, label: "Fri" },
+  { id: 5, label: "Sat" },
+  { id: 6, label: "Sun" },
+];
