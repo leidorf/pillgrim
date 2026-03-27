@@ -6,6 +6,7 @@ import {
   Text,
   TextInput,
   View,
+  ScrollView,
 } from "react-native";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
@@ -19,13 +20,14 @@ import { useMedicationStore } from "../../store/medicationStore";
 import NextButton from "../../components/NextButton";
 
 type FormErrors = {
-  medName?: Medication["name"];
-  selectedForm?: Medication["form"];
+  medName?: string;
+  selectedForm?: string;
 };
 
 const Step1Screen = () => {
   const navigation = useNavigation<NavProp>();
-  const [selectedForm, setSelectedForm] = useState<Medication["form"]>("pill");
+  const [selectedForm, setSelectedForm] =
+    useState<Medication["form"]>("capsule");
   const [medName, setMedName] = useState<Medication["name"]>("");
   const [errors, setErrors] = useState<FormErrors>();
   const [showFormPicker, setShowFormPicker] = useState(false);
@@ -104,7 +106,7 @@ const Step1Screen = () => {
                   opacity: slideAnim,
                   maxHeight: slideAnim.interpolate({
                     inputRange: [0, 1],
-                    outputRange: [0, 100],
+                    outputRange: [0, 120],
                   }),
                   marginTop: slideAnim.interpolate({
                     inputRange: [0, 1],
@@ -113,40 +115,46 @@ const Step1Screen = () => {
                 },
               ]}
             >
-              {MED_FORMS.map(({ id, label, Icon }) => {
-                const isSelected = selectedForm === id;
-                return (
-                  <Pressable
-                    key={id}
-                    style={[
-                      styles.formItem,
-                      isSelected && styles.formItemSelected,
-                    ]}
-                    onPress={() => handleSelectForm(id)}
-                  >
-                    <Icon
-                      width={28}
-                      height={28}
-                      stroke={
-                        isSelected ? Colors.primary : Colors.textSecondary
-                      }
-                    />
-                    <Text
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                contentContainerStyle={styles.formPickerContent}
+              >
+                {MED_FORMS.map(({ id, label, Icon }) => {
+                  const isSelected = selectedForm === id;
+                  return (
+                    <Pressable
+                      key={id}
                       style={[
-                        styles.formLabel,
-                        isSelected && styles.formLabelSelected,
+                        styles.formItem,
+                        isSelected && styles.formItemSelected,
                       ]}
+                      onPress={() => handleSelectForm(id)}
                     >
-                      {label}
-                    </Text>
-                    {errors?.selectedForm ? (
-                      <Text style={styles.errorText}>
-                        {errors?.selectedForm}
+                      <Icon
+                        width={28}
+                        height={28}
+                        stroke={
+                          isSelected ? Colors.primary : Colors.textSecondary
+                        }
+                      />
+                      <Text
+                        style={[
+                          styles.formLabel,
+                          isSelected && styles.formLabelSelected,
+                        ]}
+                      >
+                        {label}
                       </Text>
-                    ) : null}
-                  </Pressable>
-                );
-              })}
+                      {errors?.selectedForm ? (
+                        <Text style={styles.errorText}>
+                          {errors?.selectedForm}
+                        </Text>
+                      ) : null}
+                    </Pressable>
+                  );
+                })}
+              </ScrollView>
             </Animated.View>
 
             {/* ----------------------------- Medication Name ---------------------------- */}
@@ -240,9 +248,12 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   formPicker: {
-    flexDirection: "row",
-    gap: 8,
+    width: "100%",
     overflow: "hidden",
+  },
+  formPickerContent: {
+    paddingHorizontal: 8,
+    gap: 8,
   },
   formItem: {
     alignItems: "center",
@@ -250,8 +261,10 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 16,
+    borderRadius: 8,
     backgroundColor: Colors.surface,
+    marginRight: 8,
+    minWidth: 64,
   },
   formItemSelected: {
     backgroundColor: Colors.primary + "22",
