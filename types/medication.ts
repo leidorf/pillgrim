@@ -17,7 +17,14 @@ export type Schedule = {
 export type Medication = {
   id?: string;
   name: string;
-  form?: "pill" | "tablet" | "syringe" | string;
+  form?:
+    | "tablet"
+    | "capsule"
+    | "syrup"
+    | "drop"
+    | "injection"
+    | "spray"
+    | "cream";
   schedule?: Schedule;
   times?: string[];
   dose?: string;
