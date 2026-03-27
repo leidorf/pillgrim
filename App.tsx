@@ -23,6 +23,7 @@ import HouseIcon from "./assets/icons/house.svg";
 import LogsIcon from "./assets/icons/logs.svg";
 import Step2Screen from "./screens/AddMedication/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen";
+import Step4Screen from "./screens/AddMedication/Step4Screen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -81,7 +82,7 @@ const AddMedicationNavigator = () => {
       <AddMedStack.Screen name="Step1" component={Step1Screen} />
       <AddMedStack.Screen name="Step2" component={Step2Screen} />
       <AddMedStack.Screen name="Step3" component={Step3Screen} />
-      {/* ------------------- other add med screen will be added ------------------  */}
+      <AddMedStack.Screen name="Step4" component={Step4Screen} />
     </AddMedStack.Navigator>
   );
 };

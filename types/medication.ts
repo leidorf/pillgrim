@@ -29,23 +29,51 @@ export type Medication = {
   times?: string[];
   dose?: string;
   /* -------------------------------- Optional -------------------------------- */
-  stock?: number;
   note?:
-    | "Before Meal"
-    | "With Meal"
-    | "After Meal"
-    | "Doesn't Matter"
-    | undefined;
-  isTaken?: boolean;
+    | "before_meal"
+    | "with_meal"
+    | "after_meal"
+    | "empty_stomach"
+    | "any"
+    | string;
+  stock?: number;
+  photoUri?: string;
   isActive?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 };
 
 export type MedicationLog = {
+  id: string;
   medicationId: string;
-  takenAt: Date;
-  action: "taken" | "untaken";
+  scheduledDate: string;
+  scheduledTime: string;
+  takenAt?: Date;
+  skipped?: boolean;
+  doseTaken?: string;
 };
 
 export type MedicationProps = Medication & {
-  onToggle?: (id: string) => void;
+  onToggle?: (id: string, time: string) => void;
+  onSkip?: (id: string, time: string) => void;
+  status?: "pending" | "taken" | "skipped" | "overdue";
+};
+
+export type DailySchedule = {
+  date: string;
+  medications: {
+    medication: Medication;
+    times: {
+      time: string;
+      log?: MedicationLog;
+      status: "upcoming" | "taken" | "skipped" | "overdue" | "missed";
+    }[];
+  }[];
+};
+
+export type LogFilter = {
+  startDate: string;
+  endDate: string;
+  medicationId?: string;
+  status?: "taken" | "skipped" | "missed" | "all";
 };

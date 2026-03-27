@@ -10,24 +10,13 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../components/AddMedicationButton";
 import MedicationCard from "../components/MedicationCard";
 import { useState } from "react";
-import { Medication, MedicationLog } from "../types/medication";
+import { DailySchedule, MedicationLog } from "../types/medication";
 import PillBottleIcon from "../assets/icons/pill-bottle.svg";
 0;
 const HomeScreen = () => {
-  const [medications, setMedications] = useState<Medication[]>([
-    {
-      id: "1",
-      name: "Test",
-      note: "After Meal",
-      dose: "1 pill",
-      times: ["16:00"],
-      isTaken: false,
-    },
-  ]);
-
   const [logs, setLogs] = useState<MedicationLog[]>([]);
 
-  const handleToggle = (id: string) => {
+  /*   const handleToggle = (id: string) => {
     setMedications((prev) =>
       prev.map((med) => {
         if (med.id !== id) return med;
@@ -44,14 +33,14 @@ const HomeScreen = () => {
         return { ...med, isTaken: newTaken };
       }),
     );
-  };
+  }; */
 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.box}></View>
-      <FlatList
+{/*       <FlatList
         style={styles.medList}
-        data={medications}
+        data={[]}
         keyExtractor={(item, index) => item.id ?? index.toString()}
         renderItem={({ item }) => (
           <MedicationCard {...item} onToggle={handleToggle} />
@@ -68,7 +57,7 @@ const HomeScreen = () => {
             <Text style={styles.emptyText}>No medications for today!</Text>
           </View>
         }
-      />
+      /> */}
       <AddMedicationButton />
     </SafeAreaView>
   );
