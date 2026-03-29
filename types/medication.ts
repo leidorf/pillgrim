@@ -39,6 +39,11 @@ export type Medication = {
   stock?: number;
   photoUri?: string;
   isActive?: boolean;
+  notificationSettings?: {
+    enabled: boolean;
+    hideName: boolean;
+    lowStockAlert: boolean;
+  };
   createdAt?: string;
   updatedAt?: string;
 };

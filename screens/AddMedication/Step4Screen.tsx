@@ -9,13 +9,20 @@ import {
   Modal,
   FlatList,
   Animated,
+  Image,
+  Switch,
+  Alert,
 } from "react-native";
+import * as ImagePicker from "expo-image-picker";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
 import CloseIcon from "../../assets/icons/close.svg";
 import BackIcon from "../../assets/icons/arrow-left.svg";
 import ImageIcon from "../../assets/icons/image.svg";
 import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
+import BellIcon from "../../assets/icons/bell.svg";
+import EyeOffIcon from "../../assets/icons/eye-off.svg";
+import PackageIcon from "../../assets/icons/package.svg";
 import { useMedicationStore } from "../../store/medicationStore";
 import NextButton from "../../components/NextButton";
 import { useState, useRef, useEffect } from "react";
@@ -33,6 +40,12 @@ const INSTRUCTION_OPTIONS = [
 
 type InstructionOption = (typeof INSTRUCTION_OPTIONS)[number]["id"];
 
+type NotificationSettings = {
+  enabled: boolean;
+  hideName: boolean;
+  lowStockAlert: boolean;
+};
+
 const Step4Screen = () => {
   const navigation = useNavigation<NavProp>();
   const { draft, setDraft, saveMedication } = useMedicationStore();
@@ -45,6 +58,12 @@ const Step4Screen = () => {
     draft.photoUri || null,
   );
   const [isSaving, setIsSaving] = useState(false);
+
+  const [notifications, setNotifications] = useState<NotificationSettings>({
+    enabled: true,
+    hideName: false,
+    lowStockAlert: true,
+  });
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -64,6 +83,19 @@ const Step4Screen = () => {
       }).start();
     }
   }, [isDropdownOpen]);
+
+  useEffect(() => {
+    if (!notifications.enabled && notifications.hideName) {
+      setNotifications((prev) => ({ ...prev, hideName: false }));
+    }
+  }, [notifications.enabled]);
+
+  useEffect(() => {
+    const stockNum = parseInt(stock, 10);
+    if (stockNum > 0 && !notifications.lowStockAlert) {
+      setNotifications((prev) => ({ ...prev, lowStockAlert: true }));
+    }
+  }, [stock]);
 
   const handleSelectOption = (id: InstructionOption) => {
     setSelectedInstruction(id);
@@ -87,11 +119,84 @@ const Step4Screen = () => {
   };
 
   const pickImage = async () => {
-    console.log("Image picker would open");
+    try {
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Please grant permission to access photos",
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ["images"], // ✅ Yeni syntax - array of strings
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Image picker error:", error);
+      Alert.alert("Error", "Failed to pick image");
+    }
+  };
+
+  const takePhoto = async () => {
+    try {
+      const { status } = await ImagePicker.requestCameraPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert(
+          "Permission needed",
+          "Please grant permission to access camera",
+        );
+        return;
+      }
+
+      const result = await ImagePicker.launchCameraAsync({
+        mediaTypes: ["images"],
+        allowsEditing: true,
+        aspect: [4, 3],
+        quality: 0.8,
+      });
+
+      if (!result.canceled && result.assets[0]) {
+        setPhotoUri(result.assets[0].uri);
+      }
+    } catch (error) {
+      console.error("Camera error:", error);
+      Alert.alert("Error", "Failed to take photo");
+    }
+  };
+
+  const showImageOptions = () => {
+    Alert.alert("Add Photo", "Choose an option", [
+      { text: "Cancel", style: "cancel" },
+      { text: "Take Photo", onPress: takePhoto },
+      { text: "Choose from Library", onPress: pickImage },
+    ]);
   };
 
   const removePhoto = () => {
-    setPhotoUri(null);
+    Alert.alert("Remove Photo", "Are you sure?", [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Remove",
+        onPress: () => setPhotoUri(null),
+        style: "destructive",
+      },
+    ]);
+  };
+
+  const toggleNotification = (key: keyof NotificationSettings) => {
+    setNotifications((prev) => ({
+      ...prev,
+      [key]: !prev[key],
+    }));
   };
 
   const handleSave = async () => {
@@ -115,9 +220,12 @@ const Step4Screen = () => {
         isActive: true,
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        notificationSettings: notifications,
       };
 
       setDraft(updates);
+
+      console.log(draft);
 
       setTimeout(() => {
         saveMedication();
@@ -136,6 +244,8 @@ const Step4Screen = () => {
     }
     return true;
   };
+
+  const hasStock = parseInt(stock, 10) > 0;
 
   return (
     <KeyboardAwareScrollView
@@ -168,7 +278,7 @@ const Step4Screen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* ------------------------------ Note Dropdown ----------------------------- */}
+          {/* --------------------------- Instruction Options -------------------------- */}
           <InlineContainer containerText="Instructions">
             <Pressable
               style={styles.dropdownTrigger}
@@ -202,7 +312,7 @@ const Step4Screen = () => {
             )}
           </InlineContainer>
 
-          {/* ---------------------------------- Stock --------------------------------- */}
+          {/* ------------------------------ Current Stock ----------------------------- */}
           <InlineContainer containerText="Current Stock">
             <View style={styles.stockContainer}>
               <TextInput
@@ -224,9 +334,11 @@ const Step4Screen = () => {
           <InlineContainer containerText="Photo">
             {photoUri ? (
               <View style={styles.photoContainer}>
-                <View style={styles.photoPlaceholder}>
-                  <Text style={styles.photoPlaceholderText}>Photo added</Text>
-                </View>
+                <Image
+                  source={{ uri: photoUri }}
+                  style={styles.photoImage}
+                  resizeMode="cover"
+                />
                 <Pressable
                   style={styles.removePhotoButton}
                   onPress={removePhoto}
@@ -235,7 +347,7 @@ const Step4Screen = () => {
                 </Pressable>
               </View>
             ) : (
-              <Pressable style={styles.photoButton} onPress={pickImage}>
+              <Pressable style={styles.photoButton} onPress={showImageOptions}>
                 <ImageIcon
                   width={32}
                   height={32}
@@ -244,6 +356,126 @@ const Step4Screen = () => {
                 <Text style={styles.photoText}>Add photo</Text>
               </Pressable>
             )}
+          </InlineContainer>
+
+          {/* -------------------------- Notification Settings ------------------------- */}
+          <InlineContainer containerText="Notification Settings">
+            {/* ----------------------------- Enable Reminder ---------------------------- */}
+            <View style={[styles.settingRow, styles.horizontalLine]}>
+              <View style={styles.settingInfo}>
+                <BellIcon width={20} height={20} stroke={Colors.textPrimary} />
+                <View>
+                  <Text style={styles.settingTitle}>Enable reminders</Text>
+                  <Text style={styles.settingDescription}>
+                    Get notified when it's time
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifications.enabled}
+                onValueChange={() => toggleNotification("enabled")}
+                trackColor={{
+                  false: Colors.textSecondary + "40",
+                  true: Colors.primary,
+                }}
+                thumbColor={notifications.enabled ? "#fff" : "#f4f3f4"}
+              />
+            </View>
+
+            {/* ----------------------- Hide Name in Notifications ----------------------- */}
+            <View
+              style={[
+                styles.settingRow,
+                styles.horizontalLine,
+                !notifications.enabled && styles.settingRowDisabled,
+              ]}
+            >
+              <View style={styles.settingInfo}>
+                <EyeOffIcon
+                  width={20}
+                  height={20}
+                  stroke={
+                    notifications.enabled
+                      ? Colors.textPrimary
+                      : Colors.textSecondary
+                  }
+                />
+                <View>
+                  <Text
+                    style={[
+                      styles.settingTitle,
+                      !notifications.enabled && styles.settingTextDisabled,
+                    ]}
+                  >
+                    Hide medication name
+                  </Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      !notifications.enabled && styles.settingTextDisabled,
+                    ]}
+                  >
+                    Show "Medication" instead of name
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifications.hideName}
+                onValueChange={() => toggleNotification("hideName")}
+                disabled={!notifications.enabled}
+                trackColor={{
+                  false: Colors.textSecondary + "40",
+                  true: Colors.primary,
+                }}
+                thumbColor={notifications.hideName ? "#fff" : "#f4f3f4"}
+              />
+            </View>
+
+            {/* ----------------------------- Low Stock Alert ---------------------------- */}
+            <View
+              style={[
+                styles.settingRow,
+                !hasStock && styles.settingRowDisabled,
+              ]}
+            >
+              <View style={styles.settingInfo}>
+                <PackageIcon
+                  width={20}
+                  height={20}
+                  stroke={hasStock ? Colors.textPrimary : Colors.textSecondary}
+                />
+                <View>
+                  <Text
+                    style={[
+                      styles.settingTitle,
+                      !hasStock && styles.settingTextDisabled,
+                    ]}
+                  >
+                    Low stock alert
+                  </Text>
+                  <Text
+                    style={[
+                      styles.settingDescription,
+                      !hasStock && styles.settingTextDisabled,
+                    ]}
+                  >
+                    {hasStock
+                      ? "Notify when running low"
+                      : "Enter stock to enable"}
+                  </Text>
+                </View>
+              </View>
+              <Switch
+                value={notifications.lowStockAlert && hasStock}
+                onValueChange={() => toggleNotification("lowStockAlert")}
+                disabled={!hasStock}
+                trackColor={{
+                  false: Colors.textSecondary + "40",
+                  true: Colors.primary,
+                }}
+                thumbColor={notifications.lowStockAlert ? "#fff" : "#f4f3f4"}
+              />
+            </View>
           </InlineContainer>
         </ScrollView>
 
@@ -359,31 +591,6 @@ const styles = StyleSheet.create({
     paddingBottom: 20,
     gap: 16,
   },
-  summaryCard: {
-    backgroundColor: Colors.primary + "15",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.primary + "30",
-    marginBottom: 8,
-  },
-  summaryName: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  summaryDetails: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    marginTop: 4,
-  },
-  summarySchedule: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    marginTop: 2,
-    textTransform: "capitalize",
-  },
-
   dropdownTrigger: {
     backgroundColor: Colors.surface,
     borderRadius: 12,
@@ -413,7 +620,6 @@ const styles = StyleSheet.create({
     minHeight: 80,
     textAlignVertical: "top",
   },
-
   modalOverlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.4)",
@@ -474,7 +680,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.textSecondary + "20",
     marginLeft: 20,
   },
-
   stockContainer: {
     flexDirection: "row",
     alignItems: "center",
@@ -496,7 +701,6 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     flex: 1,
   },
-
   photoButton: {
     backgroundColor: Colors.surface,
     borderRadius: 12,
@@ -520,14 +724,9 @@ const styles = StyleSheet.create({
     height: 160,
     backgroundColor: Colors.surface,
   },
-  photoPlaceholder: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  photoPlaceholderText: {
-    color: Colors.textPrimary,
-    fontSize: 16,
+  photoImage: {
+    width: "100%",
+    height: "100%",
   },
   removePhotoButton: {
     position: "absolute",
@@ -544,6 +743,38 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 20,
     fontWeight: "600",
+  },
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 8,
+  },
+  horizontalLine: {
+    borderBottomWidth: 1,
+    borderBottomColor: Colors.textSecondary + "15",
+  },
+  settingRowDisabled: {
+    opacity: 0.5,
+  },
+  settingInfo: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    flex: 1,
+  },
+  settingTitle: {
+    color: Colors.textPrimary,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  settingDescription: {
+    color: Colors.textSecondary,
+    fontSize: 13,
+    marginTop: 2,
+  },
+  settingTextDisabled: {
+    color: Colors.textSecondary,
   },
 });
 
