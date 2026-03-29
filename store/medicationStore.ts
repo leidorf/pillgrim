@@ -2,6 +2,7 @@ import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Medication } from "../types/medication";
+import * as Crypto from "expo-crypto";
 
 type DraftMedication = Partial<Medication>;
 
@@ -35,10 +36,11 @@ export const useMedicationStore = create<MedicationStore>()(
         }
         const newMed: Medication = {
           ...draft,
+          id: Crypto.randomUUID(),
           name: draft.name,
-          id: Date.now().toString(),
           isActive: true,
-          isTaken: false,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
         };
         set({ medications: [...medications, newMed], draft: {} });
       },

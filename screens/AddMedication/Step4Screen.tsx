@@ -131,7 +131,7 @@ const Step4Screen = () => {
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ["images"], // ✅ Yeni syntax - array of strings
+        mediaTypes: ["images"],
         allowsEditing: true,
         aspect: [4, 3],
         quality: 0.8,
@@ -222,11 +222,7 @@ const Step4Screen = () => {
         updatedAt: new Date().toISOString(),
         notificationSettings: notifications,
       };
-
       setDraft(updates);
-
-      console.log(draft);
-
       setTimeout(() => {
         saveMedication();
         navigation.getParent()?.goBack();

@@ -3,33 +3,90 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../components/AddMedicationButton";
 import MedicationCard from "../components/MedicationCard";
 import { useState } from "react";
-import { MedicationLog } from "../types/medication";
+import { Medication, MedicationLog } from "../types/medication";
 import PillBottleIcon from "../assets/icons/pill-bottle.svg";
 import { useMedicationStore } from "../store/medicationStore";
 
 type LogsMap = Record<string, MedicationLog>;
 
+const WEEKDAY_MAP: Record<number, number> = {
+  0: 7,
+  1: 1,
+  2: 2,
+  3: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+};
+
 const HomeScreen = () => {
   const { medications } = useMedicationStore();
-
   const [logs, setLogs] = useState<LogsMap>({});
+  const today = new Date();
+  const todayStr = today.toISOString().split("T")[0];
+  const todayDayOfMonth = today.getDate();
+  const todayWeekday = WEEKDAY_MAP[today.getDay()];
+
+  const isMedicationScheduledForToday = (med: Medication): boolean => {
+    if (!med.schedule || !med.isActive) return false;
+
+    const { type, days, interval, startDate } = med.schedule;
+
+    switch (type) {
+      case "daily":
+        return true;
+
+      case "weekly":
+        return days?.includes(todayWeekday) ?? false;
+
+      case "biweekly":
+        if (!startDate) return false;
+        const start = new Date(startDate);
+        const diffDays = Math.floor(
+          (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        return diffDays >= 0 && diffDays % 14 === 0;
+
+      case "monthly":
+        if (!startDate) return false;
+        const monthlyStart = new Date(startDate);
+        return todayDayOfMonth === monthlyStart.getDate();
+
+      case "specificmonth":
+        return days?.includes(todayDayOfMonth) ?? false;
+
+      case "interval":
+        if (!interval || !startDate) return false;
+        const intervalStart = new Date(startDate);
+        const intervalDiff = Math.floor(
+          (today.getTime() - intervalStart.getTime()) / (1000 * 60 * 60 * 24),
+        );
+        return intervalDiff >= 0 && intervalDiff % interval === 0;
+
+      case "prn":
+        return false;
+
+      default:
+        return false;
+    }
+  };
 
   const getTodaySchedule = () => {
-    const today = new Date().toISOString().split("T")[0];
     const schedule: Array<{
-      medication: (typeof medications)[0];
+      medication: Medication;
       time: string;
       logKey: string;
     }> = [];
 
     medications.forEach((med) => {
-      if (!med.isActive || !med.times) return;
+      if (!isMedicationScheduledForToday(med)) return;
+      if (!med.times || med.times.length === 0) return;
 
       med.times.forEach((time) => {
         schedule.push({
           medication: med,
           time,
-          logKey: `${med.id}-${today}-${time}`,
+          logKey: `${med.id}-${todayStr}-${time}`,
         });
       });
     });
@@ -38,8 +95,7 @@ const HomeScreen = () => {
   };
 
   const handleToggle = (medicationId: string, time: string) => {
-    const today = new Date().toISOString().split("T")[0];
-    const logKey = `${medicationId}-${today}-${time}`;
+    const logKey = `${medicationId}-${todayStr}-${time}`;
 
     setLogs((prev) => {
       const existing = prev[logKey];
@@ -54,7 +110,7 @@ const HomeScreen = () => {
         [logKey]: {
           id: Date.now().toString(),
           medicationId,
-          scheduledDate: today,
+          scheduledDate: todayStr,
           scheduledTime: time,
           takenAt: new Date(),
           skipped: false,
@@ -67,7 +123,23 @@ const HomeScreen = () => {
 
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.box}></View>
+      <View style={styles.box}>
+        <View style={styles.dateHeader}>
+          <Text style={styles.dateDay}>{today.getDate()}</Text>
+          <View>
+            <Text style={styles.dateWeekday}>
+              {today.toLocaleDateString("tr-TR", { weekday: "long" })}
+            </Text>
+            <Text style={styles.dateMonth}>
+              {today.toLocaleDateString("tr-TR", {
+                month: "long",
+                year: "numeric",
+              })}
+            </Text>
+          </View>
+        </View>
+      </View>
+
       <FlatList
         style={styles.medList}
         contentContainerStyle={styles.listContent}
@@ -91,6 +163,13 @@ const HomeScreen = () => {
               strokeWidth={1}
             />
             <Text style={styles.emptyText}>No medications for today!</Text>
+            <Text style={styles.emptySubtext}>
+              {today.toLocaleDateString("tr-TR", {
+                weekday: "long",
+                day: "numeric",
+                month: "long",
+              })}
+            </Text>
           </View>
         }
       />
@@ -104,6 +183,34 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingTop: StatusBar.currentHeight,
   },
+  box: {
+    height: 240,
+    paddingHorizontal: 24,
+    justifyContent: "flex-end",
+    paddingBottom: 24,
+  },
+  dateHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+  },
+  dateDay: {
+    fontSize: 64,
+    fontWeight: "300",
+    color: "#000",
+    lineHeight: 64,
+  },
+  dateWeekday: {
+    fontSize: 20,
+    fontWeight: "600",
+    color: "#000",
+    textTransform: "capitalize",
+  },
+  dateMonth: {
+    fontSize: 14,
+    color: "#666",
+    textTransform: "capitalize",
+  },
   medList: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -114,18 +221,20 @@ const styles = StyleSheet.create({
   listContent: {
     paddingBottom: 72,
   },
-  box: {
-    height: 240,
-  },
   emptyContainer: {
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 32,
-    gap: 16,
+    gap: 8,
   },
   emptyText: {
     fontSize: 18,
     fontWeight: "500",
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: "#666",
+    textTransform: "capitalize",
   },
 });
 

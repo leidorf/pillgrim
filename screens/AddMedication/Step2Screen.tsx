@@ -317,7 +317,7 @@ const Step2Screen = () => {
           <Text style={styles.stepperText}>+</Text>
         </Pressable>
         <Text style={styles.intervalUnit}>days</Text>
-      </View>{" "}
+      </View>
     </InlineContainer>
   );
 
