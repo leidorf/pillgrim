@@ -123,8 +123,6 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 16,
     backgroundColor: Colors.surface,
-    borderWidth: 1.5,
-    borderColor: "transparent",
     marginBottom: 8,
   },
   takenContainer: {
@@ -142,9 +140,14 @@ const styles = StyleSheet.create({
     gap: 12,
     flex: 1,
   },
+  rightSection: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 16,
+  },
   iconContainer: {
-    width: 44,
-    height: 44,
+    width: 48,
+    height: 48,
     borderRadius: 12,
     backgroundColor: Colors.background,
     justifyContent: "center",
@@ -171,11 +174,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: "500",
     marginTop: 2,
-  },
-  rightSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 16,
   },
   timeText: {
     fontSize: 20,

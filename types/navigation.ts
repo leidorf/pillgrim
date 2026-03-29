@@ -8,7 +8,7 @@ export type SettingsParamList = {
 };
 
 export type AddMedicationParamList = {
-  Step1: undefined;
+  Step1: { mode?: "edit"; medicationId?: string } | undefined;
   Step2: undefined;
   Step3: undefined;
   Step4: undefined;
@@ -22,7 +22,7 @@ export type MainScreenParamList = {
 
 export type RootStackParamList = {
   MainTabs: { screen?: keyof MainScreenParamList };
-  AddMedication: { screen?: keyof AddMedicationParamList };
+  AddMedication: { screen?: keyof AddMedicationParamList; params?: any };
   Settings: { screen?: keyof SettingsParamList };
 };
 

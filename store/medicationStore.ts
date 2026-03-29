@@ -8,12 +8,11 @@ type DraftMedication = Partial<Medication>;
 
 type MedicationStore = {
   medications: Medication[];
-
   draft: DraftMedication;
   setDraft: (fields: Partial<Medication>) => void;
   clearDraft: () => void;
-
   saveMedication: () => void;
+  deleteMedication: (id: string) => void;
 };
 
 export const useMedicationStore = create<MedicationStore>()(
@@ -43,6 +42,11 @@ export const useMedicationStore = create<MedicationStore>()(
           updatedAt: new Date().toISOString(),
         };
         set({ medications: [...medications, newMed], draft: {} });
+      },
+      deleteMedication: (id: string) => {
+        set((state) => ({
+          medications: state.medications.filter((m) => m.id !== id),
+        }));
       },
     }),
     {
