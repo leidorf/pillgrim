@@ -15,7 +15,7 @@ export type Schedule = {
 };
 
 export type Medication = {
-  id?: string;
+  id: string;
   name: string;
   form?:
     | "tablet"
@@ -38,14 +38,14 @@ export type Medication = {
     | string;
   stock?: number;
   photoUri?: string;
-  isActive?: boolean;
   notificationSettings?: {
     enabled: boolean;
     hideName: boolean;
     lowStockAlert: boolean;
   };
-  createdAt?: string;
-  updatedAt?: string;
+  isActive: boolean;
+  createdAt: string;
+  updatedAt: string;
 };
 
 export type MedicationLog = {

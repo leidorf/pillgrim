@@ -1,3 +1,4 @@
+import { useRef, useState, useCallback } from "react";
 import {
   FlatList,
   StatusBar,
@@ -9,42 +10,69 @@ import {
 import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
-import MedInfoCard from "./components/MedInfoCard";
+import MedicationInfoCard from "./components/MedicationInfoCard";
+import MedicationBottomSheet from "./components/MedicationBottomSheet";
 import { useMedicationStore } from "../../store/medicationStore";
 import { useNavigation } from "@react-navigation/native";
 import { NavProp } from "../../types/navigation";
+import { Medication } from "../../types/medication";
+import BottomSheet from "@gorhom/bottom-sheet";
 
 const MedsScreen = () => {
-  const { medications, deleteMedication, setDraft } = useMedicationStore();
+  const { medications, deleteMedication, setDraft, updateMedication } =
+    useMedicationStore();
   const navigation = useNavigation<NavProp>();
 
-  const handleEdit = (medicationId: string) => {
-    const med = medications.find((m) => m.id === medicationId);
-    if (!med) return;
+  const bottomSheetRef = useRef<BottomSheet>(null);
+  const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
+  const [selectedScheduleLabel, setSelectedScheduleLabel] = useState("");
 
-    setDraft(med);
-    navigation.navigate("AddMedication", {
-      screen: "Step1",
-      params: { mode: "edit", medicationId },
-    });
-  };
+  const handleOpenSheet = useCallback((med: Medication) => {
+    setSelectedMed(med);
+    setSelectedScheduleLabel(formatSchedule(med));
+    bottomSheetRef.current?.snapToIndex(0);
+  }, []);
 
-  const handleDelete = (medicationId: string, name: string) => {
-    Alert.alert(
-      "Delete Medication",
-      `Are you sure you want to delete "${name}"?`,
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          onPress: () => deleteMedication(medicationId),
-          style: "destructive",
-        },
-      ],
-    );
-  };
+  const handleEdit = useCallback(
+    (medicationId: string) => {
+      const med = medications.find((m) => m.id === medicationId);
+      if (!med) return;
 
-  const formatSchedule = (med: (typeof medications)[0]) => {
+      setDraft(med);
+      navigation.navigate("AddMedication", {
+        screen: "Step1",
+        params: { mode: "edit", medicationId },
+      });
+    },
+    [medications, setDraft, navigation],
+  );
+
+  const handleDelete = useCallback(
+    (medicationId: string, name: string) => {
+      Alert.alert(
+        "Delete Medication",
+        `Are you sure you want to delete "${name}"?`,
+        [
+          { text: "Cancel", style: "cancel" },
+          {
+            text: "Delete",
+            onPress: () => deleteMedication(medicationId),
+            style: "destructive",
+          },
+        ],
+      );
+    },
+    [deleteMedication],
+  );
+
+  const handleToggleActive = useCallback(
+    (id: string, isActive: boolean) => {
+      updateMedication(id, { isActive });
+    },
+    [updateMedication],
+  );
+
+  const formatSchedule = (med: Medication) => {
     if (!med.schedule) return "No schedule";
 
     const { type, days } = med.schedule;
@@ -61,6 +89,18 @@ const MedsScreen = () => {
     return typeLabels[type] || type;
   };
 
+  const handleEditFromSheet = useCallback(() => {
+    if (selectedMed?.id) {
+      handleEdit(selectedMed.id);
+    }
+  }, [selectedMed, handleEdit]);
+
+  const handleDeleteFromSheet = useCallback(() => {
+    if (selectedMed?.id && selectedMed?.name) {
+      handleDelete(selectedMed.id, selectedMed.name);
+    }
+  }, [selectedMed, handleDelete]);
+
   return (
     <SafeAreaView style={styles.container}>
       <FlatList
@@ -68,11 +108,10 @@ const MedsScreen = () => {
         keyExtractor={(item) => item.id || Math.random().toString()}
         contentContainerStyle={styles.listContent}
         renderItem={({ item }) => (
-          <MedInfoCard
+          <MedicationInfoCard
             medication={item}
-            scheduleLabel={formatSchedule(item)}
-            onEdit={() => handleEdit(item.id!)}
-            onDelete={() => handleDelete(item.id!, item.name)}
+            isInactive={!item.isActive}
+            onPress={() => handleOpenSheet(item)}
           />
         )}
         showsVerticalScrollIndicator={false}
@@ -102,6 +141,16 @@ const MedsScreen = () => {
           </View>
         }
       />
+
+      <MedicationBottomSheet
+        ref={bottomSheetRef}
+        medication={selectedMed}
+        scheduleLabel={selectedScheduleLabel}
+        onEdit={handleEditFromSheet}
+        onDelete={handleDeleteFromSheet}
+        onToggleActive={handleToggleActive}
+      />
+
       <AddMedicationButton />
     </SafeAreaView>
   );

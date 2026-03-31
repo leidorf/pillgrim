@@ -1,8 +1,9 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaProvider } from "react-native-safe-area-context";
-import { StyleSheet } from "react-native";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { GestureHandlerRootView } from "react-native-gesture-handler";
+import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import {
   AddMedicationParamList,
   MainScreenParamList,
@@ -98,31 +99,35 @@ const SettingsNavigator = () => {
 
 export default function App() {
   return (
-    <SafeAreaProvider>
-      <NavigationContainer theme={AppTheme}>
-        <RootStack.Navigator>
-          <RootStack.Screen
-            name="MainTabs"
-            component={MainTabs}
-            options={{ headerShown: false }}
-          />
-          <RootStack.Screen
-            name="AddMedication"
-            component={AddMedicationNavigator}
-            options={{
-              presentation: "transparentModal",
-              headerShown: false,
-              animation: "fade",
-              title: "Add Medication",
-            }}
-          />
-          <RootStack.Screen
-            name="Settings"
-            component={SettingsNavigator}
-            options={{ headerShown: false, title: "Settings" }}
-          />
-        </RootStack.Navigator>
-      </NavigationContainer>
-    </SafeAreaProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <SafeAreaProvider>
+        <BottomSheetModalProvider>
+          <NavigationContainer theme={AppTheme}>
+            <RootStack.Navigator>
+              <RootStack.Screen
+                name="MainTabs"
+                component={MainTabs}
+                options={{ headerShown: false }}
+              />
+              <RootStack.Screen
+                name="AddMedication"
+                component={AddMedicationNavigator}
+                options={{
+                  presentation: "transparentModal",
+                  headerShown: false,
+                  animation: "fade",
+                  title: "Add Medication",
+                }}
+              />
+              <RootStack.Screen
+                name="Settings"
+                component={SettingsNavigator}
+                options={{ headerShown: false, title: "Settings" }}
+              />
+            </RootStack.Navigator>
+          </NavigationContainer>
+        </BottomSheetModalProvider>
+      </SafeAreaProvider>
+    </GestureHandlerRootView>
   );
 }

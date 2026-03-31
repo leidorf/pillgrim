@@ -13,6 +13,7 @@ type MedicationStore = {
   clearDraft: () => void;
   saveMedication: () => void;
   deleteMedication: (id: string) => void;
+  updateMedication: (id: string, updates: Partial<Medication>) => void;
 };
 
 export const useMedicationStore = create<MedicationStore>()(
@@ -33,19 +34,43 @@ export const useMedicationStore = create<MedicationStore>()(
           console.warn("Cannot save medication without a name");
           return;
         }
+        const now = new Date().toISOString();
+
         const newMed: Medication = {
-          ...draft,
           id: Crypto.randomUUID(),
-          name: draft.name,
+          name: draft.name.trim(),
+          form: draft.form,
+          schedule: draft.schedule,
+          times: draft.times ?? [],
+          dose: draft.dose,
+          note: draft.note,
+          stock: draft.stock,
+          photoUri: draft.photoUri,
           isActive: true,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString(),
+          notificationSettings: draft.notificationSettings ?? {
+            enabled: true,
+            hideName: false,
+            lowStockAlert: draft.stock !== undefined,
+          },
+          createdAt: now,
+          updatedAt: now,
         };
         set({ medications: [...medications, newMed], draft: {} });
       },
+
       deleteMedication: (id: string) => {
         set((state) => ({
           medications: state.medications.filter((m) => m.id !== id),
+        }));
+      },
+
+      updateMedication: (id: string, updates: Partial<Medication>) => {
+        set((state) => ({
+          medications: state.medications.map((m) =>
+            m.id === id
+              ? { ...m, ...updates, updatedAt: new Date().toISOString() }
+              : m,
+          ),
         }));
       },
     }),
