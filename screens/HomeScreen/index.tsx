@@ -1,11 +1,11 @@
 import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AddMedicationButton from "../components/AddMedicationButton";
-import MedicationCard from "../components/MedicationCard";
+import AddMedicationButton from "../../components/AddMedicationButton";
+import MedicationCard from "./components/MedicationCard";
 import { useState } from "react";
-import { Medication, MedicationLog } from "../types/medication";
-import PillBottleIcon from "../assets/icons/pill-bottle.svg";
-import { useMedicationStore } from "../store/medicationStore";
+import { Medication, MedicationLog } from "../../types/medication";
+import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
+import { useMedicationStore } from "../../store/medicationStore";
 
 type LogsMap = Record<string, MedicationLog>;
 

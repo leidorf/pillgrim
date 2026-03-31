@@ -26,9 +26,9 @@ import {
 } from "../../constants/schedules";
 import { Schedule, ScheduleType } from "../../types/medication";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
-import NextButton from "../../components/NextButton";
-import DateInputInfoCard from "../../components/DateInputInfoCard";
-import InlineContainer from "../../components/InlineContainer";
+import NextButton from "./components/NextButton";
+import DateInputInfoCard from "./components/DateInputInfoCard";
+import InlineContainer from "./components/InlineContainer";
 
 const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 

@@ -7,12 +7,12 @@ import {
   Alert,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import AddMedicationButton from "../components/AddMedicationButton";
-import PillBottleIcon from "../assets/icons/pill-bottle.svg";
-import MedInfoCard from "../components/MedInfoCard";
-import { useMedicationStore } from "../store/medicationStore";
+import AddMedicationButton from "../../components/AddMedicationButton";
+import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
+import MedInfoCard from "./components/MedInfoCard";
+import { useMedicationStore } from "../../store/medicationStore";
 import { useNavigation } from "@react-navigation/native";
-import { NavProp } from "../types/navigation";
+import { NavProp } from "../../types/navigation";
 
 const MedsScreen = () => {
   const { medications, deleteMedication, setDraft } = useMedicationStore();
@@ -79,7 +79,7 @@ const MedsScreen = () => {
         ListHeaderComponent={
           <View style={styles.headerContainer}>
             <Text style={styles.headerText}>My Medications</Text>
-            {medications && (
+            {medications.length > 0 && (
               <Text style={styles.subHeaderText}>
                 {medications.length}{" "}
                 {medications.length === 1 ? "medication" : "medications"}

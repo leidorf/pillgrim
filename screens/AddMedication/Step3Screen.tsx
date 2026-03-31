@@ -18,7 +18,7 @@ import BackIcon from "../../assets/icons/arrow-left.svg";
 import PlusIcon from "../../assets/icons/plus.svg";
 import TrashIcon from "../../assets/icons/trash.svg";
 import { useMedicationStore } from "../../store/medicationStore";
-import NextButton from "../../components/NextButton";
+import NextButton from "./components/NextButton";
 import { useState, useCallback } from "react";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../constants/units";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";

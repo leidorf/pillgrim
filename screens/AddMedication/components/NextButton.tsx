@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text } from "react-native";
-import { Colors } from "../constants/theme";
+import { Colors } from "../../../constants/theme";
 
 type NextButtonProps = {
   disabled?: boolean;

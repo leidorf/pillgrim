@@ -24,10 +24,10 @@ import BellIcon from "../../assets/icons/bell.svg";
 import EyeOffIcon from "../../assets/icons/eye-off.svg";
 import PackageIcon from "../../assets/icons/package.svg";
 import { useMedicationStore } from "../../store/medicationStore";
-import NextButton from "../../components/NextButton";
+import NextButton from "./components/NextButton";
 import { useState, useRef, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-import InlineContainer from "../../components/InlineContainer";
+import InlineContainer from "./components/InlineContainer";
 
 const INSTRUCTION_OPTIONS = [
   { id: "before_meal", label: "Before meal" },

@@ -1,10 +1,10 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Medication, MedicationLog } from "../types/medication";
-import PillIcon from "../assets/icons/pill.svg";
-import CheckIcon from "../assets/icons/circle-check-big.svg";
-import CircleIcon from "../assets/icons/circle.svg";
-import { Colors } from "../constants/theme";
-import { MED_FORMS } from "../constants/medication-forms";
+import { Medication, MedicationLog } from "../../../types/medication";
+import PillIcon from "../../../assets/icons/pill.svg";
+import CheckIcon from "../../../assets/icons/circle-check-big.svg";
+import CircleIcon from "../../../assets/icons/circle.svg";
+import { Colors } from "../../../constants/theme";
+import { MED_FORMS } from "../../../constants/medication-forms";
 
 type MedicationCardProps = {
   medication: Medication;

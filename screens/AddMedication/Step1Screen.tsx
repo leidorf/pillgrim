@@ -17,7 +17,7 @@ import { Medication } from "../../types/medication";
 import { MED_FORMS } from "../../constants/medication-forms";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useMedicationStore } from "../../store/medicationStore";
-import NextButton from "../../components/NextButton";
+import NextButton from "./components/NextButton";
 
 type FormErrors = {
   medName?: string;

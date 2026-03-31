@@ -1,5 +1,5 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
-import { Colors } from "../constants/theme";
+import { Colors } from "../../../constants/theme";
 import InlineContainer from "./InlineContainer";
 
 type InfoCardProps = {
