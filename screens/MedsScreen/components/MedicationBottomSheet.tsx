@@ -68,7 +68,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
       <BottomSheet
         ref={ref}
         index={-1}
-        snapPoints={["50%"]}
+        enableDynamicSizing
         enablePanDownToClose={true}
         backdropComponent={renderBackdrop}
         handleIndicatorStyle={styles.handleIndicator}
