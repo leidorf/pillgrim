@@ -37,6 +37,7 @@ const Step3Screen = () => {
   const medicationForm = draft.form || "";
   const availableUnits = DOSE_UNITS_BY_FORM[medicationForm] || DEFAULT_UNITS;
 
+  const [selectedUnit, setSelectedUnit] = useState<string>("");
   const [doses, setDoses] = useState<DoseEntry[]>(() => [
     {
       id: "1",
@@ -56,6 +57,19 @@ const Step3Screen = () => {
     return date;
   }
 
+  const handleUnitChange = (unitValue: string) => {
+    setSelectedUnit(unitValue);
+    const unit = availableUnits.find((u) => u.value === unitValue);
+
+    setDoses((prev) =>
+      prev.map((d) => ({
+        ...d,
+        unit: unitValue,
+        amount: unit?.needsAmount ? d.amount : "",
+      })),
+    );
+  };
+
   const addNewDose = () => {
     const newId = (doses.length + 1).toString();
     const lastDose = doses[doses.length - 1];
@@ -67,7 +81,7 @@ const Step3Screen = () => {
         id: newId,
         time: createDefaultTime(newHour),
         amount: "",
-        unit: "",
+        unit: selectedUnit,
       },
     ]);
   };
@@ -77,8 +91,8 @@ const Step3Screen = () => {
     setDoses(doses.filter((d) => d.id !== id));
   };
 
-  const updateDose = (id: string, updates: Partial<DoseEntry>) => {
-    setDoses(doses.map((d) => (d.id === id ? { ...d, ...updates } : d)));
+  const updateDoseAmount = (id: string, amount: string) => {
+    setDoses((prev) => prev.map((d) => (d.id === id ? { ...d, amount } : d)));
   };
 
   const handleTimeChange = useCallback(
@@ -87,7 +101,11 @@ const Step3Screen = () => {
         setActiveTimePickerId(null);
       }
       if (selectedDate && activeTimePickerId) {
-        updateDose(activeTimePickerId, { time: selectedDate });
+        setDoses((prev) =>
+          prev.map((d) =>
+            d.id === activeTimePickerId ? { ...d, time: selectedDate } : d,
+          ),
+        );
       }
     },
     [activeTimePickerId],
@@ -101,17 +119,25 @@ const Step3Screen = () => {
   };
 
   const handleAmountChange = (id: string, text: string) => {
-    const numeric = text.replace(/[^0-9.]/g, "");
+    let numeric = text.replace(/[^0-9.]/g, "");
+
     const parts = numeric.split(".");
-    const clean =
-      parts.length > 2 ? parts[0] + "." + parts.slice(1).join("") : numeric;
-    updateDose(id, { amount: clean });
+    if (parts.length > 2) {
+      numeric = parts[0] + "." + parts.slice(1).join("");
+    }
+    updateDoseAmount(id, numeric);
+  };
+
+  const isValidAmount = (amount: string): boolean => {
+    if (!amount) return false;
+    const num = parseFloat(amount);
+    return !isNaN(num) && num > 0;
   };
 
   const isDoseComplete = (dose: DoseEntry): boolean => {
-    if (!dose.unit) return false;
-    const unit = availableUnits.find((u) => u.value === dose.unit);
-    if (unit?.needsAmount && !dose.amount) return false;
+    if (!selectedUnit) return false;
+    const unit = availableUnits.find((u) => u.value === selectedUnit);
+    if (unit?.needsAmount && !isValidAmount(dose.amount)) return false;
     return true;
   };
 
@@ -119,15 +145,14 @@ const Step3Screen = () => {
 
   const handleNext = () => {
     const times = doses.map((d) => formatTime(d.time));
-    const doseStrings = doses.map((d) => {
-      const unitLabel =
-        availableUnits.find((u) => u.value === d.unit)?.label || d.unit;
-      return d.amount ? `${d.amount} ${unitLabel}` : unitLabel;
-    });
+    const unitLabel =
+      availableUnits.find((u) => u.value === selectedUnit)?.label ||
+      selectedUnit;
+    const doseString = doses.map((d) => `${d.amount} ${unitLabel}`).join(", ");
 
     setDraft({
       times,
-      dose: doseStrings.join(", "),
+      dose: doseString,
     });
 
     navigation.navigate("AddMedication", { screen: "Step4" });
@@ -164,93 +189,109 @@ const Step3Screen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
+          {/* ------------------------------ Summary Card ------------------------------ */}
           {isFormComplete && (
             <View style={styles.summaryCard}>
               <Text style={styles.summaryLabel}>Daily Schedule</Text>
-              {doses.map((dose, idx) => (
+              {doses.map((dose) => (
                 <View key={dose.id} style={styles.summaryRow}>
                   <Text style={styles.summaryTime}>
                     {formatTime(dose.time)}
                   </Text>
                   <Text style={styles.summaryDose}>
                     {dose.amount}{" "}
-                    {availableUnits.find((u) => u.value === dose.unit)?.label}
+                    {
+                      availableUnits.find((u) => u.value === selectedUnit)
+                        ?.label
+                    }
                   </Text>
                 </View>
               ))}
             </View>
           )}
 
+          {/* ------------------------------ Unit Section ------------------------------ */}
+          <View style={styles.section}>
+            <Text style={styles.sectionLabel}>Select Unit</Text>
+            <View style={styles.unitsContainer}>
+              {availableUnits.map((unit) => (
+                <Pressable
+                  key={unit.value}
+                  style={[
+                    styles.unitChip,
+                    selectedUnit === unit.value && styles.unitChipActive,
+                  ]}
+                  onPress={() => handleUnitChange(unit.value)}
+                >
+                  <Text
+                    style={[
+                      styles.unitText,
+                      selectedUnit === unit.value && styles.unitTextActive,
+                    ]}
+                  >
+                    {unit.label}
+                  </Text>
+                </Pressable>
+              ))}
+            </View>
+          </View>
+
+          {/* ------------------------------ Dose Section ------------------------------ */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>When and how much?</Text>
-            {doses.map((dose, index) => (
-              <View key={dose.id} style={styles.doseCard}>
-                <View style={styles.doseHeader}>
-                  <View style={styles.doseNumberBadge}>
-                    <Text style={styles.doseNumberText}>#{index + 1}</Text>
-                  </View>
-                  {doses.length > 1 && (
-                    <Pressable
-                      onPress={() => removeDose(dose.id)}
-                      style={styles.removeButton}
-                    >
-                      <TrashIcon width={18} height={18} stroke={Colors.error} />
-                    </Pressable>
-                  )}
-                </View>
 
-                {/* ------------------------------- Time Picker ------------------------------ */}
-                <Pressable
-                  style={styles.timePickerButton}
-                  onPress={() => setActiveTimePickerId(dose.id)}
-                >
-                  <Text style={styles.timeText}>{formatTime(dose.time)}</Text>
-                  <Text style={styles.timeHint}>Tap to change time</Text>
-                </Pressable>
+            {doses.map((dose, index) => {
+              const hasInvalidAmount =
+                dose.amount && !isValidAmount(dose.amount);
 
-                {activeTimePickerId === dose.id && (
-                  <DateTimePicker
-                    value={dose.time}
-                    mode="time"
-                    is24Hour={true}
-                    display={Platform.OS === "ios" ? "spinner" : "default"}
-                    onChange={handleTimeChange}
-                  />
-                )}
-
-                {/* ------------------------------ Unit Section ------------------------------ */}
-                <View style={styles.unitsContainer}>
-                  {availableUnits.map((unit) => (
-                    <Pressable
-                      key={unit.value}
-                      style={[
-                        styles.unitChip,
-                        dose.unit === unit.value && styles.unitChipActive,
-                      ]}
-                      onPress={() => {
-                        updateDose(dose.id, {
-                          unit: unit.value,
-                          amount: unit.needsAmount ? dose.amount : "",
-                        });
-                      }}
-                    >
-                      <Text
-                        style={[
-                          styles.unitText,
-                          dose.unit === unit.value && styles.unitTextActive,
-                        ]}
+              return (
+                <View key={dose.id} style={styles.doseCard}>
+                  {/* ------------------------------- Dose Header ------------------------------ */}
+                  <View style={styles.doseHeader}>
+                    <View style={styles.doseNumberBadge}>
+                      <Text style={styles.doseNumberText}>#{index + 1}</Text>
+                    </View>
+                    {doses.length > 1 && (
+                      <Pressable
+                        onPress={() => removeDose(dose.id)}
+                        style={styles.removeButton}
                       >
-                        {unit.label}
-                      </Text>
-                    </Pressable>
-                  ))}
-                </View>
+                        <TrashIcon
+                          width={18}
+                          height={18}
+                          stroke={Colors.error || "#EF4444"}
+                        />
+                      </Pressable>
+                    )}
+                  </View>
 
-                {/* ------------------------------ Amount Input ------------------------------ */}
-                {dose.unit &&
-                  availableUnits.find((u) => u.value === dose.unit)
-                    ?.needsAmount && (
-                    <View style={styles.amountContainer}>
+                  {/* ------------------------------- Time Picker ------------------------------ */}
+                  <Pressable
+                    style={styles.timePickerButton}
+                    onPress={() => setActiveTimePickerId(dose.id)}
+                  >
+                    <Text style={styles.timeText}>{formatTime(dose.time)}</Text>
+                    <Text style={styles.timeHint}>Tap to change time</Text>
+                  </Pressable>
+
+                  {activeTimePickerId === dose.id && (
+                    <DateTimePicker
+                      value={dose.time}
+                      mode="time"
+                      is24Hour={true}
+                      display={Platform.OS === "ios" ? "spinner" : "default"}
+                      onChange={handleTimeChange}
+                    />
+                  )}
+
+                  {/* ------------------------------ Amount Input ------------------------------ */}
+                  {selectedUnit ? (
+                    <View
+                      style={[
+                        styles.amountContainer,
+                        hasInvalidAmount && styles.amountContainerError,
+                      ]}
+                    >
                       <TextInput
                         style={styles.amountInput}
                         value={dose.amount}
@@ -264,34 +305,53 @@ const Step3Screen = () => {
                       />
                       <Text style={styles.amountUnit}>
                         {
-                          availableUnits.find((u) => u.value === dose.unit)
+                          availableUnits.find((u) => u.value === selectedUnit)
                             ?.label
                         }
                       </Text>
                     </View>
+                  ) : (
+                    <Text style={styles.selectUnitHint}>
+                      Please select a unit first
+                    </Text>
                   )}
 
-                {/* --------------------------------- Summary -------------------------------- */}
-                {isDoseComplete(dose) && (
-                  <View style={styles.miniSummary}>
-                    <Text style={styles.miniSummaryText}>
-                      Take {dose.amount}{" "}
-                      {availableUnits.find((u) => u.value === dose.unit)?.label}{" "}
-                      at {formatTime(dose.time)}
+                  {/* ------------------------------ Error Message ----------------------------- */}
+                  {hasInvalidAmount && (
+                    <Text style={styles.errorText}>
+                      Please enter a positive number greater than 0
                     </Text>
-                  </View>
-                )}
-              </View>
-            ))}
+                  )}
+                </View>
+              );
+            })}
 
-            {/* ----------------------------- New Dose Button ---------------------------- */}
-            <Pressable style={styles.addButton} onPress={addNewDose}>
-              <PlusIcon width={20} height={20} stroke={Colors.primary} />
-              <Text style={styles.addButtonText}>Add another time</Text>
+            {/* ----------------------------- Add Dose Button ---------------------------- */}
+            <Pressable
+              style={[
+                styles.addButton,
+                !selectedUnit && styles.addButtonDisabled,
+              ]}
+              onPress={addNewDose}
+              disabled={!selectedUnit}
+            >
+              <PlusIcon
+                width={20}
+                height={20}
+                stroke={selectedUnit ? Colors.primary : Colors.textSecondary}
+              />
+              <Text
+                style={[
+                  styles.addButtonText,
+                  !selectedUnit && styles.addButtonTextDisabled,
+                ]}
+              >
+                Add another time
+              </Text>
             </Pressable>
           </View>
         </ScrollView>
-        {/* ------------------------------- Next Button ------------------------------ */}
+
         <NextButton disabled={!isFormComplete} onPress={handleNext} />
       </View>
     </KeyboardAwareScrollView>
@@ -337,84 +397,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 20,
-    gap: 20,
-  },
-  infoCard: {
-    backgroundColor: Colors.primary + "15",
-    borderRadius: 16,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: Colors.primary + "30",
-  },
-  infoLabel: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "500",
-    marginBottom: 4,
-  },
-  infoValue: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  infoSubvalue: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    marginTop: 2,
+    gap: 16,
   },
   section: {
     gap: 12,
   },
   sectionLabel: {
     color: Colors.textPrimary,
-    fontSize: 20,
-    fontWeight: "700",
-    marginBottom: 4,
-  },
-  doseCard: {
-    backgroundColor: Colors.surface,
-    borderRadius: 16,
-    padding: 16,
-    gap: 12,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary + "20",
-  },
-  doseHeader: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  doseNumberBadge: {
-    backgroundColor: Colors.primary + "20",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  doseNumberText: {
-    color: Colors.primary,
-    fontSize: 13,
+    fontSize: 18,
     fontWeight: "600",
-  },
-  removeButton: {
-    padding: 4,
-  },
-  timePickerButton: {
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    padding: 16,
-    alignItems: "center",
-    gap: 4,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary + "30",
-  },
-  timeText: {
-    color: Colors.textPrimary,
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  timeHint: {
-    color: Colors.textSecondary,
-    fontSize: 12,
+    marginBottom: 4,
   },
   unitsContainer: {
     flexDirection: "row",
@@ -422,12 +414,14 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   unitChip: {
-    backgroundColor: Colors.background,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: Colors.surface,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
     borderWidth: 1.5,
-    borderColor: "transparent",
+    borderColor: Colors.textSecondary + "30",
+    minWidth: 70,
+    alignItems: "center",
   },
   unitChipActive: {
     backgroundColor: Colors.primary,
@@ -435,61 +429,11 @@ const styles = StyleSheet.create({
   },
   unitText: {
     color: Colors.textPrimary,
-    fontSize: 13,
+    fontSize: 14,
     fontWeight: "500",
   },
   unitTextActive: {
     color: "#fff",
-  },
-  amountContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: Colors.background,
-    borderRadius: 12,
-    padding: 4,
-    paddingHorizontal: 12,
-    gap: 8,
-    borderWidth: 1,
-    borderColor: Colors.textSecondary + "30",
-  },
-  amountInput: {
-    flex: 1,
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  amountUnit: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  miniSummary: {
-    backgroundColor: Colors.primary + "10",
-    borderRadius: 10,
-    padding: 10,
-    marginTop: 4,
-  },
-  miniSummaryText: {
-    color: Colors.primary,
-    fontSize: 13,
-    fontWeight: "500",
-    textAlign: "center",
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: Colors.primary + "40",
-    borderStyle: "dashed",
-    marginTop: 8,
-  },
-  addButtonText: {
-    color: Colors.primary,
-    fontSize: 15,
     fontWeight: "600",
   },
   summaryCard: {
@@ -522,6 +466,112 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontSize: 14,
     fontWeight: "500",
+  },
+  doseCard: {
+    backgroundColor: Colors.surface,
+    borderRadius: 16,
+    padding: 16,
+    gap: 8,
+    borderWidth: 1,
+    borderColor: Colors.textSecondary + "20",
+  },
+  doseHeader: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+  },
+  doseNumberBadge: {
+    backgroundColor: Colors.primary + "20",
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderRadius: 12,
+  },
+  doseNumberText: {
+    color: Colors.primary,
+    fontSize: 13,
+    fontWeight: "600",
+  },
+  removeButton: {
+    padding: 4,
+  },
+  timePickerButton: {
+    backgroundColor: Colors.background,
+    borderRadius: 8,
+    padding: 16,
+    alignItems: "center",
+    gap: 4,
+    borderWidth: 1,
+    borderColor: Colors.textSecondary + "30",
+  },
+  timeText: {
+    color: Colors.textPrimary,
+    fontSize: 28,
+    fontWeight: "700",
+  },
+  timeHint: {
+    color: Colors.textSecondary,
+    fontSize: 12,
+  },
+  amountContainer: {
+    flexDirection: "row",
+    alignItems: "center",
+    backgroundColor: Colors.background,
+    borderRadius: 8,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    gap: 12,
+    borderWidth: 1,
+    borderColor: Colors.textSecondary + "30",
+  },
+  amountContainerError: {
+    borderColor: Colors.error || "#EF4444",
+    borderWidth: 2,
+  },
+  amountInput: {
+    flex: 1,
+    color: Colors.textPrimary,
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  amountUnit: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    fontWeight: "500",
+  },
+  selectUnitHint: {
+    color: Colors.textSecondary,
+    fontSize: 14,
+    textAlign: "center",
+    paddingVertical: 12,
+  },
+  errorText: {
+    color: Colors.error || "#EF4444",
+    fontSize: 12,
+    fontWeight: "500",
+    marginTop: 4,
+  },
+  addButton: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+    gap: 8,
+    padding: 16,
+    borderRadius: 16,
+    borderWidth: 2,
+    borderColor: Colors.primary + "40",
+    borderStyle: "dashed",
+    marginTop: 8,
+  },
+  addButtonDisabled: {
+    borderColor: Colors.textSecondary + "30",
+  },
+  addButtonText: {
+    color: Colors.primary,
+    fontSize: 15,
+    fontWeight: "600",
+  },
+  addButtonTextDisabled: {
+    color: Colors.textSecondary,
   },
 });
 

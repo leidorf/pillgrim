@@ -3,8 +3,8 @@
 - [ ] AddMedication screens will be split into components
 - [ ] Step4Screen addPhoto action will be shown with proper component not with alert
 - [ ] Add statusBar to AddMedication screens
-- [ ] Step3Screen minimum doses must bigger than 0
-- [ ] Step3Screen choosable dose types must be same 
+- [x] Step3Screen minimum doses must bigger than 0
+- [x] Step3Screen choosable dose types must be same 
 
 ### components
 
