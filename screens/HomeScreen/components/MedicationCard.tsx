@@ -8,21 +8,20 @@ import BaseMedicationCard from "../../../components/BaseMedicationCard";
 type MedicationCardProps = {
   medication: Medication;
   time: string;
+  dose: string;
   log?: MedicationLog;
   onToggle?: (medicationId: string, time: string) => void;
-  onSkip?: (medicationId: string, time: string) => void;
 };
 
 const MedicationCard = ({
   medication,
   time,
+  dose,
   log,
   onToggle,
 }: MedicationCardProps) => {
   const isTaken = log?.takenAt && !log?.skipped;
   const isSkipped = log?.skipped;
-
-  const displayTime = time || medication.times?.[0] || "--:--";
 
   const getContainerStyle = (): ViewStyle => {
     if (isTaken) {
@@ -33,10 +32,7 @@ const MedicationCard = ({
       };
     }
     if (isSkipped) {
-      return {
-        backgroundColor: Colors.textSecondary + "10",
-        opacity: 0.7,
-      };
+      return { backgroundColor: Colors.textSecondary + "10", opacity: 0.7 };
     }
     return {};
   };
@@ -47,18 +43,18 @@ const MedicationCard = ({
       isInactive={isSkipped}
       style={getContainerStyle()}
       onPress={() => onToggle?.(medication.id || "", time)}
+      dose={dose}
     >
       <View style={styles.timeSection}>
         <Text
           style={[
             styles.timeText,
             isTaken && styles.takenText,
-            isSkipped && styles.skippedText,
+            isSkipped && styles.skippedTimeText,
           ]}
         >
-          {displayTime}
+          {time}
         </Text>
-
         <Pressable
           style={styles.checkButton}
           onPress={() => onToggle?.(medication.id || "", time)}
@@ -68,7 +64,7 @@ const MedicationCard = ({
             <CheckIcon width={28} height={28} color={Colors.primary} />
           ) : isSkipped ? (
             <View style={styles.skippedCircle}>
-              <Text style={styles.skippedText}>✕</Text>
+              <Text style={styles.skippedSymbol}>✕</Text>
             </View>
           ) : (
             <CircleIcon
@@ -85,26 +81,16 @@ const MedicationCard = ({
 };
 
 const styles = StyleSheet.create({
-  timeSection: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
+  timeSection: { flexDirection: "row", alignItems: "center", gap: 12 },
   timeText: {
     fontSize: 20,
     fontWeight: "700",
     color: Colors.textPrimary,
     fontVariant: ["tabular-nums"],
   },
-  takenText: {
-    color: Colors.primary,
-  },
-  skippedText: {
-    color: Colors.textSecondary,
-  },
-  checkButton: {
-    padding: 4,
-  },
+  takenText: { color: Colors.primary },
+  skippedTimeText: { color: Colors.textSecondary },
+  checkButton: { padding: 4 },
   skippedCircle: {
     width: 28,
     height: 28,
@@ -113,6 +99,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
+  skippedSymbol: { color: Colors.textSecondary },
 });
 
 export default MedicationCard;

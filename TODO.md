@@ -8,7 +8,7 @@
 
 ### components
 
-- [ ] MedicationCard doses will be shown in correct schedules
+- [x] MedicationCard doses will be shown in correct schedules
 - [x] MedicationCard & MedInfoCard will be built top on common component
 - [x] MedInfoCard deleteButton and other options will shown in inlineContainer
 - [ ] MedInfoCard delete action will be shown with proper component not with alert

@@ -23,11 +23,10 @@ import { useState, useCallback } from "react";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../constants/units";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
-type DoseEntry = {
+type TimeDoseEntry = {
   id: string;
   time: Date;
   amount: string;
-  unit: string;
 };
 
 const Step3Screen = () => {
@@ -38,12 +37,11 @@ const Step3Screen = () => {
   const availableUnits = DOSE_UNITS_BY_FORM[medicationForm] || DEFAULT_UNITS;
 
   const [selectedUnit, setSelectedUnit] = useState<string>("");
-  const [doses, setDoses] = useState<DoseEntry[]>(() => [
+  const [timeDoses, setTimeDoses] = useState<TimeDoseEntry[]>(() => [
     {
       id: "1",
       time: createDefaultTime(8),
       amount: "",
-      unit: "",
     },
   ]);
 
@@ -59,40 +57,32 @@ const Step3Screen = () => {
 
   const handleUnitChange = (unitValue: string) => {
     setSelectedUnit(unitValue);
-    const unit = availableUnits.find((u) => u.value === unitValue);
-
-    setDoses((prev) =>
-      prev.map((d) => ({
-        ...d,
-        unit: unitValue,
-        amount: unit?.needsAmount ? d.amount : "",
-      })),
-    );
   };
 
-  const addNewDose = () => {
-    const newId = (doses.length + 1).toString();
-    const lastDose = doses[doses.length - 1];
+  const addNewTimeDose = () => {
+    const newId = (timeDoses.length + 1).toString();
+    const lastDose = timeDoses[timeDoses.length - 1];
     const newHour = (lastDose.time.getHours() + 6) % 24;
 
-    setDoses([
-      ...doses,
+    setTimeDoses([
+      ...timeDoses,
       {
         id: newId,
         time: createDefaultTime(newHour),
         amount: "",
-        unit: selectedUnit,
       },
     ]);
   };
 
-  const removeDose = (id: string) => {
-    if (doses.length === 1) return;
-    setDoses(doses.filter((d) => d.id !== id));
+  const removeTimeDose = (id: string) => {
+    if (timeDoses.length === 1) return;
+    setTimeDoses(timeDoses.filter((d) => d.id !== id));
   };
 
-  const updateDoseAmount = (id: string, amount: string) => {
-    setDoses((prev) => prev.map((d) => (d.id === id ? { ...d, amount } : d)));
+  const updateTimeDose = (id: string, updates: Partial<TimeDoseEntry>) => {
+    setTimeDoses(
+      timeDoses.map((d) => (d.id === id ? { ...d, ...updates } : d)),
+    );
   };
 
   const handleTimeChange = useCallback(
@@ -101,11 +91,7 @@ const Step3Screen = () => {
         setActiveTimePickerId(null);
       }
       if (selectedDate && activeTimePickerId) {
-        setDoses((prev) =>
-          prev.map((d) =>
-            d.id === activeTimePickerId ? { ...d, time: selectedDate } : d,
-          ),
-        );
+        updateTimeDose(activeTimePickerId, { time: selectedDate });
       }
     },
     [activeTimePickerId],
@@ -120,12 +106,11 @@ const Step3Screen = () => {
 
   const handleAmountChange = (id: string, text: string) => {
     let numeric = text.replace(/[^0-9.]/g, "");
-
     const parts = numeric.split(".");
     if (parts.length > 2) {
       numeric = parts[0] + "." + parts.slice(1).join("");
     }
-    updateDoseAmount(id, numeric);
+    updateTimeDose(id, { amount: numeric });
   };
 
   const isValidAmount = (amount: string): boolean => {
@@ -134,25 +119,25 @@ const Step3Screen = () => {
     return !isNaN(num) && num > 0;
   };
 
-  const isDoseComplete = (dose: DoseEntry): boolean => {
+  const isTimeDoseComplete = (td: TimeDoseEntry): boolean => {
     if (!selectedUnit) return false;
-    const unit = availableUnits.find((u) => u.value === selectedUnit);
-    if (unit?.needsAmount && !isValidAmount(dose.amount)) return false;
-    return true;
+    return isValidAmount(td.amount);
   };
 
-  const isFormComplete = doses.every(isDoseComplete);
+  const isFormComplete = timeDoses.every(isTimeDoseComplete);
 
   const handleNext = () => {
-    const times = doses.map((d) => formatTime(d.time));
     const unitLabel =
       availableUnits.find((u) => u.value === selectedUnit)?.label ||
       selectedUnit;
-    const doseString = doses.map((d) => `${d.amount} ${unitLabel}`).join(", ");
+
+    const newTimeDoses = timeDoses.map((td) => ({
+      time: formatTime(td.time),
+      dose: `${td.amount} ${unitLabel}`,
+    }));
 
     setDraft({
-      times,
-      dose: doseString,
+      timeDoses: newTimeDoses,
     });
 
     navigation.navigate("AddMedication", { screen: "Step4" });
@@ -189,17 +174,15 @@ const Step3Screen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* ------------------------------ Summary Card ------------------------------ */}
+          {/* --------------------------------- Summary -------------------------------- */}
           {isFormComplete && (
             <View style={styles.summaryCard}>
               <Text style={styles.summaryLabel}>Daily Schedule</Text>
-              {doses.map((dose) => (
-                <View key={dose.id} style={styles.summaryRow}>
-                  <Text style={styles.summaryTime}>
-                    {formatTime(dose.time)}
-                  </Text>
+              {timeDoses.map((td) => (
+                <View key={td.id} style={styles.summaryRow}>
+                  <Text style={styles.summaryTime}>{formatTime(td.time)}</Text>
                   <Text style={styles.summaryDose}>
-                    {dose.amount}{" "}
+                    {td.amount}{" "}
                     {
                       availableUnits.find((u) => u.value === selectedUnit)
                         ?.label
@@ -210,7 +193,7 @@ const Step3Screen = () => {
             </View>
           )}
 
-          {/* ------------------------------ Unit Section ------------------------------ */}
+          {/* ----------------------------- Unit Selection ----------------------------- */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>Select Unit</Text>
             <View style={styles.unitsContainer}>
@@ -236,24 +219,22 @@ const Step3Screen = () => {
             </View>
           </View>
 
-          {/* ------------------------------ Dose Section ------------------------------ */}
+          {/* --------------------------- Time Dose Selection -------------------------- */}
           <View style={styles.section}>
             <Text style={styles.sectionLabel}>When and how much?</Text>
 
-            {doses.map((dose, index) => {
-              const hasInvalidAmount =
-                dose.amount && !isValidAmount(dose.amount);
+            {timeDoses.map((td, index) => {
+              const hasInvalidAmount = td.amount && !isValidAmount(td.amount);
 
               return (
-                <View key={dose.id} style={styles.doseCard}>
-                  {/* ------------------------------- Dose Header ------------------------------ */}
-                  <View style={styles.doseHeader}>
+                <View key={td.id} style={styles.timeDoseCard}>
+                  <View style={styles.timeDoseHeader}>
                     <View style={styles.doseNumberBadge}>
                       <Text style={styles.doseNumberText}>#{index + 1}</Text>
                     </View>
-                    {doses.length > 1 && (
+                    {timeDoses.length > 1 && (
                       <Pressable
-                        onPress={() => removeDose(dose.id)}
+                        onPress={() => removeTimeDose(td.id)}
                         style={styles.removeButton}
                       >
                         <TrashIcon
@@ -268,15 +249,15 @@ const Step3Screen = () => {
                   {/* ------------------------------- Time Picker ------------------------------ */}
                   <Pressable
                     style={styles.timePickerButton}
-                    onPress={() => setActiveTimePickerId(dose.id)}
+                    onPress={() => setActiveTimePickerId(td.id)}
                   >
-                    <Text style={styles.timeText}>{formatTime(dose.time)}</Text>
+                    <Text style={styles.timeText}>{formatTime(td.time)}</Text>
                     <Text style={styles.timeHint}>Tap to change time</Text>
                   </Pressable>
 
-                  {activeTimePickerId === dose.id && (
+                  {activeTimePickerId === td.id && (
                     <DateTimePicker
-                      value={dose.time}
+                      value={td.time}
                       mode="time"
                       is24Hour={true}
                       display={Platform.OS === "ios" ? "spinner" : "default"}
@@ -294,10 +275,8 @@ const Step3Screen = () => {
                     >
                       <TextInput
                         style={styles.amountInput}
-                        value={dose.amount}
-                        onChangeText={(text) =>
-                          handleAmountChange(dose.id, text)
-                        }
+                        value={td.amount}
+                        onChangeText={(text) => handleAmountChange(td.id, text)}
                         placeholder="Enter amount"
                         placeholderTextColor={Colors.textSecondary}
                         keyboardType="decimal-pad"
@@ -316,7 +295,6 @@ const Step3Screen = () => {
                     </Text>
                   )}
 
-                  {/* ------------------------------ Error Message ----------------------------- */}
                   {hasInvalidAmount && (
                     <Text style={styles.errorText}>
                       Please enter a positive number greater than 0
@@ -326,13 +304,12 @@ const Step3Screen = () => {
               );
             })}
 
-            {/* ----------------------------- Add Dose Button ---------------------------- */}
             <Pressable
               style={[
                 styles.addButton,
                 !selectedUnit && styles.addButtonDisabled,
               ]}
-              onPress={addNewDose}
+              onPress={addNewTimeDose}
               disabled={!selectedUnit}
             >
               <PlusIcon
@@ -359,10 +336,7 @@ const Step3Screen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    justifyContent: "flex-end",
-  },
+  container: { flex: 1, justifyContent: "flex-end" },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -383,59 +357,34 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginBottom: 20,
   },
-  headerIcon: {
-    padding: 4,
-  },
-  headerTitle: {
-    color: Colors.textPrimary,
-    fontSize: 18,
-    fontWeight: "600",
-  },
-  content: {
-    flex: 1,
-    marginBottom: 12,
-  },
-  scrollContent: {
-    paddingBottom: 20,
-    gap: 16,
-  },
-  section: {
-    gap: 12,
-  },
+  headerIcon: { padding: 4 },
+  headerTitle: { color: Colors.textPrimary, fontSize: 18, fontWeight: "600" },
+  content: { flex: 1, marginBottom: 12 },
+  scrollContent: { paddingBottom: 20, gap: 16 },
+  section: { gap: 12 },
   sectionLabel: {
     color: Colors.textPrimary,
     fontSize: 18,
     fontWeight: "600",
     marginBottom: 4,
   },
-  unitsContainer: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 8,
-  },
+  unitsContainer: { flexDirection: "row", flexWrap: "wrap", gap: 8 },
   unitChip: {
     backgroundColor: Colors.surface,
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
     borderRadius: 8,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: Colors.textSecondary + "30",
-    minWidth: 70,
+    minWidth: 64,
     alignItems: "center",
   },
   unitChipActive: {
     backgroundColor: Colors.primary,
     borderColor: Colors.primary,
   },
-  unitText: {
-    color: Colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  unitTextActive: {
-    color: "#fff",
-    fontWeight: "600",
-  },
+  unitText: { color: Colors.textPrimary, fontSize: 14, fontWeight: "500" },
+  unitTextActive: { color: "#fff", fontWeight: "600" },
   summaryCard: {
     backgroundColor: Colors.primary + "10",
     borderRadius: 16,
@@ -457,17 +406,9 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.textSecondary + "20",
   },
-  summaryTime: {
-    color: Colors.textPrimary,
-    fontSize: 16,
-    fontWeight: "600",
-  },
-  summaryDose: {
-    color: Colors.primary,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  doseCard: {
+  summaryTime: { color: Colors.textPrimary, fontSize: 16, fontWeight: "600" },
+  summaryDose: { color: Colors.primary, fontSize: 14, fontWeight: "500" },
+  timeDoseCard: {
     backgroundColor: Colors.surface,
     borderRadius: 16,
     padding: 16,
@@ -475,7 +416,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.textSecondary + "20",
   },
-  doseHeader: {
+  timeDoseHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
@@ -486,14 +427,8 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     borderRadius: 12,
   },
-  doseNumberText: {
-    color: Colors.primary,
-    fontSize: 13,
-    fontWeight: "600",
-  },
-  removeButton: {
-    padding: 4,
-  },
+  doseNumberText: { color: Colors.primary, fontSize: 13, fontWeight: "600" },
+  removeButton: { padding: 4 },
   timePickerButton: {
     backgroundColor: Colors.background,
     borderRadius: 8,
@@ -503,22 +438,15 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.textSecondary + "30",
   },
-  timeText: {
-    color: Colors.textPrimary,
-    fontSize: 28,
-    fontWeight: "700",
-  },
-  timeHint: {
-    color: Colors.textSecondary,
-    fontSize: 12,
-  },
+  timeText: { color: Colors.textPrimary, fontSize: 28, fontWeight: "700" },
+  timeHint: { color: Colors.textSecondary, fontSize: 12 },
   amountContainer: {
     flexDirection: "row",
     alignItems: "center",
     backgroundColor: Colors.background,
     borderRadius: 8,
     paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingVertical: 8,
     gap: 12,
     borderWidth: 1,
     borderColor: Colors.textSecondary + "30",
@@ -530,14 +458,10 @@ const styles = StyleSheet.create({
   amountInput: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 18,
+    fontSize: 14,
     fontWeight: "600",
   },
-  amountUnit: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "500",
-  },
+  amountUnit: { color: Colors.textSecondary, fontSize: 14, fontWeight: "500" },
   selectUnitHint: {
     color: Colors.textSecondary,
     fontSize: 14,
@@ -562,17 +486,9 @@ const styles = StyleSheet.create({
     borderStyle: "dashed",
     marginTop: 8,
   },
-  addButtonDisabled: {
-    borderColor: Colors.textSecondary + "30",
-  },
-  addButtonText: {
-    color: Colors.primary,
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  addButtonTextDisabled: {
-    color: Colors.textSecondary,
-  },
+  addButtonDisabled: { borderColor: Colors.textSecondary + "30" },
+  addButtonText: { color: Colors.primary, fontSize: 15, fontWeight: "600" },
+  addButtonTextDisabled: { color: Colors.textSecondary },
 });
 
 export default Step3Screen;

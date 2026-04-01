@@ -10,6 +10,7 @@ export type BaseMedicationCardProps = {
   style?: ViewStyle;
   onPress?: () => void;
   isInactive?: boolean;
+  dose?: string;
 };
 
 export const getFormIcon = (formId?: string) => {
@@ -35,8 +36,9 @@ const BaseMedicationCard = ({
   style,
   onPress,
   isInactive = false,
+  dose,
 }: PropsWithChildren<BaseMedicationCardProps>) => {
-  const { name, form, dose } = medication;
+  const { name, form } = medication;
   const FormIcon = getFormIcon(form) || (() => null);
 
   return (

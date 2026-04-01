@@ -29,16 +29,13 @@ const HomeScreen = () => {
 
   const isMedicationScheduledForToday = (med: Medication): boolean => {
     if (!med.schedule || !med.isActive) return false;
-
     const { type, days, interval, startDate } = med.schedule;
 
     switch (type) {
       case "daily":
         return true;
-
       case "weekly":
         return days?.includes(todayWeekday) ?? false;
-
       case "biweekly":
         if (!startDate) return false;
         const start = new Date(startDate);
@@ -46,26 +43,20 @@ const HomeScreen = () => {
           (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
         );
         return diffDays >= 0 && diffDays % 14 === 0;
-
       case "monthly":
         if (!startDate) return false;
-        const monthlyStart = new Date(startDate);
-        return todayDayOfMonth === monthlyStart.getDate();
-
+        return todayDayOfMonth === new Date(startDate).getDate();
       case "specificmonth":
         return days?.includes(todayDayOfMonth) ?? false;
-
       case "interval":
         if (!interval || !startDate) return false;
-        const intervalStart = new Date(startDate);
         const intervalDiff = Math.floor(
-          (today.getTime() - intervalStart.getTime()) / (1000 * 60 * 60 * 24),
+          (today.getTime() - new Date(startDate).getTime()) /
+            (1000 * 60 * 60 * 24),
         );
         return intervalDiff >= 0 && intervalDiff % interval === 0;
-
       case "prn":
         return false;
-
       default:
         return false;
     }
@@ -75,18 +66,20 @@ const HomeScreen = () => {
     const schedule: Array<{
       medication: Medication;
       time: string;
+      dose: string;
       logKey: string;
     }> = [];
 
     medications.forEach((med) => {
       if (!isMedicationScheduledForToday(med)) return;
-      if (!med.times || med.times.length === 0) return;
+      if (!med.timeDoses || med.timeDoses.length === 0) return;
 
-      med.times.forEach((time) => {
+      med.timeDoses.forEach((td) => {
         schedule.push({
           medication: med,
-          time,
-          logKey: `${med.id}-${todayStr}-${time}`,
+          time: td.time,
+          dose: td.dose,
+          logKey: `${med.id}-${todayStr}-${td.time}`,
         });
       });
     });
@@ -96,15 +89,12 @@ const HomeScreen = () => {
 
   const handleToggle = (medicationId: string, time: string) => {
     const logKey = `${medicationId}-${todayStr}-${time}`;
-
     setLogs((prev) => {
       const existing = prev[logKey];
-
       if (existing?.takenAt && !existing?.skipped) {
         const { [logKey]: _, ...rest } = prev;
         return rest;
       }
-
       return {
         ...prev,
         [logKey]: {
@@ -149,6 +139,7 @@ const HomeScreen = () => {
           <MedicationCard
             medication={item.medication}
             time={item.time}
+            dose={item.dose}
             log={logs[item.logKey]}
             onToggle={handleToggle}
           />
@@ -179,38 +170,22 @@ const HomeScreen = () => {
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
+  container: { flex: 1, paddingTop: StatusBar.currentHeight },
   box: {
     height: 240,
     paddingHorizontal: 24,
     justifyContent: "flex-end",
     paddingBottom: 24,
   },
-  dateHeader: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 12,
-  },
-  dateDay: {
-    fontSize: 64,
-    fontWeight: "300",
-    color: "#000",
-    lineHeight: 64,
-  },
+  dateHeader: { flexDirection: "row", alignItems: "center", gap: 12 },
+  dateDay: { fontSize: 64, fontWeight: "300", color: "#000", lineHeight: 64 },
   dateWeekday: {
     fontSize: 20,
     fontWeight: "600",
     color: "#000",
     textTransform: "capitalize",
   },
-  dateMonth: {
-    fontSize: 14,
-    color: "#666",
-    textTransform: "capitalize",
-  },
+  dateMonth: { fontSize: 14, color: "#666", textTransform: "capitalize" },
   medList: {
     paddingHorizontal: 32,
     paddingTop: 16,
@@ -218,24 +193,15 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 24,
     backgroundColor: "#e0ead6",
   },
-  listContent: {
-    paddingBottom: 72,
-  },
+  listContent: { paddingBottom: 72 },
   emptyContainer: {
     justifyContent: "center",
     alignItems: "center",
     paddingTop: 32,
     gap: 8,
   },
-  emptyText: {
-    fontSize: 18,
-    fontWeight: "500",
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: "#666",
-    textTransform: "capitalize",
-  },
+  emptyText: { fontSize: 18, fontWeight: "500" },
+  emptySubtext: { fontSize: 14, color: "#666", textTransform: "capitalize" },
 });
 
 export default HomeScreen;

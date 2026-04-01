@@ -20,14 +20,10 @@ export const useMedicationStore = create<MedicationStore>()(
   persist(
     (set, get) => ({
       medications: [],
-
       draft: {},
-
       setDraft: (fields) =>
         set((state) => ({ draft: { ...state.draft, ...fields } })),
-
       clearDraft: () => set({ draft: {} }),
-
       saveMedication: () => {
         const { draft, medications } = get();
         if (!draft.name) {
@@ -35,14 +31,12 @@ export const useMedicationStore = create<MedicationStore>()(
           return;
         }
         const now = new Date().toISOString();
-
         const newMed: Medication = {
           id: Crypto.randomUUID(),
           name: draft.name.trim(),
           form: draft.form,
           schedule: draft.schedule,
-          times: draft.times ?? [],
-          dose: draft.dose,
+          timeDoses: draft.timeDoses ?? [],
           note: draft.note,
           stock: draft.stock,
           photoUri: draft.photoUri,
@@ -57,13 +51,11 @@ export const useMedicationStore = create<MedicationStore>()(
         };
         set({ medications: [...medications, newMed], draft: {} });
       },
-
       deleteMedication: (id: string) => {
         set((state) => ({
           medications: state.medications.filter((m) => m.id !== id),
         }));
       },
-
       updateMedication: (id: string, updates: Partial<Medication>) => {
         set((state) => ({
           medications: state.medications.map((m) =>

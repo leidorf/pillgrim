@@ -22,7 +22,7 @@ type Props = {
 
 const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
   ({ medication, scheduleLabel, onEdit, onDelete, onToggleActive }, ref) => {
-    const { name, form, isActive, dose, times, stock, note } = medication || {};
+    const { name, form, isActive, timeDoses, stock, note } = medication || {};
 
     const handleClose = () => {
       (ref as React.RefObject<BottomSheet>).current?.close();
@@ -83,15 +83,8 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
                 </View>
                 <Text style={styles.summaryName}>{name}</Text>
                 <Text style={styles.summaryDetails}>
-                  {dose} • {form} • {scheduleLabel}
+                  {form} • {scheduleLabel}
                 </Text>
-
-                {times && times.length > 0 && (
-                  <View style={styles.detailRow}>
-                    <Text style={styles.detailLabel}>Times:</Text>
-                    <Text style={styles.detailValue}>{times.join(", ")}</Text>
-                  </View>
-                )}
 
                 {stock !== undefined && stock > 0 && (
                   <View style={styles.detailRow}>
@@ -219,7 +212,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: Colors.textSecondary,
     textTransform: "capitalize",
-    marginBottom: 16,
   },
   detailRow: {
     flexDirection: "row",

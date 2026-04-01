@@ -26,8 +26,10 @@ export type Medication = {
     | "spray"
     | "cream";
   schedule?: Schedule;
-  times?: string[];
-  dose?: string;
+  timeDoses?: {
+    time: string;
+    dose: string;
+  }[];
   /* -------------------------------- Optional -------------------------------- */
   note?:
     | "before_meal"
