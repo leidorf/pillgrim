@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Animated,
   Pressable,
@@ -26,13 +26,18 @@ type FormErrors = {
 
 const Step1Screen = () => {
   const navigation = useNavigation<NavProp>();
-  const [selectedForm, setSelectedForm] =
-    useState<Medication["form"]>("capsule");
-  const [medName, setMedName] = useState<Medication["name"]>("");
+  const { draft, setDraft } = useMedicationStore();
+  const [selectedForm, setSelectedForm] = useState<Medication["form"]>(
+    draft.form ?? "capsule",
+  );
+  const [medName, setMedName] = useState<Medication["name"]>(draft.name ?? "");
   const [errors, setErrors] = useState<FormErrors>();
   const [showFormPicker, setShowFormPicker] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
-  const { draft, setDraft } = useMedicationStore();
+
+  const route = useRoute<any>();
+  const mode = route.params?.mode;
+  const medicationId = route.params?.medicationId;
 
   const validateForm = () => {
     let errors: FormErrors = {};
@@ -62,7 +67,10 @@ const Step1Screen = () => {
   const handleNextButton = () => {
     if (validateForm()) {
       setDraft({ name: medName, form: selectedForm });
-      navigation.navigate("AddMedication", { screen: "Step2" });
+      navigation.navigate("AddMedication", {
+        screen: "Step2",
+        params: { mode, medicationId },
+      });
     }
   };
 

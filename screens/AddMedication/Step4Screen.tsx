@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Pressable,
   StyleSheet,
@@ -47,23 +47,36 @@ type NotificationSettings = {
 };
 
 const Step4Screen = () => {
+  const route = useRoute<any>();
+  const mode = route.params?.mode;
+  const medicationId = route.params?.medicationId;
+
   const navigation = useNavigation<NavProp>();
-  const { draft, setDraft, saveMedication } = useMedicationStore();
+  const { draft, setDraft, saveMedication, updateMedication, clearDraft } =
+    useMedicationStore();
 
   const [selectedInstruction, setSelectedInstruction] =
-    useState<InstructionOption | null>(null);
-  const [customInstruction, setCustomInstruction] = useState("");
+    useState<InstructionOption | null>(() => {
+      if (!draft.note) return null;
+      const match = INSTRUCTION_OPTIONS.find((o) => o.id === draft.note);
+      return match ? match.id : "other";
+    });
+  const [customInstruction, setCustomInstruction] = useState(
+    selectedInstruction === "other" ? (draft.note ?? "") : "",
+  );
   const [stock, setStock] = useState<string>(draft.stock?.toString() || "");
   const [photoUri, setPhotoUri] = useState<string | null>(
     draft.photoUri || null,
   );
   const [isSaving, setIsSaving] = useState(false);
 
-  const [notifications, setNotifications] = useState<NotificationSettings>({
-    enabled: true,
-    hideName: false,
-    lowStockAlert: true,
-  });
+  const [notifications, setNotifications] = useState<NotificationSettings>(
+    draft.notificationSettings ?? {
+      enabled: true,
+      hideName: false,
+      lowStockAlert: true,
+    },
+  );
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -201,11 +214,10 @@ const Step4Screen = () => {
 
   const handleSave = async () => {
     if (isSaving) return;
-
     setIsSaving(true);
+
     try {
       let finalNote: string | undefined;
-
       if (selectedInstruction && selectedInstruction !== "any") {
         finalNote =
           selectedInstruction === "other"
@@ -218,13 +230,19 @@ const Step4Screen = () => {
         ...(stock && { stock: parseInt(stock, 10) }),
         ...(photoUri && { photoUri }),
         isActive: true,
-        createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
         notificationSettings: notifications,
       };
+
       setDraft(updates);
+
       setTimeout(() => {
-        saveMedication();
+        if (mode === "edit" && medicationId) {
+          updateMedication(medicationId, { ...draft, ...updates });
+          clearDraft();
+        } else {
+          saveMedication();
+        }
         navigation.getParent()?.goBack();
       }, 100);
     } catch (error) {

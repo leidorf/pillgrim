@@ -9,9 +9,9 @@ export type SettingsParamList = {
 
 export type AddMedicationParamList = {
   Step1: { mode?: "edit"; medicationId?: string } | undefined;
-  Step2: undefined;
-  Step3: undefined;
-  Step4: undefined;
+  Step2: { mode?: "edit"; medicationId?: string } | undefined;
+  Step3: { mode?: "edit"; medicationId?: string } | undefined;
+  Step4: { mode?: "edit"; medicationId?: string } | undefined;
 };
 
 export type MainScreenParamList = {

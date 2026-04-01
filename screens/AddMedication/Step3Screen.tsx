@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Pressable,
   StyleSheet,
@@ -30,20 +30,36 @@ type TimeDoseEntry = {
 };
 
 const Step3Screen = () => {
-  const navigation = useNavigation<NavProp>();
+  const route = useRoute<any>();
+  const mode = route.params?.mode;
+  const medicationId = route.params?.medicationId;
+
   const { draft, setDraft } = useMedicationStore();
+  const navigation = useNavigation<NavProp>();
 
   const medicationForm = draft.form || "";
   const availableUnits = DOSE_UNITS_BY_FORM[medicationForm] || DEFAULT_UNITS;
 
-  const [selectedUnit, setSelectedUnit] = useState<string>("");
-  const [timeDoses, setTimeDoses] = useState<TimeDoseEntry[]>(() => [
-    {
-      id: "1",
-      time: createDefaultTime(8),
-      amount: "",
-    },
-  ]);
+  const [selectedUnit, setSelectedUnit] = useState<string>(() => {
+    if (!draft.timeDoses?.length) return "";
+    const doseStr = draft.timeDoses[0].dose;
+    const parts = doseStr?.split(" ") ?? [];
+    const unitLabel = parts.slice(1).join(" ");
+    return availableUnits.find((u) => u.label === unitLabel)?.value ?? "";
+  });
+  const [timeDoses, setTimeDoses] = useState<TimeDoseEntry[]>(() => {
+    if (draft.timeDoses?.length) {
+      return draft.timeDoses.map((td, i) => {
+        const parts = td.dose?.split(" ") ?? [];
+        const amount = parts[0] ?? "";
+        const [hours, minutes] = td.time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hours, minutes, 0, 0);
+        return { id: String(i + 1), time: date, amount };
+      });
+    }
+    return [{ id: "1", time: createDefaultTime(8), amount: "" }];
+  });
 
   const [activeTimePickerId, setActiveTimePickerId] = useState<string | null>(
     null,
@@ -140,7 +156,10 @@ const Step3Screen = () => {
       timeDoses: newTimeDoses,
     });
 
-    navigation.navigate("AddMedication", { screen: "Step4" });
+    navigation.navigate("AddMedication", {
+      screen: "Step4",
+      params: { mode, medicationId },
+    });
   };
 
   return (

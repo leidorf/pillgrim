@@ -1,4 +1,4 @@
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import {
   Animated,
   Pressable,
@@ -37,6 +37,10 @@ const Step2Screen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const { draft, setDraft } = useMedicationStore();
 
+  const route = useRoute<any>();
+  const mode = route.params?.mode;
+  const medicationId = route.params?.medicationId;
+
   const [isOnOtherView, setIsOnOtherView] = useState(false);
   const [selectedSchedule, setSelectedSchedule] = useState<ScheduleType | null>(
     (draft.schedule?.type as ScheduleType) || null,
@@ -52,8 +56,16 @@ const Step2Screen = () => {
     draft.schedule?.days || [],
   );
 
-  const [biweeklyStartDay, setBiweeklyStartDay] = useState<Date | null>(null);
-  const [monthlyStartDay, setMonthlyStartDay] = useState<Date | null>(null);
+  const [biweeklyStartDay, setBiweeklyStartDay] = useState<Date | null>(
+    draft.schedule?.type === "biweekly" && draft.schedule.startDate
+      ? new Date(draft.schedule.startDate)
+      : null,
+  );
+  const [monthlyStartDay, setMonthlyStartDay] = useState<Date | null>(
+    draft.schedule?.type === "monthly" && draft.schedule.startDate
+      ? new Date(draft.schedule.startDate)
+      : null,
+  );
 
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [activeDatePickerConfig, setActiveDatePickerConfig] = useState<
@@ -248,7 +260,10 @@ const Step2Screen = () => {
   };
 
   const handleNextButton = () => {
-    navigation.navigate("AddMedication", { screen: "Step3" });
+    navigation.navigate("AddMedication", {
+      screen: "Step3",
+      params: { mode, medicationId },
+    });
   };
 
   const isScheduleComplete = (): boolean => {
