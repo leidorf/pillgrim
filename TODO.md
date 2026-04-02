@@ -1,3 +1,7 @@
+### app
+
+- [ ] multi language support
+
 ### screens
 
 - [ ] AddMedication screens will be split into components
