@@ -17,21 +17,19 @@ import { useState, useMemo } from "react";
 import { useLogStore } from "../../store/logsStore";
 import { useMedicationStore } from "../../store/medicationStore";
 
-const now = new Date();
-
 const LogsScreen = () => {
   const navigation = useNavigation<NavProp>();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonthLabel, setCurrentMonthLabel] = useState(
     new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }),
   );
-  const { getLogsByDate } = useLogStore();
+  const { getLogsByDate, logs } = useLogStore();
   const { medications } = useMedicationStore();
 
   const dayLogs = useMemo(() => {
-    const logs = getLogsByDate(selectedDate);
+    const logList = getLogsByDate(selectedDate);
 
-    return logs
+    return logList
       .map((log) => {
         const medication = medications.find((m) => m.id === log.medicationId);
         return {
@@ -41,12 +39,12 @@ const LogsScreen = () => {
         };
       })
       .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
-  }, [selectedDate, getLogsByDate, medications]);
+  }, [selectedDate, logs, medications]);
 
   const getDayStats = useLogStore((state) => state.getDayStats);
   const dayStats = useMemo(() => {
     return getDayStats(selectedDate);
-  }, [selectedDate, getDayStats]);
+  }, [selectedDate, logs]);
 
   const formatSelectedDate = (date: Date) => {
     return date.toLocaleDateString("en-US", {
@@ -57,6 +55,7 @@ const LogsScreen = () => {
   };
 
   const getStatusInfo = (log: (typeof dayLogs)[0]) => {
+    const now = new Date();
     if (log.takenAt) {
       return {
         icon: "✓",
@@ -228,14 +227,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingBottom: 16,
   },
   iconButton: {
     padding: 8,
   },
   headerText: {
-    fontSize: 20,
-    fontWeight: "600",
+    fontSize: 24,
+    fontWeight: "500",
+    textAlign: "center",
     color: Colors.textPrimary,
   },
   calendarContainer: {

@@ -1,7 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { MedicationLog } from "../types/medication";
+import { LogFilter, MedicationLog } from "../types/medication";
 import * as Crypto from "expo-crypto";
 
 type LogStore = {
@@ -9,6 +9,7 @@ type LogStore = {
   addLog: (log: Omit<MedicationLog, "id">) => void;
   updateLog: (id: string, updates: Partial<MedicationLog>) => void;
   deleteLog: (id: string) => void;
+  deleteLogsByMedication: (id: string) => void;
   getLogsByDate: (date: Date) => MedicationLog[];
   getLogsByDateRange: (startDate: Date, endDate: Date) => MedicationLog[];
   getLogsByMedication: (medicationId: string) => MedicationLog[];
@@ -19,6 +20,7 @@ type LogStore = {
     takenMeds: number;
     skippedMeds: number;
   };
+  getFilteredLogs: (filter: LogFilter) => MedicationLog[];
 };
 
 export const useLogStore = create<LogStore>()(
@@ -35,9 +37,15 @@ export const useLogStore = create<LogStore>()(
       },
 
       updateLog: (id, updates) => {
+        const safeUpdates = {
+          ...updates,
+          takenAt: updates.takenAt
+            ? new Date(updates.takenAt)
+            : updates.takenAt,
+        };
         set((state) => ({
           logs: state.logs.map((log) =>
-            log.id === id ? { ...log, ...updates } : log,
+            log.id === id ? { ...log, ...safeUpdates } : log,
           ),
         }));
       },
@@ -45,6 +53,12 @@ export const useLogStore = create<LogStore>()(
       deleteLog: (id) => {
         set((state) => ({
           logs: state.logs.filter((log) => log.id !== id),
+        }));
+      },
+
+      deleteLogsByMedication: (medicationId: string) => {
+        set((state) => ({
+          logs: state.logs.filter((log) => log.medicationId !== medicationId),
         }));
       },
 
@@ -97,11 +111,46 @@ export const useLogStore = create<LogStore>()(
           skippedMeds,
         };
       },
+
+      getFilteredLogs: (filter: LogFilter) => {
+        const { startDate, endDate, medicationId, status } = filter;
+        return get().logs.filter((log) => {
+          if (log.scheduledDate < startDate || log.scheduledDate > endDate)
+            return false;
+          if (medicationId && log.medicationId !== medicationId) return false;
+          if (!status || status === "all") return true;
+
+          const now = new Date();
+          const scheduledDateTime = new Date(
+            `${log.scheduledDate}T${log.scheduledTime}`,
+          );
+
+          switch (status) {
+            case "taken":
+              return !!log.takenAt && !log.skipped;
+            case "skipped":
+              return !!log.skipped;
+            case "missed":
+              return !log.takenAt && !log.skipped && scheduledDateTime < now;
+            case "pending":
+              return !log.takenAt && !log.skipped && scheduledDateTime >= now;
+            default:
+              return true;
+          }
+        });
+      },
     }),
     {
       name: "logs-storage",
       storage: createJSONStorage(() => AsyncStorage),
       partialize: (state) => ({ logs: state.logs }),
+      onRehydrateStorage: () => (state) => {
+        if (!state) return;
+        state.logs = state.logs.map((log) => ({
+          ...log,
+          takenAt: log.takenAt ? new Date(log.takenAt) : undefined,
+        }));
+      },
     },
   ),
 );

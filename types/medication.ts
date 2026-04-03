@@ -60,10 +60,12 @@ export type MedicationLog = {
   doseTaken?: string;
 };
 
+export type LogStatus = "pending" | "taken" | "skipped" | "missed";
+
 export type MedicationProps = Medication & {
   onToggle?: (id: string, time: string) => void;
   onSkip?: (id: string, time: string) => void;
-  status?: "pending" | "taken" | "skipped" | "overdue";
+  status?: LoginStatus;
 };
 
 export type DailySchedule = {
@@ -73,7 +75,7 @@ export type DailySchedule = {
     times: {
       time: string;
       log?: MedicationLog;
-      status: "upcoming" | "taken" | "skipped" | "overdue" | "missed";
+      status: LogStatus;
     }[];
   }[];
 };
@@ -82,5 +84,5 @@ export type LogFilter = {
   startDate: string;
   endDate: string;
   medicationId?: string;
-  status?: "taken" | "skipped" | "missed" | "all";
+  status?: LogStatus | "all";
 };

@@ -60,6 +60,7 @@ const MonthGrid = ({
 
   const dates = useMemo(() => getMonthGrid(year, month), [year, month]);
   const getDayStats = useLogStore((state) => state.getDayStats);
+  const logs = useLogStore((state) => state.logs);
   const getAdherenceColor = (rate: number) => {
     if (rate === 100) return Colors.success || "#22C55E";
     if (rate > 0) return Colors.warning || "#F59E0B";
@@ -110,7 +111,7 @@ const MonthGrid = ({
         </Pressable>
       );
     },
-    [today, selectedDate, currentMonth, getDayStats, onSelectDate],
+    [today, selectedDate, currentMonth, getDayStats, onSelectDate, logs],
   );
 
   return (

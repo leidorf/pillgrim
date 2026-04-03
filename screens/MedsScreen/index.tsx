@@ -171,8 +171,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   headerText: {
-    fontSize: 32,
-    fontWeight: "700",
+    fontSize: 24,
+    fontWeight: "500",
+    textAlign: "center",
     color: Colors.textPrimary,
   },
   subHeaderText: {

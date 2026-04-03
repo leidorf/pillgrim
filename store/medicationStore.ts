@@ -3,6 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Medication } from "../types/medication";
 import * as Crypto from "expo-crypto";
+import { useLogStore } from "./logsStore";
 
 type DraftMedication = Partial<Medication>;
 
@@ -52,6 +53,7 @@ export const useMedicationStore = create<MedicationStore>()(
         set({ medications: [...medications, newMed], draft: {} });
       },
       deleteMedication: (id: string) => {
+        useLogStore.getState().deleteLogsByMedication(id);
         set((state) => ({
           medications: state.medications.filter((m) => m.id !== id),
         }));

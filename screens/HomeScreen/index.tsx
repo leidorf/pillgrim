@@ -3,7 +3,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { Medication, MedicationLog } from "../../types/medication";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import { useMedicationStore } from "../../store/medicationStore";
@@ -99,9 +99,10 @@ const HomeScreen = () => {
     return schedule.sort((a, b) => a.time.localeCompare(b.time));
   };
 
-  const hasMedsOnDate = (date: Date): boolean => {
-    return getScheduleForDate(date).length > 0;
-  };
+  const hasMedsOnDate = useCallback(
+    (date: Date) => getScheduleForDate(date).length > 0,
+    [medications],
+  );
 
   const dayLogs = useMemo(() => {
     return getLogsByDate(selectedDate);
