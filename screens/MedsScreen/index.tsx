@@ -17,6 +17,7 @@ import { useNavigation } from "@react-navigation/native";
 import { NavProp } from "../../types/navigation";
 import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { Colors } from "../../constants/theme";
 
 const MedsScreen = () => {
   const { medications, deleteMedication, setDraft, updateMedication } =
@@ -131,7 +132,7 @@ const MedsScreen = () => {
             <PillBottleIcon
               height={64}
               width={64}
-              stroke="#757575"
+              stroke={Colors.textSecondary}
               strokeWidth={1}
             />
             <Text style={styles.emptyText}>No medications found</Text>
@@ -162,7 +163,7 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
   },
   listContent: {
-    padding: 24,
+    paddingHorizontal: 24,
     paddingBottom: 56,
   },
   headerContainer: {
@@ -172,11 +173,11 @@ const styles = StyleSheet.create({
   headerText: {
     fontSize: 32,
     fontWeight: "700",
-    color: "#1a1a1a",
+    color: Colors.textPrimary,
   },
   subHeaderText: {
     fontSize: 14,
-    color: "#757575",
+    color: Colors.textSecondary,
     marginTop: 4,
   },
   emptyContainer: {
@@ -188,11 +189,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: "#757575",
+    color: Colors.textSecondary,
   },
   emptySubtext: {
     fontSize: 14,
-    color: "#999",
+    color: Colors.textSecondary,
   },
 });
 

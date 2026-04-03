@@ -3,10 +3,12 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Medication, MedicationLog } from "../../types/medication";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import { useMedicationStore } from "../../store/medicationStore";
+import { Colors } from "../../constants/theme";
+import { useLogStore } from "../../store/logsStore";
 
 type LogsMap = Record<string, MedicationLog>;
 
@@ -30,7 +32,7 @@ const WEEKDAY_MAP: Record<number, number> = {
 const HomeScreen = () => {
   const { medications } = useMedicationStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [logs, setLogs] = useState<LogsMap>({});
+  const { logs, addLog, updateLog, deleteLog, getLogsByDate } = useLogStore();
 
   const isMedicationScheduledForDate = (
     med: Medication,
@@ -101,27 +103,31 @@ const HomeScreen = () => {
     return getScheduleForDate(date).length > 0;
   };
 
+  const dayLogs = useMemo(() => {
+    return getLogsByDate(selectedDate);
+  }, [selectedDate, logs]);
+
   const handleToggle = (medicationId: string, time: string) => {
     const dateStr = selectedDate.toISOString().split("T")[0];
-    const logKey = `${medicationId}-${dateStr}-${time}`;
-    setLogs((prev) => {
-      const existing = prev[logKey];
-      if (existing?.takenAt && !existing?.skipped) {
-        const { [logKey]: _, ...rest } = prev;
-        return rest;
+    const existingLog = dayLogs.find(
+      (l) => l.medicationId === medicationId && l.scheduledTime === time,
+    );
+
+    if (existingLog) {
+      if (existingLog.takenAt && !existingLog.skipped) {
+        deleteLog(existingLog.id);
+      } else {
+        updateLog(existingLog.id, { takenAt: new Date(), skipped: false });
       }
-      return {
-        ...prev,
-        [logKey]: {
-          id: Date.now().toString(),
-          medicationId,
-          scheduledDate: dateStr,
-          scheduledTime: time,
-          takenAt: new Date(),
-          skipped: false,
-        },
-      };
-    });
+    } else {
+      addLog({
+        medicationId,
+        scheduledDate: dateStr,
+        scheduledTime: time,
+        takenAt: new Date(),
+        skipped: false,
+      });
+    }
   };
 
   const schedule = getScheduleForDate(selectedDate);
@@ -139,27 +145,34 @@ const HomeScreen = () => {
         contentContainerStyle={styles.listContent}
         data={schedule}
         keyExtractor={(item) => item.logKey}
-        renderItem={({ item }) => (
-          <MedicationCard
-            medication={item.medication}
-            time={item.time}
-            dose={item.dose}
-            log={logs[item.logKey]}
-            onToggle={handleToggle}
-          />
-        )}
+        renderItem={({ item }) => {
+          const log = dayLogs.find(
+            (l) =>
+              l.medicationId === item.medication.id &&
+              l.scheduledTime === item.time,
+          );
+          return (
+            <MedicationCard
+              medication={item.medication}
+              time={item.time}
+              dose={item.dose}
+              log={log}
+              onToggle={handleToggle}
+            />
+          );
+        }}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <PillBottleIcon
               height={64}
               width={64}
-              stroke="#000000"
+              stroke={Colors.textPrimary}
               strokeWidth={1}
             />
             <Text style={styles.emptyText}>No medications for today!</Text>
             <Text style={styles.emptySubtext}>
-              {selectedDate.toLocaleDateString("tr-TR", {
+              {selectedDate.toLocaleDateString("en-US", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",
@@ -190,7 +203,11 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   emptyText: { fontSize: 18, fontWeight: "500" },
-  emptySubtext: { fontSize: 14, color: "#666", textTransform: "capitalize" },
+  emptySubtext: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textTransform: "capitalize",
+  },
 });
 
 export default HomeScreen;

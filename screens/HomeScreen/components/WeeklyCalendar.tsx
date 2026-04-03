@@ -160,7 +160,7 @@ const WeeklyCalendar = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 16,
+    paddingBottom: 12,
   },
   monthLabel: {
     fontSize: 24,
@@ -172,10 +172,10 @@ const styles = StyleSheet.create({
   weekRow: {
     flexDirection: "row",
     justifyContent: "space-between",
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
   },
   dayCol: { alignItems: "center", gap: 4 },
-  dayName: { fontSize: 12, color: "#888" },
+  dayName: { fontSize: 12, color: Colors.textSecondary },
   dayNum: {
     width: 34,
     height: 34,
@@ -187,16 +187,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.primary,
   },
-  dayNumSelected: { backgroundColor: "#c5d9b8", borderRadius: 17 },
-  dayNumText: { fontSize: 14, fontWeight: "500", color: "#000" },
-  dayNumTextSelected: { color: "#3a6340" },
+  dayNumSelected: { backgroundColor: Colors.subtle, borderRadius: 17 },
+  dayNumText: { fontSize: 14, fontWeight: "500", color: Colors.textPrimary },
+  dayNumTextSelected: { color: Colors.dark },
   dot: {
     top: -9,
     width: 8,
     height: 8,
     borderWidth: 2,
     borderRadius: 4,
-    borderColor: "#c5d9b8",
+    borderColor: Colors.subtle,
   },
   dotToday: { borderColor: Colors.primary },
   dotActive: { backgroundColor: Colors.background },

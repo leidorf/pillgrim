@@ -114,7 +114,7 @@ const Step3Screen = () => {
   );
 
   const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("tr-TR", {
+    return date.toLocaleTimeString("en-US", {
       hour: "2-digit",
       minute: "2-digit",
     });
