@@ -3,14 +3,14 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Medication, MedicationLog } from "../../types/medication";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import { useMedicationStore } from "../../store/medicationStore";
 import { Colors } from "../../constants/theme";
 import { useLogStore } from "../../store/logsStore";
-
-type LogsMap = Record<string, MedicationLog>;
+import BottomSheet from "@gorhom/bottom-sheet";
+import MedicationActionSheet from "./components/ActionBottomSheet";
 
 type ScheduleItem = {
   medication: Medication;
@@ -33,6 +33,13 @@ const HomeScreen = () => {
   const { medications } = useMedicationStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { logs, addLog, updateLog, deleteLog, getLogsByDate } = useLogStore();
+
+  const actionSheetRef = useRef<BottomSheet>(null);
+  const [selectedItem, setSelectedItem] = useState<{
+    medication: Medication;
+    time: string;
+    log?: MedicationLog;
+  } | null>(null);
 
   const isMedicationScheduledForDate = (
     med: Medication,
@@ -108,28 +115,78 @@ const HomeScreen = () => {
     return getLogsByDate(selectedDate);
   }, [selectedDate, logs]);
 
-  const handleToggle = (medicationId: string, time: string) => {
-    const dateStr = selectedDate.toISOString().split("T")[0];
-    const existingLog = dayLogs.find(
-      (l) => l.medicationId === medicationId && l.scheduledTime === time,
-    );
+  const handleOpenSheet = useCallback(
+    (medication: Medication, time: string, log?: MedicationLog) => {
+      setSelectedItem({ medication, time, log });
+      actionSheetRef.current?.expand();
+    },
+    [],
+  );
 
-    if (existingLog) {
-      if (existingLog.takenAt && !existingLog.skipped) {
-        deleteLog(existingLog.id);
+  const handleToggle = useCallback(
+    (medicationId: string, time: string) => {
+      const dateStr = selectedDate.toISOString().split("T")[0];
+      const existingLog = dayLogs.find(
+        (l) => l.medicationId === medicationId && l.scheduledTime === time,
+      );
+      if (existingLog) {
+        if (existingLog.takenAt && !existingLog.skipped) {
+          deleteLog(existingLog.id);
+        } else {
+          updateLog(existingLog.id, { takenAt: new Date(), skipped: false });
+        }
       } else {
-        updateLog(existingLog.id, { takenAt: new Date(), skipped: false });
+        addLog({
+          medicationId,
+          scheduledDate: dateStr,
+          scheduledTime: time,
+          takenAt: new Date(),
+          skipped: false,
+        });
       }
-    } else {
-      addLog({
-        medicationId,
-        scheduledDate: dateStr,
-        scheduledTime: time,
-        takenAt: new Date(),
-        skipped: false,
-      });
-    }
-  };
+    },
+    [selectedDate, dayLogs, deleteLog, updateLog, addLog],
+  );
+
+  const handleSkip = useCallback(
+    (medicationId: string, time: string) => {
+      const dateStr = selectedDate.toISOString().split("T")[0];
+      const existingLog = dayLogs.find(
+        (l) => l.medicationId === medicationId && l.scheduledTime === time,
+      );
+      if (existingLog) {
+        if (existingLog.skipped) {
+          deleteLog(existingLog.id);
+        } else {
+          updateLog(existingLog.id, { takenAt: undefined, skipped: true });
+        }
+      } else {
+        addLog({
+          medicationId,
+          scheduledDate: dateStr,
+          scheduledTime: time,
+          skipped: true,
+        });
+      }
+    },
+    [selectedDate, dayLogs, deleteLog, updateLog, addLog],
+  );
+
+  const handleSnooze = useCallback(
+    (medicationId: string, time: string, minutes: number) => {
+      // TODO: expo-notifications
+      console.log(`Snooze ${medicationId} at ${time} for ${minutes} min`);
+    },
+    [],
+  );
+
+  const selectedLog = selectedItem
+    ? dayLogs.find(
+        (l) =>
+          l.medicationId === selectedItem.medication.id &&
+          l.scheduledTime === selectedItem.time,
+      )
+    : undefined;
 
   const schedule = getScheduleForDate(selectedDate);
 
@@ -159,6 +216,7 @@ const HomeScreen = () => {
               dose={item.dose}
               log={log}
               onToggle={handleToggle}
+              onOpenSheet={handleOpenSheet}
             />
           );
         }}
@@ -182,6 +240,28 @@ const HomeScreen = () => {
           </View>
         }
       />
+      <AddMedicationButton />
+
+      <MedicationActionSheet
+        ref={actionSheetRef}
+        medicationName={selectedItem?.medication.name ?? ""}
+        time={selectedItem?.time ?? ""}
+        isTaken={!!selectedLog?.takenAt && !selectedLog?.skipped}
+        isSkipped={!!selectedLog?.skipped}
+        onTaken={() =>
+          selectedItem &&
+          handleToggle(selectedItem.medication.id, selectedItem.time)
+        }
+        onSkip={() =>
+          selectedItem &&
+          handleSkip(selectedItem.medication.id, selectedItem.time)
+        }
+        onSnooze={(minutes) =>
+          selectedItem &&
+          handleSnooze(selectedItem.medication.id, selectedItem.time, minutes)
+        }
+      />
+
       <AddMedicationButton />
     </SafeAreaView>
   );

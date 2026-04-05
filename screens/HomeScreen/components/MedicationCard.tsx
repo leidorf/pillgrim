@@ -2,8 +2,10 @@ import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
 import { Medication, MedicationLog } from "../../../types/medication";
 import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import CircleIcon from "../../../assets/icons/circle.svg";
+import CloseIcon from "../../../assets/icons/circle-close.svg";
 import { Colors } from "../../../constants/theme";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
+import { useCallback, useMemo } from "react";
 
 type MedicationCardProps = {
   medication: Medication;
@@ -11,6 +13,11 @@ type MedicationCardProps = {
   dose: string;
   log?: MedicationLog;
   onToggle?: (medicationId: string, time: string) => void;
+  onOpenSheet?: (
+    medication: Medication,
+    time: string,
+    log?: MedicationLog,
+  ) => void;
 };
 
 const MedicationCard = ({
@@ -19,30 +26,36 @@ const MedicationCard = ({
   dose,
   log,
   onToggle,
+  onOpenSheet,
 }: MedicationCardProps) => {
-  const isTaken = log?.takenAt && !log?.skipped;
-  const isSkipped = log?.skipped;
+  const isTaken = !!log?.takenAt && !log?.skipped;
+  const isSkipped = !!log?.skipped;
 
-  const getContainerStyle = (): ViewStyle => {
-    if (isTaken) {
+  const containerStyle = useMemo((): ViewStyle => {
+    if (isTaken)
       return {
         backgroundColor: Colors.primary + "10",
         borderColor: Colors.primary + "30",
         opacity: 0.9,
       };
-    }
-    if (isSkipped) {
-      return { backgroundColor: Colors.textSecondary + "10", opacity: 0.7 };
-    }
+    if (isSkipped)
+      return {
+        backgroundColor: Colors.textSecondary + "10",
+        opacity: 0.7,
+      };
     return {};
-  };
+  }, [isTaken, isSkipped]);
+
+  const handleTaken = useCallback(() => {
+    onToggle?.(medication.id, time);
+  }, [onToggle, medication.id, time]);
 
   return (
     <BaseMedicationCard
       medication={medication}
       isInactive={isSkipped}
-      style={getContainerStyle()}
-      onPress={() => onToggle?.(medication.id || "", time)}
+      style={containerStyle}
+      onPress={() => onOpenSheet?.(medication, time, log)}
       dose={dose}
     >
       <View style={styles.timeSection}>
@@ -57,15 +70,13 @@ const MedicationCard = ({
         </Text>
         <Pressable
           style={styles.checkButton}
-          onPress={() => onToggle?.(medication.id || "", time)}
+          onPress={() => onToggle?.(medication.id, time)}
           hitSlop={8}
         >
           {isTaken ? (
             <CheckIcon width={28} height={28} color={Colors.primary} />
           ) : isSkipped ? (
-            <View style={styles.skippedCircle}>
-              <Text style={styles.skippedSymbol}>✕</Text>
-            </View>
+            <CloseIcon width={28} height={28} color={Colors.textSecondary} />
           ) : (
             <CircleIcon
               width={28}
@@ -91,15 +102,6 @@ const styles = StyleSheet.create({
   takenText: { color: Colors.primary },
   skippedTimeText: { color: Colors.textSecondary },
   checkButton: { padding: 4 },
-  skippedCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.textSecondary + "30",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  skippedSymbol: { color: Colors.textSecondary },
 });
 
 export default MedicationCard;
