@@ -15,7 +15,7 @@ import HomeScreen from "./screens/HomeScreen";
 import MedsScreen from "./screens/MedsScreen";
 import LogsScreen from "./screens/LogsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen";
-import SettingsScreen from "./screens/Settings/SettingsScreen";
+import SettingsScreen from "./screens/Settings";
 
 import { AppTheme } from "./theme/theme";
 
@@ -25,6 +25,11 @@ import LogsIcon from "./assets/icons/logs.svg";
 import Step2Screen from "./screens/AddMedication/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen";
 import Step4Screen from "./screens/AddMedication/Step4Screen";
+import NotificationsScreen from "./screens/Settings/NotificationsScreen";
+import { StatusBar } from "react-native";
+import AppearanceScreen from "./screens/Settings/AppearanceScreen";
+import LanguageScreen from "./screens/Settings/LanguageScreen";
+import AlarmScreen from "./screens/Settings/AlarmScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -90,8 +95,15 @@ const AddMedicationNavigator = () => {
 
 const SettingsNavigator = () => {
   return (
-    <SettingsStack.Navigator>
+    <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
       <SettingsStack.Screen name="SettingsMain" component={SettingsScreen} />
+      <SettingsStack.Screen
+        name="Notifications"
+        component={NotificationsScreen}
+      />
+      <SettingsStack.Screen name="Alarm" component={AlarmScreen} />
+      <SettingsStack.Screen name="Appearance" component={AppearanceScreen} />
+      <SettingsStack.Screen name="Language" component={LanguageScreen} />
       {/* ------------------- other settings screen will be added ------------------  */}
     </SettingsStack.Navigator>
   );

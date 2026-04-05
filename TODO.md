@@ -18,3 +18,7 @@
 - [x] MedInfoCard deleteButton and other options will shown in inlineContainer
 - [ ] MedInfoCard delete action will be shown with proper component not with alert
 - [ ] addMedicationButton must be dynamic
+
+### bugs
+
+- [ ] medication take actions somehow effects the next day

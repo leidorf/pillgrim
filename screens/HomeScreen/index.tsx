@@ -1,5 +1,4 @@
-import { FlatList, StatusBar, StyleSheet, Text, View } from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, Text, View } from "react-native";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
@@ -11,6 +10,7 @@ import { Colors } from "../../constants/theme";
 import { useLogStore } from "../../store/logsStore";
 import BottomSheet from "@gorhom/bottom-sheet";
 import MedicationActionSheet from "./components/ActionBottomSheet";
+import ScreenLayout from "../../components/ScreenLayout";
 
 type ScheduleItem = {
   medication: Medication;
@@ -191,7 +191,7 @@ const HomeScreen = () => {
   const schedule = getScheduleForDate(selectedDate);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenLayout>
       <WeeklyCalendar
         selectedDate={selectedDate}
         onSelectDate={setSelectedDate}
@@ -263,12 +263,11 @@ const HomeScreen = () => {
       />
 
       <AddMedicationButton />
-    </SafeAreaView>
+    </ScreenLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: { flex: 1, paddingTop: StatusBar.currentHeight },
   medList: {
     paddingHorizontal: 32,
     paddingTop: 16,

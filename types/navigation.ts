@@ -3,8 +3,10 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 export type SettingsParamList = {
   SettingsMain: undefined;
   Notifications: undefined;
-  Sound: undefined;
-  Theme: undefined;
+  Alarm: undefined;
+  Appearance: undefined;
+  Language: undefined;
+  About: undefined;
 };
 
 export type AddMedicationParamList = {

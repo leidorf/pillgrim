@@ -1,12 +1,4 @@
-import {
-  View,
-  Text,
-  Pressable,
-  StatusBar,
-  StyleSheet,
-  ScrollView,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { View, Text, Pressable, StyleSheet, ScrollView } from "react-native";
 import { NavProp } from "../../types/navigation";
 import { useNavigation } from "@react-navigation/native";
 import SettingsIcon from "../../assets/icons/settings.svg";
@@ -16,6 +8,7 @@ import MonthlyCalendar from "./components/MonthlyCalendar";
 import { useState, useMemo } from "react";
 import { useLogStore } from "../../store/logsStore";
 import { useMedicationStore } from "../../store/medicationStore";
+import ScreenLayout from "../../components/ScreenLayout";
 
 const LogsScreen = () => {
   const navigation = useNavigation<NavProp>();
@@ -96,7 +89,7 @@ const LogsScreen = () => {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenLayout>
       {/* --------------------------------- Header --------------------------------- */}
       <View style={styles.topBar}>
         <Pressable style={styles.iconButton} onPress={handleExport}>
@@ -210,18 +203,13 @@ const LogsScreen = () => {
           )}
         </ScrollView>
       </View>
-    </SafeAreaView>
+    </ScreenLayout>
   );
 };
 
 export default LogsScreen;
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-    backgroundColor: Colors.background,
-  },
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",

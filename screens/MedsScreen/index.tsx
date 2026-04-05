@@ -1,13 +1,5 @@
 import { useRef, useState, useCallback } from "react";
-import {
-  FlatList,
-  StatusBar,
-  StyleSheet,
-  Text,
-  View,
-  Alert,
-} from "react-native";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { FlatList, StyleSheet, Text, View, Alert } from "react-native";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import MedicationInfoCard from "./components/MedicationInfoCard";
@@ -18,11 +10,12 @@ import { NavProp } from "../../types/navigation";
 import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Colors } from "../../constants/theme";
+import ScreenLayout from "../../components/ScreenLayout";
 
 const MedsScreen = () => {
+  const navigation = useNavigation<NavProp>();
   const { medications, deleteMedication, setDraft, updateMedication } =
     useMedicationStore();
-  const navigation = useNavigation<NavProp>();
 
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
@@ -103,7 +96,7 @@ const MedsScreen = () => {
   }, [selectedMed, handleDelete]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <ScreenLayout>
       <FlatList
         data={medications}
         keyExtractor={(item) => item.id || Math.random().toString()}
@@ -153,15 +146,11 @@ const MedsScreen = () => {
       />
 
       <AddMedicationButton />
-    </SafeAreaView>
+    </ScreenLayout>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    paddingTop: StatusBar.currentHeight,
-  },
   listContent: {
     paddingHorizontal: 24,
     paddingBottom: 56,
