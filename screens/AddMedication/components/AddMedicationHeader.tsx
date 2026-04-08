@@ -11,12 +11,14 @@ type AddMedicationHeaderProps = {
   currentStep: 1 | 2 | 3 | 4;
   title: string;
   showBackIcon?: boolean;
+  onBack?: () => void;
 };
 
 const AddMedicationHeader = ({
   currentStep,
   title,
   showBackIcon = true,
+  onBack,
 }: AddMedicationHeaderProps) => {
   const navigation = useNavigation();
   const route = useRoute<any>();
@@ -32,7 +34,11 @@ const AddMedicationHeader = ({
   };
 
   const handleBack = () => {
-    navigation.goBack();
+    if (onBack) {
+      onBack();
+    } else {
+      navigation.goBack();
+    }
   };
 
   return (

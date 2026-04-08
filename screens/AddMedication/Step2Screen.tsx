@@ -93,12 +93,16 @@ const Step2Screen = () => {
   };
 
   const goBack = () => {
-    setIsOnOtherView(false);
-    Animated.timing(slideAnim, {
-      toValue: 0,
-      duration: 300,
-      useNativeDriver: true,
-    }).start();
+    if (isOnOtherView) {
+      setIsOnOtherView(false);
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 300,
+        useNativeDriver: true,
+      }).start();
+    } else {
+      navigation.goBack();
+    }
   };
 
   const handleSelectSchedule = (id: ScheduleType) => {
@@ -431,13 +435,19 @@ const Step2Screen = () => {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
+      <Pressable
+        style={styles.backdrop}
+        onPress={() => {
+          if (isOnOtherView) {
+            goBack();
+          } else {
+            navigation.goBack();
+          }
+        }}
+      />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
-        <AddMedicationHeader
-          currentStep={2}
-          title="Schedule"
-        />
+        <AddMedicationHeader currentStep={2} title="Schedule" onBack={goBack} />
 
         {/* --------------------------------- Content -------------------------------- */}
         <View style={styles.content}>
@@ -450,7 +460,6 @@ const Step2Screen = () => {
               },
             ]}
           >
-
             {/* -------------------------------- Main View ------------------------------- */}
             <ScrollView
               style={{ width: contentWidth }}
