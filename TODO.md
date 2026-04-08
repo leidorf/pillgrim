@@ -7,7 +7,7 @@
 - [ ] AddMedication screens will be split into components
 - [ ] LogsScreen will be split into components
 - [ ] Step4Screen addPhoto action will be shown with proper component not with alert
-- [ ] Add statusBar to AddMedication screens
+- [x] Add statusBar to AddMedication screens
 - [x] Step3Screen minimum doses must bigger than 0
 - [x] Step3Screen choosable dose types must be same
 

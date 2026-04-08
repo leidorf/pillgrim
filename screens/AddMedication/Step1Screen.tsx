@@ -10,7 +10,6 @@ import {
 } from "react-native";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
-import CloseIcon from "../../assets/icons/close.svg";
 import PillIcon from "../../assets/icons/pill.svg";
 import { useRef, useState } from "react";
 import { Medication } from "../../types/medication";
@@ -18,6 +17,7 @@ import { MED_FORMS } from "../../constants/medication-forms";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useMedicationStore } from "../../store/medicationStore";
 import NextButton from "./components/NextButton";
+import AddMedicationHeader from "./components/AddMedicationHeader";
 
 type FormErrors = {
   medName?: string;
@@ -40,13 +40,16 @@ const Step1Screen = () => {
   const medicationId = route.params?.medicationId;
 
   const validateForm = () => {
-    let errors: FormErrors = {};
-    if (!medName) errors.medName = "Medication name is required";
-    if (!selectedForm) errors.selectedForm = "Medication form is required";
+    let newErrors: FormErrors = {};
+    if (!medName.trim()) newErrors.medName = "Medication name is required";
+    if (!selectedForm) newErrors.selectedForm = "Medication form is required";
 
-    setErrors(errors);
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
-    return Object.keys(errors).length === 0;
+  const isFormValid = () => {
+    return medName.trim().length > 0 && selectedForm !== undefined;
   };
 
   const togglePicker = () => {
@@ -66,7 +69,7 @@ const Step1Screen = () => {
 
   const handleNextButton = () => {
     if (validateForm()) {
-      setDraft({ name: medName, form: selectedForm });
+      setDraft({ name: medName.trim(), form: selectedForm });
       navigation.navigate("AddMedication", {
         screen: "Step2",
         params: { mode, medicationId },
@@ -88,12 +91,12 @@ const Step1Screen = () => {
     >
       <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
       <View style={styles.modalContainer}>
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>Add Medication</Text>
-          <Pressable onPress={() => navigation.goBack()}>
-            <CloseIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-        </View>
+        {/* --------------------------------- Header --------------------------------- */}
+        <AddMedicationHeader
+          currentStep={1}
+          title="Add Medication"
+          showBackIcon={false}
+        />
 
         {/* ------------------------------ Input Section ----------------------------- */}
         <View style={styles.content}>
@@ -154,11 +157,6 @@ const Step1Screen = () => {
                       >
                         {label}
                       </Text>
-                      {errors?.selectedForm ? (
-                        <Text style={styles.errorText}>
-                          {errors?.selectedForm}
-                        </Text>
-                      ) : null}
                     </Pressable>
                   );
                 })}
@@ -176,14 +174,13 @@ const Step1Screen = () => {
                 onChangeText={setMedName}
               />
               {errors?.medName ? (
-                <Text style={styles.errorText}>{errors?.medName}</Text>
+                <Text style={styles.errorText}>{errors.medName}</Text>
               ) : null}
             </View>
           </View>
 
           {/* ------------------------------- Next Button ------------------------------ */}
-
-          <NextButton disabled={!validateForm} onPress={handleNextButton} />
+          <NextButton disabled={!isFormValid()} onPress={handleNextButton} />
         </View>
       </View>
     </KeyboardAwareScrollView>
@@ -208,15 +205,6 @@ const styles = StyleSheet.create({
     padding: 24,
     paddingBottom: 48,
     overflow: "hidden",
-  },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-  },
-  headerTitle: {
-    color: Colors.textPrimary,
-    fontSize: 20,
   },
   content: {
     flex: 1,
@@ -294,7 +282,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   errorText: {
-    fontSize: 16,
+    fontSize: 14,
     marginTop: 8,
     textAlign: "center",
     color: Colors.error,

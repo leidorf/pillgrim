@@ -23,6 +23,8 @@ import { useState, useCallback } from "react";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../constants/units";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
+import ProgressBar from "./components/ProgressBar";
+import AddMedicationHeader from "./components/AddMedicationHeader";
 
 type TimeDoseEntry = {
   id: string;
@@ -181,21 +183,10 @@ const Step3Screen = () => {
       <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={styles.headerIcon}
-          >
-            <BackIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Time & Dose</Text>
-          <Pressable
-            onPress={() => navigation.getParent()?.goBack()}
-            style={styles.headerIcon}
-          >
-            <CloseIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-        </View>
+        <AddMedicationHeader
+          currentStep={3}
+          title="Time & Dose"
+        />
 
         <ScrollView
           style={styles.content}
@@ -279,7 +270,7 @@ const Step3Screen = () => {
                     style={styles.timePickerButton}
                     onPress={() => setActiveTimePickerId(td.id)}
                   >
-                  <Text style={styles.timeText}>{formatTime(td.time)}</Text>
+                    <Text style={styles.timeText}>{formatTime(td.time)}</Text>
                     <Text style={styles.timeHint}>Tap to change time</Text>
                   </Pressable>
 

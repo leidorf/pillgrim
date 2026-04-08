@@ -28,6 +28,8 @@ import NextButton from "./components/NextButton";
 import { useState, useRef, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import InlineContainer from "./components/InlineContainer";
+import ProgressBar from "./components/ProgressBar";
+import AddMedicationHeader from "./components/AddMedicationHeader";
 
 const INSTRUCTION_OPTIONS = [
   { id: "before_meal", label: "Before meal" },
@@ -271,21 +273,7 @@ const Step4Screen = () => {
       <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={() => navigation.goBack()}
-            style={styles.headerIcon}
-          >
-            <BackIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Optional Details</Text>
-          <Pressable
-            onPress={() => navigation.getParent()?.goBack()}
-            style={styles.headerIcon}
-          >
-            <CloseIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-        </View>
+        <AddMedicationHeader currentStep={4} title="Optional Details" />
 
         <ScrollView
           style={styles.content}

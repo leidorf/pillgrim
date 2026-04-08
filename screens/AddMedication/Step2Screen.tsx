@@ -9,13 +9,10 @@ import {
   ScrollView,
   TextInput,
   LayoutAnimation,
-  UIManager,
   Platform,
 } from "react-native";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
-import CloseIcon from "../../assets/icons/close.svg";
-import BackIcon from "../../assets/icons/arrow-left.svg";
 import RightArrowIcon from "../../assets/icons/arrow-right.svg";
 import { useCallback, useRef, useState } from "react";
 import { useMedicationStore } from "../../store/medicationStore";
@@ -29,6 +26,7 @@ import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 import NextButton from "./components/NextButton";
 import DateInputInfoCard from "./components/DateInputInfoCard";
 import InlineContainer from "./components/InlineContainer";
+import AddMedicationHeader from "./components/AddMedicationHeader";
 
 const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -436,22 +434,12 @@ const Step2Screen = () => {
       <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
-        <View style={styles.header}>
-          <Pressable
-            onPress={isOnOtherView ? goBack : () => navigation.goBack()}
-            style={styles.headerIcon}
-          >
-            <BackIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-          <Text style={styles.headerTitle}>Schedule</Text>
-          <Pressable
-            onPress={() => navigation.getParent()?.goBack()}
-            style={styles.headerIcon}
-          >
-            <CloseIcon height={24} width={24} stroke={Colors.textPrimary} />
-          </Pressable>
-        </View>
+        <AddMedicationHeader
+          currentStep={2}
+          title="Schedule"
+        />
 
+        {/* --------------------------------- Content -------------------------------- */}
         <View style={styles.content}>
           <Animated.View
             style={[
@@ -462,6 +450,7 @@ const Step2Screen = () => {
               },
             ]}
           >
+
             {/* -------------------------------- Main View ------------------------------- */}
             <ScrollView
               style={{ width: contentWidth }}
@@ -529,14 +518,6 @@ const styles = StyleSheet.create({
     paddingBottom: 48,
     overflow: "hidden",
   },
-  header: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 10,
-  },
-  headerIcon: { padding: 4 },
-  headerTitle: { color: Colors.textPrimary, fontSize: 18, fontWeight: "600" },
   content: { flex: 1, overflow: "hidden" },
   sliderWrapper: { flex: 1, flexDirection: "row", overflow: "hidden" },
   scrollContent: {
