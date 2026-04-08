@@ -9,7 +9,7 @@ import { useMedicationStore } from "../../store/medicationStore";
 import { Colors } from "../../constants/theme";
 import { useLogStore } from "../../store/logsStore";
 import BottomSheet from "@gorhom/bottom-sheet";
-import MedicationActionSheet from "./components/ActionBottomSheet";
+import MedicationActionSheet from "./components/MedicationActionSheet";
 import ScreenLayout from "../../components/ScreenLayout";
 
 type ScheduleItem = {
@@ -33,7 +33,7 @@ const HomeScreen = () => {
   const { medications } = useMedicationStore();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { logs, addLog, updateLog, deleteLog, getLogsByDate } = useLogStore();
-
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const actionSheetRef = useRef<BottomSheet>(null);
   const [selectedItem, setSelectedItem] = useState<{
     medication: Medication;
@@ -240,7 +240,8 @@ const HomeScreen = () => {
           </View>
         }
       />
-      <AddMedicationButton />
+
+      {!isSheetOpen && <AddMedicationButton />}
 
       <MedicationActionSheet
         ref={actionSheetRef}
@@ -261,8 +262,6 @@ const HomeScreen = () => {
           handleSnooze(selectedItem.medication.id, selectedItem.time, minutes)
         }
       />
-
-      <AddMedicationButton />
     </ScreenLayout>
   );
 };

@@ -27,7 +27,7 @@ const LogsScreen = () => {
         const medication = medications.find((m) => m.id === log.medicationId);
         return {
           ...log,
-          medicationName: medication?.name || "Bilinmeyen İlaç",
+          medicationName: medication?.name || "Unknown Medication",
           form: medication?.form,
         };
       })
@@ -161,7 +161,7 @@ const LogsScreen = () => {
           ) : (
             dayLogs.map((log) => {
               const status = getStatusInfo(log);
-              // Medication Log Card
+              /* --------------------------- Medication Log Card -------------------------- */
               return (
                 <View key={log.id} style={styles.logItem}>
                   <View style={styles.logLeft}>

@@ -18,10 +18,14 @@ type Props = {
   onEdit: () => void;
   onDelete: () => void;
   onToggleActive?: (id: string, isActive: boolean) => void;
+  onAnimate?: (fromIndex: number, toIndex: number) => void;
 };
 
 const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
-  ({ medication, scheduleLabel, onEdit, onDelete, onToggleActive }, ref) => {
+  (
+    { medication, scheduleLabel, onEdit, onDelete, onToggleActive, onAnimate },
+    ref,
+  ) => {
     const { name, form, isActive, timeDoses, stock, note } = medication || {};
 
     const handleClose = () => {
@@ -73,6 +77,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
         backdropComponent={renderBackdrop}
         handleIndicatorStyle={styles.handleIndicator}
         backgroundStyle={styles.sheetBackground}
+        onAnimate={onAnimate}
       >
         <BottomSheetView style={styles.contentContainer}>
           {medication && (

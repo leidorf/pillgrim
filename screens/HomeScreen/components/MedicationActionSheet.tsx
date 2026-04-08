@@ -32,11 +32,21 @@ type Props = {
   onTaken: () => void;
   onSkip: () => void;
   onSnooze: (minutes: number) => void;
+  onChange?: (index: number) => void;
 };
 
 const MedicationActionSheet = forwardRef<BottomSheet, Props>(
   (
-    { medicationName, time, isTaken, isSkipped, onTaken, onSkip, onSnooze },
+    {
+      medicationName,
+      time,
+      isTaken,
+      isSkipped,
+      onTaken,
+      onSkip,
+      onSnooze,
+      onChange,
+    },
     ref,
   ) => {
     const { width } = useWindowDimensions();
@@ -113,7 +123,10 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
         backdropComponent={renderBackdrop}
         handleIndicatorStyle={styles.handle}
         backgroundStyle={styles.background}
-        onChange={handleSheetChange}
+        onChange={(index) => {
+          handleSheetChange(index);
+          onChange?.(index);
+        }}
       >
         <BottomSheetView style={styles.container}>
           <View style={styles.overflow}>
@@ -382,9 +395,8 @@ const styles = StyleSheet.create({
     paddingVertical: 14,
     alignItems: "center",
     borderRadius: 14,
-    backgroundColor: Colors.subtle || "#F5F5F5",
+    backgroundColor: Colors.surface,
     marginTop: 4,
-    marginBottom: 8,
   },
   cancelText: {
     fontSize: 15,
@@ -395,7 +407,6 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    paddingVertical: 20,
   },
   backButton: {
     width: 36,

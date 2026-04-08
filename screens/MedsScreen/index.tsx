@@ -17,6 +17,7 @@ const MedsScreen = () => {
   const { medications, deleteMedication, setDraft, updateMedication } =
     useMedicationStore();
 
+  const [isSheetOpen, setIsSheetOpen] = useState(false);
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
   const [selectedScheduleLabel, setSelectedScheduleLabel] = useState("");
@@ -25,6 +26,14 @@ const MedsScreen = () => {
     setSelectedMed(med);
     setSelectedScheduleLabel(formatSchedule(med));
     bottomSheetRef.current?.snapToIndex(0);
+  }, []);
+
+  const handleAnimate = useCallback((fromIndex: number, toIndex: number) => {
+    if (toIndex === -1) {
+      setIsSheetOpen(false);
+    } else if (toIndex === 0) {
+      setIsSheetOpen(true);
+    }
   }, []);
 
   const handleEdit = useCallback(
@@ -136,6 +145,8 @@ const MedsScreen = () => {
         }
       />
 
+      {!isSheetOpen && <AddMedicationButton />}
+
       <MedicationBottomSheet
         ref={bottomSheetRef}
         medication={selectedMed}
@@ -143,9 +154,8 @@ const MedsScreen = () => {
         onEdit={handleEditFromSheet}
         onDelete={handleDeleteFromSheet}
         onToggleActive={handleToggleActive}
+        onAnimate={handleAnimate}
       />
-
-      <AddMedicationButton />
     </ScreenLayout>
   );
 };
