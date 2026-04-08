@@ -4,6 +4,11 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Medication } from "../types/medication";
 import * as Crypto from "expo-crypto";
 import { useLogStore } from "./logsStore";
+import {
+  scheduleMedicationNotifications,
+  cancelMedicationNotifications,
+  rescheduleMedicationNotifications,
+} from "../services/notificationService";
 
 type DraftMedication = Partial<Medication>;
 
@@ -12,9 +17,13 @@ type MedicationStore = {
   draft: DraftMedication;
   setDraft: (fields: Partial<Medication>) => void;
   clearDraft: () => void;
-  saveMedication: () => void;
-  deleteMedication: (id: string) => void;
-  updateMedication: (id: string, updates: Partial<Medication>) => void;
+  saveMedication: () => Promise<void>;
+  deleteMedication: (id: string) => Promise<void>;
+  updateMedication: (id: string, updates: Partial<Medication>) => Promise<void>;
+  _updateMedicationNotificationIds: (
+    id: string,
+    notificationIds: string[],
+  ) => void;
 };
 
 export const useMedicationStore = create<MedicationStore>()(
@@ -22,15 +31,22 @@ export const useMedicationStore = create<MedicationStore>()(
     (set, get) => ({
       medications: [],
       draft: {},
+      /* -------------------------------- Set Draft ------------------------------- */
       setDraft: (fields) =>
         set((state) => ({ draft: { ...state.draft, ...fields } })),
+
+      /* ------------------------------- Clear Draft ------------------------------ */
       clearDraft: () => set({ draft: {} }),
-      saveMedication: () => {
+
+      /* ----------------------------- Save Medication ---------------------------- */
+      saveMedication: async () => {
         const { draft, medications } = get();
+
         if (!draft.name) {
           console.warn("Cannot save medication without a name");
           return;
         }
+
         const now = new Date().toISOString();
         const newMed: Medication = {
           id: Crypto.randomUUID(),
@@ -49,25 +65,102 @@ export const useMedicationStore = create<MedicationStore>()(
           },
           createdAt: now,
           updatedAt: now,
+          notificationIds: [],
         };
+
         set({ medications: [...medications, newMed], draft: {} });
+
+        try {
+          const notificationIds = await scheduleMedicationNotifications(newMed);
+          // development log
+          console.log("Scheduled IDs:", notificationIds);
+          set((state) => ({
+            medications: state.medications.map((m) =>
+              m.id === newMed.id ? { ...m, notificationIds } : m,
+            ),
+          }));
+        } catch (error) {
+          console.error("Failed to schedule notifications:", error);
+        }
       },
-      deleteMedication: (id: string) => {
+
+      /* ---------------------------- Delete Medication --------------------------- */
+      deleteMedication: async (id: string) => {
+        const medication = get().medications.find((m) => m.id === id);
+        if (medication?.notificationIds?.length) {
+          try {
+            await cancelMedicationNotifications(medication.notificationIds);
+          } catch (error) {
+            console.error("Failed to cancel notifications: ", error);
+          }
+        }
+
         useLogStore.getState().deleteLogsByMedication(id);
+
         set((state) => ({
           medications: state.medications.filter((m) => m.id !== id),
         }));
       },
-      updateMedication: (id: string, updates: Partial<Medication>) => {
+
+      /* ---------------------------- Update Medication --------------------------- */
+      updateMedication: async (id: string, updates: Partial<Medication>) => {
+        const currentMed = get().medications.find((m) => m.id === id);
+        if (!currentMed) {
+          console.warn("Medication not found:", id);
+          return;
+        }
+
+        const updatedMed: Medication = {
+          ...currentMed,
+          ...updates,
+          id,
+          updatedAt: new Date().toISOString(),
+        };
+
+        const needsReschedule =
+          updates.notificationSettings !== undefined ||
+          updates.schedule !== undefined ||
+          updates.timeDoses !== undefined ||
+          updates.isActive !== undefined;
+
+        let newNotificationIds: string[] = currentMed.notificationIds ?? [];
+
+        if (needsReschedule) {
+          try {
+            newNotificationIds = await rescheduleMedicationNotifications(
+              updatedMed,
+              currentMed.notificationIds ?? [],
+            );
+          } catch (error) {
+            console.error("Failed to reschedule notifications:", error);
+          }
+        }
+
         set((state) => ({
           medications: state.medications.map((m) =>
             m.id === id
-              ? { ...m, ...updates, updatedAt: new Date().toISOString() }
+              ? { ...updatedMed, notificationIds: newNotificationIds }
               : m,
+          ),
+        }));
+
+        //TODO: lowstock notification
+        if (updates.stock !== undefined && updates.stock <= 5) {
+        }
+      },
+
+      _updateMedicationNotificationIds: (
+        id: string,
+        notificationIds: string[],
+      ) => {
+        set((state) => ({
+          medications: state.medications.map((m) =>
+            m.id === id ? { ...m, notificationIds } : m,
           ),
         }));
       },
     }),
+
     {
       name: "medications-storage",
       storage: createJSONStorage(() => AsyncStorage),

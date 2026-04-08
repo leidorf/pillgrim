@@ -22,12 +22,26 @@ import NextButton from "./components/NextButton";
 import { useState, useCallback } from "react";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../constants/units";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
+import { useTimeFormat } from "../../hooks/useTimeFormat";
 
 type TimeDoseEntry = {
   id: string;
   time: Date;
   amount: string;
 };
+
+function formatTime24(date: Date): string {
+  const h = date.getHours().toString().padStart(2, "0");
+  const m = date.getMinutes().toString().padStart(2, "0");
+  return `${h}:${m}`;
+}
+
+function parseTime24(time: string): Date {
+  const [h, m] = time.split(":").map(Number);
+  const date = new Date();
+  date.setHours(h, m, 0, 0);
+  return date;
+}
 
 const Step3Screen = () => {
   const route = useRoute<any>();
@@ -36,6 +50,8 @@ const Step3Screen = () => {
 
   const { draft, setDraft } = useMedicationStore();
   const navigation = useNavigation<NavProp>();
+
+  const { formatTime } = useTimeFormat();
 
   const medicationForm = draft.form || "";
   const availableUnits = DOSE_UNITS_BY_FORM[medicationForm] || DEFAULT_UNITS;
@@ -47,15 +63,17 @@ const Step3Screen = () => {
     const unitLabel = parts.slice(1).join(" ");
     return availableUnits.find((u) => u.label === unitLabel)?.value ?? "";
   });
+
   const [timeDoses, setTimeDoses] = useState<TimeDoseEntry[]>(() => {
     if (draft.timeDoses?.length) {
       return draft.timeDoses.map((td, i) => {
         const parts = td.dose?.split(" ") ?? [];
         const amount = parts[0] ?? "";
-        const [hours, minutes] = td.time.split(":").map(Number);
-        const date = new Date();
-        date.setHours(hours, minutes, 0, 0);
-        return { id: String(i + 1), time: date, amount };
+        return {
+          id: String(i + 1),
+          time: parseTime24(td.time),
+          amount,
+        };
       });
     }
     return [{ id: "1", time: createDefaultTime(8), amount: "" }];
@@ -113,13 +131,6 @@ const Step3Screen = () => {
     [activeTimePickerId],
   );
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString("en-US", {
-      hour: "2-digit",
-      minute: "2-digit",
-    });
-  };
-
   const handleAmountChange = (id: string, text: string) => {
     let numeric = text.replace(/[^0-9.]/g, "");
     const parts = numeric.split(".");
@@ -147,13 +158,11 @@ const Step3Screen = () => {
       availableUnits.find((u) => u.value === selectedUnit)?.label ||
       selectedUnit;
 
-    const newTimeDoses = timeDoses.map((td) => ({
-      time: formatTime(td.time),
-      dose: `${td.amount} ${unitLabel}`,
-    }));
-
     setDraft({
-      timeDoses: newTimeDoses,
+      timeDoses: timeDoses.map((td) => ({
+        time: formatTime24(td.time),
+        dose: `${td.amount} ${unitLabel}`,
+      })),
     });
 
     navigation.navigate("AddMedication", {
@@ -270,7 +279,7 @@ const Step3Screen = () => {
                     style={styles.timePickerButton}
                     onPress={() => setActiveTimePickerId(td.id)}
                   >
-                    <Text style={styles.timeText}>{formatTime(td.time)}</Text>
+                  <Text style={styles.timeText}>{formatTime(td.time)}</Text>
                     <Text style={styles.timeHint}>Tap to change time</Text>
                   </Pressable>
 

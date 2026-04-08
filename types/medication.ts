@@ -45,6 +45,7 @@ export type Medication = {
     hideName: boolean;
     lowStockAlert: boolean;
   };
+  notificationIds?: string[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
