@@ -59,15 +59,15 @@ function toExpoWeekday(jsDay: number): number {
 
 function buildTitle(medication: Medication): string {
   if (medication.notificationSettings?.hideName) {
-    return "💊 Medication Reminder";
+    return "Medication Reminder";
   }
-  return `💊 ${medication.name}`;
+  return `${medication.name}`;
 }
 
 function buildBody(medication: Medication, dose: string, time: string): string {
   const parts: string[] = [];
 
-  if (dose) parts.push(`Dose: ${dose}`);
+  dose && parts.push(dose);
   if (medication.note && medication.note !== "any") {
     parts.push(noteLabel(medication.note));
   }
@@ -340,8 +340,8 @@ export async function scheduleLowStockNotification(
     return null;
 
   const title = medication.notificationSettings.hideName
-    ? "⚠️ Low Medication Stock"
-    : `⚠️ Low Stock: ${medication.name}`;
+    ? "Low Medication Stock"
+    : `Low ${medication.name} Stock`;
 
   const body = `Only ${medication.stock} dose${medication.stock === 1 ? "" : "s"} remaining. Time to refill.`;
 

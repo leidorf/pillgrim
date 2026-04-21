@@ -26,7 +26,7 @@ import Step2Screen from "./screens/AddMedication/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen";
 import Step4Screen from "./screens/AddMedication/Step4Screen";
 import NotificationsScreen from "./screens/Settings/NotificationsScreen";
-import { StatusBar } from "react-native";
+import { StatusBar, useColorScheme } from "react-native";
 import AppearanceScreen from "./screens/Settings/AppearanceScreen";
 import LanguageScreen from "./screens/Settings/LanguageScreen";
 import AlarmScreen from "./screens/Settings/AlarmScreen";
@@ -110,11 +110,14 @@ const SettingsNavigator = () => {
 };
 
 export default function App() {
+  const colorScheme = useColorScheme();
+  const isDarkMode = colorScheme === "dark";
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <BottomSheetModalProvider>
           <NavigationContainer theme={AppTheme}>
+            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"}   />
             <RootStack.Navigator>
               <RootStack.Screen
                 name="MainTabs"

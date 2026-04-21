@@ -33,9 +33,24 @@
       [
         "expo-notifications",
         {
+          "enableBackgroundRemoteNotifications": true,
           "icon": "./assets/notification-icon.png",
           "color": "#689F38",
           "sounds": []
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "usesCleartextTraffic": false,
+            "permissions": [
+              "android.permission.SCHEDULE_EXACT_ALARM",
+              "android.permission.USE_EXACT_ALARM",
+              "android.permission.RECEIVE_BOOT_COMPLETED",
+              "android.permission.WAKE_LOCK"
+            ]
+          }
         }
       ],
       "expo-font"
