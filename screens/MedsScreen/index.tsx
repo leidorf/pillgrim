@@ -11,6 +11,7 @@ import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Colors } from "../../constants/theme";
 import ScreenLayout from "../../components/ScreenLayout";
+import BaseModal from "../../components/BaseModal";
 
 const MedsScreen = () => {
   const navigation = useNavigation<NavProp>();
@@ -21,6 +22,12 @@ const MedsScreen = () => {
   const bottomSheetRef = useRef<BottomSheet>(null);
   const [selectedMed, setSelectedMed] = useState<Medication | null>(null);
   const [selectedScheduleLabel, setSelectedScheduleLabel] = useState("");
+
+  const [deleteModal, setDeleteModal] = useState<{
+    visible: boolean;
+    medicationId?: string;
+    name?: string;
+  }>({ visible: false });
 
   const handleOpenSheet = useCallback((med: Medication) => {
     setSelectedMed(med);
@@ -50,23 +57,16 @@ const MedsScreen = () => {
     [medications, setDraft, navigation],
   );
 
-  const handleDelete = useCallback(
-    (medicationId: string, name: string) => {
-      Alert.alert(
-        "Delete Medication",
-        `Are you sure you want to delete "${name}"?`,
-        [
-          { text: "Cancel", style: "cancel" },
-          {
-            text: "Delete",
-            onPress: () => deleteMedication(medicationId),
-            style: "destructive",
-          },
-        ],
-      );
-    },
-    [deleteMedication],
-  );
+  const handleDelete = useCallback((medicationId: string, name: string) => {
+    setDeleteModal({ visible: true, medicationId, name });
+  }, []);
+
+  const confirmDelete = useCallback(() => {
+    if (deleteModal.medicationId) {
+      deleteMedication(deleteModal.medicationId);
+    }
+    setDeleteModal({ visible: false });
+  }, [deleteModal.medicationId, deleteMedication]);
 
   const handleToggleActive = useCallback(
     (id: string, isActive: boolean) => {
@@ -155,6 +155,25 @@ const MedsScreen = () => {
         onDelete={handleDeleteFromSheet}
         onToggleActive={handleToggleActive}
         onAnimate={handleAnimate}
+      />
+
+      <BaseModal
+        visible={deleteModal.visible}
+        title="Delete Medication"
+        message={`Are you sure you want to delete "${deleteModal.name}"?`}
+        onDismiss={() => setDeleteModal({ visible: false })}
+        buttons={[
+          {
+            text: "Cancel",
+            onPress: () => setDeleteModal({ visible: false }),
+            variant: "default",
+          },
+          {
+            text: "Delete",
+            onPress: confirmDelete,
+            variant: "destructive",
+          },
+        ]}
       />
     </ScreenLayout>
   );

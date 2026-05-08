@@ -33,7 +33,7 @@ const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const Step2Screen = () => {
   const navigation = useNavigation<NavProp>();
   const { width: screenWidth } = useWindowDimensions();
-  const { draft, setDraft } = useMedicationStore();
+  const { draft, setDraft, clearDraft } = useMedicationStore();
 
   const route = useRoute<any>();
   const mode = route.params?.mode;
@@ -268,6 +268,13 @@ const Step2Screen = () => {
     });
   };
 
+  const handleClose = () => {
+    if (mode !== "edit") {
+      clearDraft();
+    }
+    navigation.getParent()?.goBack();
+  };
+
   const isScheduleComplete = (): boolean => {
     if (!selectedSchedule) return false;
     if (selectedSchedule === "weekly") return selectedWeekdays.length > 0;
@@ -441,7 +448,7 @@ const Step2Screen = () => {
           if (isOnOtherView) {
             goBack();
           } else {
-            navigation.goBack();
+            handleClose();
           }
         }}
       />

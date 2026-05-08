@@ -16,8 +16,6 @@ import {
 import * as ImagePicker from "expo-image-picker";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
-import CloseIcon from "../../assets/icons/close.svg";
-import BackIcon from "../../assets/icons/arrow-left.svg";
 import ImageIcon from "../../assets/icons/image.svg";
 import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
 import BellIcon from "../../assets/icons/bell.svg";
@@ -28,8 +26,8 @@ import NextButton from "./components/NextButton";
 import { useState, useRef, useEffect } from "react";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import InlineContainer from "./components/InlineContainer";
-import ProgressBar from "./components/ProgressBar";
 import AddMedicationHeader from "./components/AddMedicationHeader";
+import BaseModal from "../../components/BaseModal";
 
 const INSTRUCTION_OPTIONS = [
   { id: "before_meal", label: "Before meal" },
@@ -82,6 +80,9 @@ const Step4Screen = () => {
 
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
+  const [imageModalVisible, setImageModalVisible] = useState(false);
+  const [removePhotoModal, setRemovePhotoModal] = useState(false);
+  const stockInputRef = useRef<TextInput>(null);
 
   useEffect(() => {
     if (isDropdownOpen) {
@@ -189,22 +190,11 @@ const Step4Screen = () => {
   };
 
   const showImageOptions = () => {
-    Alert.alert("Add Photo", "Choose an option", [
-      { text: "Cancel", style: "cancel" },
-      { text: "Take Photo", onPress: takePhoto },
-      { text: "Choose from Library", onPress: pickImage },
-    ]);
+    setImageModalVisible(true);
   };
 
-  const removePhoto = () => {
-    Alert.alert("Remove Photo", "Are you sure?", [
-      { text: "Cancel", style: "cancel" },
-      {
-        text: "Remove",
-        onPress: () => setPhotoUri(null),
-        style: "destructive",
-      },
-    ]);
+  const showRemovePhotoOptions = () => {
+    setRemovePhotoModal(true);
   };
 
   const toggleNotification = (key: keyof NotificationSettings) => {
@@ -263,6 +253,13 @@ const Step4Screen = () => {
 
   const hasStock = parseInt(stock, 10) > 0;
 
+  const handleClose = () => {
+    if (mode !== "edit") {
+      clearDraft();
+    }
+    navigation.getParent()?.goBack();
+  };
+
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="handled"
@@ -270,7 +267,7 @@ const Step4Screen = () => {
       contentContainerStyle={styles.container}
       enableOnAndroid
     >
-      <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
+      <Pressable style={styles.backdrop} onPress={() => handleClose()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
         <AddMedicationHeader currentStep={4} title="Optional Details" />
@@ -316,8 +313,12 @@ const Step4Screen = () => {
 
           {/* ------------------------------ Current Stock ----------------------------- */}
           <InlineContainer containerText="Current Stock">
-            <View style={styles.stockContainer}>
+            <Pressable
+              style={styles.stockContainer}
+              onPress={() => stockInputRef.current?.focus()}
+            >
               <TextInput
+                ref={stockInputRef}
                 style={styles.stockInput}
                 value={stock}
                 onChangeText={handleStockChange}
@@ -329,7 +330,7 @@ const Step4Screen = () => {
               <Text style={styles.stockLabel}>
                 {parseInt(stock || "0") === 1 ? "unit left" : "units left"}
               </Text>
-            </View>
+            </Pressable>
           </InlineContainer>
 
           {/* ---------------------------------- Photo --------------------------------- */}
@@ -343,7 +344,7 @@ const Step4Screen = () => {
                 />
                 <Pressable
                   style={styles.removePhotoButton}
-                  onPress={removePhoto}
+                  onPress={showRemovePhotoOptions}
                 >
                   <Text style={styles.removePhotoText}>×</Text>
                 </Pressable>
@@ -548,6 +549,58 @@ const Step4Screen = () => {
           </Animated.View>
         </Pressable>
       </Modal>
+
+      {/* ----------------------------- Add Photo Modal ---------------------------- */}
+      <BaseModal
+        visible={imageModalVisible}
+        title="Add Photo"
+        message="Choose an option"
+        onDismiss={() => setImageModalVisible(false)}
+        buttons={[
+          {
+            text: "Take Photo",
+            variant: "primary",
+            onPress: () => {
+              setImageModalVisible(false);
+              takePhoto();
+            },
+          },
+          {
+            text: "Choose from Library",
+            variant: "primary",
+            onPress: () => {
+              setImageModalVisible(false);
+              pickImage();
+            },
+          },
+          {
+            text: "Cancel",
+            onPress: () => setImageModalVisible(false),
+          },
+        ]}
+      />
+
+      {/* --------------------------- Remove Photo Modal --------------------------- */}
+      <BaseModal
+        visible={removePhotoModal}
+        title="Remove Photo"
+        message="Are you sure you want to remove this photo?"
+        onDismiss={() => setRemovePhotoModal(false)}
+        buttons={[
+          {
+            text: "Cancel",
+            onPress: () => setRemovePhotoModal(false),
+          },
+          {
+            text: "Remove",
+            variant: "destructive",
+            onPress: () => {
+              setPhotoUri(null);
+              setRemovePhotoModal(false);
+            },
+          },
+        ]}
+      />
     </KeyboardAwareScrollView>
   );
 };

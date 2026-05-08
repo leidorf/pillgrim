@@ -13,8 +13,6 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import { NavProp } from "../../types/navigation";
 import { Colors } from "../../constants/theme";
-import CloseIcon from "../../assets/icons/close.svg";
-import BackIcon from "../../assets/icons/arrow-left.svg";
 import PlusIcon from "../../assets/icons/plus.svg";
 import TrashIcon from "../../assets/icons/trash.svg";
 import { useMedicationStore } from "../../store/medicationStore";
@@ -23,7 +21,6 @@ import { useState, useCallback } from "react";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../constants/units";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
-import ProgressBar from "./components/ProgressBar";
 import AddMedicationHeader from "./components/AddMedicationHeader";
 
 type TimeDoseEntry = {
@@ -50,7 +47,7 @@ const Step3Screen = () => {
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
 
-  const { draft, setDraft } = useMedicationStore();
+  const { draft, setDraft, clearDraft } = useMedicationStore();
   const navigation = useNavigation<NavProp>();
 
   const { formatTime } = useTimeFormat();
@@ -173,6 +170,13 @@ const Step3Screen = () => {
     });
   };
 
+  const handleClose = () => {
+    if (mode !== "edit") {
+      clearDraft();
+    }
+    navigation.getParent()?.goBack();
+  };
+
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="handled"
@@ -180,7 +184,7 @@ const Step3Screen = () => {
       contentContainerStyle={styles.container}
       enableOnAndroid
     >
-      <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
+      <Pressable style={styles.backdrop} onPress={() => handleClose()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
         <AddMedicationHeader

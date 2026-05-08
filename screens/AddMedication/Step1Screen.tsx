@@ -26,7 +26,7 @@ type FormErrors = {
 
 const Step1Screen = () => {
   const navigation = useNavigation<NavProp>();
-  const { draft, setDraft } = useMedicationStore();
+  const { draft, setDraft, clearDraft } = useMedicationStore();
   const [selectedForm, setSelectedForm] = useState<Medication["form"]>(
     draft.form ?? "capsule",
   );
@@ -77,6 +77,13 @@ const Step1Screen = () => {
     }
   };
 
+  const handleClose = () => {
+    if (mode !== "edit") {
+      clearDraft();
+    }
+    navigation.getParent()?.goBack();
+  };
+
   const SelectedIcon =
     MED_FORMS.find((f) => f.id === selectedForm)?.Icon ?? PillIcon;
 
@@ -89,7 +96,7 @@ const Step1Screen = () => {
       extraHeight={showFormPicker ? 32 : 8}
       extraScrollHeight={showFormPicker ? 32 : 8}
     >
-      <Pressable style={styles.backdrop} onPress={() => navigation.goBack()} />
+      <Pressable style={styles.backdrop} onPress={() => handleClose()} />
       <View style={styles.modalContainer}>
         {/* --------------------------------- Header --------------------------------- */}
         <AddMedicationHeader
