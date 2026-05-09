@@ -4,7 +4,7 @@
 
 ### screens
 
-- [ ] AddMedication screens will be split into components
+- [x] AddMedication screens will be split into components
 - [x] LogsScreen will be split into components
 - [x] Step4Screen addPhoto action will be shown with proper component not with alert
 - [x] Add statusBar to AddMedication screens
@@ -22,3 +22,5 @@
 ### bugs
 
 - [ ] medication take actions somehow effects the next day
+- [ ] time format only affects step3screen
+- [x] draft doesnt clear after exiting edit med screen
