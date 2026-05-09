@@ -56,6 +56,7 @@ export type MedicationLog = {
   medicationId: string;
   scheduledDate: string;
   scheduledTime: string;
+  doseAmount?: number;
   takenAt?: Date;
   skipped?: boolean;
   doseTaken?: string;

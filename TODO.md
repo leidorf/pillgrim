@@ -24,3 +24,4 @@
 - [ ] medication take actions somehow effects the next day
 - [ ] time format only affects step3screen
 - [x] draft doesnt clear after exiting edit med screen
+- [x] med stocks dont change

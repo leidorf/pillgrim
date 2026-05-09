@@ -124,7 +124,7 @@ const HomeScreen = () => {
   );
 
   const handleToggle = useCallback(
-    (medicationId: string, time: string) => {
+    (medicationId: string, time: string, doseAmount?: number) => {
       const dateStr = selectedDate.toISOString().split("T")[0];
       const existingLog = dayLogs.find(
         (l) => l.medicationId === medicationId && l.scheduledTime === time,
@@ -133,7 +133,11 @@ const HomeScreen = () => {
         if (existingLog.takenAt && !existingLog.skipped) {
           deleteLog(existingLog.id);
         } else {
-          updateLog(existingLog.id, { takenAt: new Date(), skipped: false });
+          updateLog(existingLog.id, {
+            takenAt: new Date(),
+            skipped: false,
+            ...(doseAmount && !existingLog.doseAmount && { doseAmount }),
+          });
         }
       } else {
         addLog({
@@ -142,6 +146,7 @@ const HomeScreen = () => {
           scheduledTime: time,
           takenAt: new Date(),
           skipped: false,
+          doseAmount,
         });
       }
     },
@@ -215,7 +220,10 @@ const HomeScreen = () => {
               time={item.time}
               dose={item.dose}
               log={log}
-              onToggle={handleToggle}
+              onToggle={(medId, time) => {
+                const amount = parseFloat(item.dose) || 1;
+                handleToggle(medId, time, amount);
+              }}
               onOpenSheet={handleOpenSheet}
             />
           );
@@ -249,10 +257,14 @@ const HomeScreen = () => {
         time={selectedItem?.time ?? ""}
         isTaken={!!selectedLog?.takenAt && !selectedLog?.skipped}
         isSkipped={!!selectedLog?.skipped}
-        onTaken={() =>
-          selectedItem &&
-          handleToggle(selectedItem.medication.id, selectedItem.time)
-        }
+        onTaken={() => {
+          if (!selectedItem) return;
+          const doseStr = selectedItem.medication.timeDoses?.find(
+            (td) => td.time === selectedItem.time,
+          )?.dose;
+          const amount = parseFloat(doseStr || "1") || 1;
+          handleToggle(selectedItem.medication.id, selectedItem.time, amount);
+        }}
         onSkip={() =>
           selectedItem &&
           handleSkip(selectedItem.medication.id, selectedItem.time)

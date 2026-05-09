@@ -20,6 +20,7 @@ type MedicationStore = {
   saveMedication: () => Promise<void>;
   deleteMedication: (id: string) => Promise<void>;
   updateMedication: (id: string, updates: Partial<Medication>) => Promise<void>;
+  updateStock: (id: string, delta: number) => void;
   _updateMedicationNotificationIds: (
     id: string,
     notificationIds: string[],
@@ -72,7 +73,7 @@ export const useMedicationStore = create<MedicationStore>()(
 
         try {
           const notificationIds = await scheduleMedicationNotifications(newMed);
-          // development log
+          // TODO: development log - remove before publish
           console.log("Scheduled IDs:", notificationIds);
           set((state) => ({
             medications: state.medications.map((m) =>
@@ -147,6 +148,21 @@ export const useMedicationStore = create<MedicationStore>()(
         //TODO: lowstock notification
         if (updates.stock !== undefined && updates.stock <= 5) {
         }
+      },
+
+      /* -------------------- Update Stock on Medication Takes -------------------- */
+      updateStock: (id: string, delta: number) => {
+        set((state) => ({
+          medications: state.medications.map((m) =>
+            m.id === id && m.stock !== undefined
+              ? {
+                  ...m,
+                  stock: Math.max(0, m.stock + delta),
+                  updatedAt: new Date().toISOString(),
+                }
+              : m,
+          ),
+        }));
       },
 
       _updateMedicationNotificationIds: (
