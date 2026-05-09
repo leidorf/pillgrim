@@ -11,10 +11,12 @@ import { useLogStore } from "../../store/logsStore";
 import BottomSheet from "@gorhom/bottom-sheet";
 import MedicationActionSheet from "./components/MedicationActionSheet";
 import ScreenLayout from "../../components/ScreenLayout";
+import { useTimeFormat } from "../../hooks/useTimeFormat";
 
 type ScheduleItem = {
   medication: Medication;
   time: string;
+  displayTime: string;
   dose: string;
   logKey: string;
 };
@@ -40,6 +42,7 @@ const HomeScreen = () => {
     time: string;
     log?: MedicationLog;
   } | null>(null);
+  const { formatTimeString } = useTimeFormat();
 
   const isMedicationScheduledForDate = (
     med: Medication,
@@ -97,6 +100,7 @@ const HomeScreen = () => {
         schedule.push({
           medication: med,
           time: td.time,
+          displayTime: formatTimeString(td.time),
           dose: td.dose,
           logKey: `${med.id}-${dateStr}-${td.time}`,
         });
@@ -218,6 +222,7 @@ const HomeScreen = () => {
             <MedicationCard
               medication={item.medication}
               time={item.time}
+              displayTime={item.displayTime}
               dose={item.dose}
               log={log}
               onToggle={(medId, time) => {
@@ -255,6 +260,7 @@ const HomeScreen = () => {
         ref={actionSheetRef}
         medicationName={selectedItem?.medication.name ?? ""}
         time={selectedItem?.time ?? ""}
+        displayTime={selectedItem ? formatTimeString(selectedItem.time) : ""}
         isTaken={!!selectedLog?.takenAt && !selectedLog?.skipped}
         isSkipped={!!selectedLog?.skipped}
         onTaken={() => {

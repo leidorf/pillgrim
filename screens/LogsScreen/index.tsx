@@ -8,6 +8,7 @@ import ScreenLayout from "../../components/ScreenLayout";
 import LogsHeader from "./components/LogsHeader";
 import SelectedDayHeader from "./components/SelectedDayHeader";
 import MedicationLogCard from "./components/MedicationLogCard";
+import { useTimeFormat } from "../../hooks/useTimeFormat";
 
 const LogsScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -16,6 +17,7 @@ const LogsScreen = () => {
   );
   const { getLogsByDate, logs } = useLogStore();
   const { medications } = useMedicationStore();
+  const { formatTimeString } = useTimeFormat();
 
   const dayLogs = useMemo(() => {
     const logList = getLogsByDate(selectedDate);
@@ -27,10 +29,11 @@ const LogsScreen = () => {
           ...log,
           medicationName: medication?.name || "Unknown Medication",
           form: medication?.form,
+          displayTime: formatTimeString(log.scheduledTime),
         };
       })
       .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
-  }, [selectedDate, logs, medications]);
+  }, [selectedDate, logs, medications, formatTimeString]);
 
   const getDayStats = useLogStore((state) => state.getDayStats);
   const dayStats = useMemo(() => {

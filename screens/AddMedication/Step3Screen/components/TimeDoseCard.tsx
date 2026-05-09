@@ -11,6 +11,7 @@ import DateTimePicker, {
 } from "@react-native-community/datetimepicker";
 import TrashIcon from "../../../../assets/icons/trash.svg";
 import { Colors } from "../../../../constants/theme";
+import { useTimeFormat } from "../../../../hooks/useTimeFormat";
 
 type Props = {
   index: number;
@@ -48,6 +49,7 @@ export const TimeDoseCard = ({
   formattedTime,
 }: Props) => {
   const hasInvalidAmount = amount.length > 0 && !isValidAmount(amount);
+  const is24Hour = useTimeFormat().timeFormat === "24h";
 
   return (
     <View style={styles.card}>
@@ -77,8 +79,8 @@ export const TimeDoseCard = ({
         <DateTimePicker
           value={time}
           mode="time"
-          is24Hour
-          display={Platform.OS === "ios" ? "spinner" : "default"}
+          is24Hour={is24Hour}
+          display="spinner"
           onChange={onTimeChange}
         />
       )}

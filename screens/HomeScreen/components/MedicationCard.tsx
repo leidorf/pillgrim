@@ -10,6 +10,7 @@ import { useCallback, useMemo } from "react";
 type MedicationCardProps = {
   medication: Medication;
   time: string;
+  displayTime:string;
   dose: string;
   log?: MedicationLog;
   onToggle?: (medicationId: string, time: string) => void;
@@ -23,6 +24,7 @@ type MedicationCardProps = {
 const MedicationCard = ({
   medication,
   time,
+  displayTime,
   dose,
   log,
   onToggle,
@@ -66,7 +68,7 @@ const MedicationCard = ({
             isSkipped && styles.skippedTimeText,
           ]}
         >
-          {time}
+          {displayTime}
         </Text>
         <Pressable
           style={styles.checkButton}

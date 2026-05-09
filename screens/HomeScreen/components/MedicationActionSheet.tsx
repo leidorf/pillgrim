@@ -27,6 +27,7 @@ const SNOOZE_OPTIONS = [
 type Props = {
   medicationName: string;
   time: string;
+  displayTime:string;
   isTaken: boolean;
   isSkipped: boolean;
   onTaken: () => void;
@@ -40,6 +41,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
     {
       medicationName,
       time,
+      displayTime,
       isTaken,
       isSkipped,
       onTaken,
@@ -140,7 +142,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
               <View style={[styles.viewPane, { width }]}>
                 <View style={styles.header}>
                   <Text style={styles.medName}>{medicationName}</Text>
-                  <Text style={styles.medTime}>{time}</Text>
+                  <Text style={styles.medTime}>{displayTime}</Text>
                 </View>
 
                 <View style={styles.divider} />

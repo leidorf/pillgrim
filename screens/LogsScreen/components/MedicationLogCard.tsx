@@ -1,5 +1,6 @@
 import { StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../../constants/theme";
+import { useTimeFormat } from "../../../hooks/useTimeFormat";
 
 type MedicationLog = {
   id: string;
@@ -9,6 +10,7 @@ type MedicationLog = {
   takenAt?: Date;
   skipped?: boolean;
   scheduledDate: string;
+  displayTime: string;
 };
 
 type StatusInfo = {
@@ -23,6 +25,8 @@ type MedicationLogCardProps = {
 };
 
 const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
+  const { formatTime } = useTimeFormat();
+
   const getStatusInfo = (): StatusInfo => {
     const now = new Date();
 
@@ -31,7 +35,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
         icon: "✓",
         label: "Taken",
         color: Colors.success || "#22C55E",
-        subtext: `${log.takenAt.getHours().toString().padStart(2, "0")}:${log.takenAt.getMinutes().toString().padStart(2, "0")}`,
+        subtext: formatTime(log.takenAt),
       };
     }
 
@@ -70,7 +74,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
   return (
     <View style={styles.logItem}>
       <View style={styles.logLeft}>
-        <Text style={styles.logTime}>{log.scheduledTime}</Text>
+        <Text style={styles.logTime}>{log.displayTime}</Text>
         <View style={styles.timeline} />
       </View>
 
