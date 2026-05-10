@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LogFilter, MedicationLog } from "../types/medication";
 import * as Crypto from "expo-crypto";
 import { useMedicationStore } from "./medicationStore";
+import { getLocalDateString } from "../utils/dateUtils";
 
 type LogStore = {
   logs: MedicationLog[];
@@ -92,13 +93,13 @@ export const useLogStore = create<LogStore>()(
       },
 
       getLogsByDate: (date) => {
-        const dateStr = date.toISOString().split("T")[0];
+        const dateStr = getLocalDateString(date);
         return get().logs.filter((log) => log.scheduledDate === dateStr);
       },
 
       getLogsByDateRange: (startDate, endDate) => {
-        const startStr = startDate.toISOString().split("T")[0];
-        const endStr = endDate.toISOString().split("T")[0];
+        const startStr = getLocalDateString(startDate);
+        const endStr = getLocalDateString(endDate);
         return get().logs.filter(
           (log) => log.scheduledDate >= startStr && log.scheduledDate <= endStr,
         );

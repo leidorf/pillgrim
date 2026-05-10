@@ -12,6 +12,7 @@ import BottomSheet from "@gorhom/bottom-sheet";
 import MedicationActionSheet from "./components/MedicationActionSheet";
 import ScreenLayout from "../../components/ScreenLayout";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
+import { getLocalDateString } from "../../utils/dateUtils";
 
 type ScheduleItem = {
   medication: Medication;
@@ -87,7 +88,7 @@ const HomeScreen = () => {
   };
 
   const getScheduleForDate = (date: Date): ScheduleItem[] => {
-    const dateStr = date.toISOString().split("T")[0];
+    const dateStr = getLocalDateString(date);
     const dayOfMonth = date.getDate();
     const weekday = WEEKDAY_MAP[date.getDay()];
     const schedule: ScheduleItem[] = [];
@@ -129,7 +130,7 @@ const HomeScreen = () => {
 
   const handleToggle = useCallback(
     (medicationId: string, time: string, doseAmount?: number) => {
-      const dateStr = selectedDate.toISOString().split("T")[0];
+      const dateStr = getLocalDateString(selectedDate);
       const existingLog = dayLogs.find(
         (l) => l.medicationId === medicationId && l.scheduledTime === time,
       );
@@ -159,7 +160,7 @@ const HomeScreen = () => {
 
   const handleSkip = useCallback(
     (medicationId: string, time: string) => {
-      const dateStr = selectedDate.toISOString().split("T")[0];
+      const dateStr = getLocalDateString(selectedDate);
       const existingLog = dayLogs.find(
         (l) => l.medicationId === medicationId && l.scheduledTime === time,
       );
