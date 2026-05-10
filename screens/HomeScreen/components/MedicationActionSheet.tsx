@@ -26,8 +26,7 @@ const SNOOZE_OPTIONS = [
 
 type Props = {
   medicationName: string;
-  time: string;
-  displayTime:string;
+  displayTime: string;
   isTaken: boolean;
   isSkipped: boolean;
   onTaken: () => void;
@@ -40,7 +39,6 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
   (
     {
       medicationName,
-      time,
       displayTime,
       isTaken,
       isSkipped,
@@ -329,7 +327,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
   },
   header: {
-    paddingVertical: 20,
+    paddingVertical: 10,
   },
   medName: {
     fontSize: 18,
@@ -344,7 +342,7 @@ const styles = StyleSheet.create({
   divider: {
     height: 1,
     backgroundColor: Colors.border || "#E5E5E5",
-    marginBottom: 8,
+    marginVertical: 8,
   },
   actions: {
     gap: 4,
@@ -355,7 +353,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
     paddingVertical: 12,
-    paddingHorizontal: 12,
     borderRadius: 14,
   },
   actionRowTaken: {
@@ -398,7 +395,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 14,
     backgroundColor: Colors.surface,
-    marginTop: 4,
+    marginTop: "auto",
   },
   cancelText: {
     fontSize: 15,
@@ -406,15 +403,14 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   snoozeHeader: {
+    paddingVertical: 10,
     flexDirection: "row",
     alignItems: "center",
-    gap: 12,
+    gap: 20,
   },
   backButton: {
     width: 36,
     height: 36,
-    borderRadius: 10,
-    backgroundColor: Colors.subtle || "#F5F5F5",
     alignItems: "center",
     justifyContent: "center",
   },
@@ -427,7 +423,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 14,
-    backgroundColor: Colors.subtle || "#F5F5F5",
+    backgroundColor: Colors.surface || "#F5F5F5",
   },
   snoozeLabel: {
     fontSize: 15,

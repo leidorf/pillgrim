@@ -260,7 +260,6 @@ const HomeScreen = () => {
       <MedicationActionSheet
         ref={actionSheetRef}
         medicationName={selectedItem?.medication.name ?? ""}
-        time={selectedItem?.time ?? ""}
         displayTime={selectedItem ? formatTimeString(selectedItem.time) : ""}
         isTaken={!!selectedLog?.takenAt && !selectedLog?.skipped}
         isSkipped={!!selectedLog?.skipped}
