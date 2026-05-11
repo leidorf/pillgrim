@@ -1,13 +1,5 @@
-import { useCallback, useState } from "react";
-import {
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
-import { DateTimePickerEvent } from "@react-native-community/datetimepicker";
+import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -24,6 +16,7 @@ import PlusIcon from "../../../assets/icons/plus.svg";
 import { UnitSelector } from "./components/UnitSelector";
 import { TimeDoseCard } from "./components/TimeDoseCard";
 import { DailySummaryCard } from "./components/DailySummaryCard";
+import { TimePickerModal } from "./components/TimePickerModal";
 
 type TimeDoseEntry = {
   id: string;
@@ -71,6 +64,7 @@ const Step3Screen = () => {
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
 
+  const is24Hour = useTimeFormat().timeFormat === "24h";
   const availableUnits = DOSE_UNITS_BY_FORM[draft.form || ""] || DEFAULT_UNITS;
 
   const [selectedUnit, setSelectedUnit] = useState<string>(() => {
@@ -98,7 +92,9 @@ const Step3Screen = () => {
     null,
   );
 
-  /* ----------------------------- Dose Mutations ----------------------------- */
+  const activeTime =
+    timeDoses.find((d) => d.id === activeTimePickerId)?.time ?? new Date();
+
   const updateDose = (id: string, updates: Partial<TimeDoseEntry>) => {
     setTimeDoses((prev) =>
       prev.map((d) => (d.id === id ? { ...d, ...updates } : d)),
@@ -122,15 +118,12 @@ const Step3Screen = () => {
   };
 
   /* ------------------------------- Time Picker ------------------------------ */
-  const handleTimeChange = useCallback(
-    (event: DateTimePickerEvent, selectedDate?: Date) => {
-      if (Platform.OS === "android") setActiveTimePickerId(null);
-      if (selectedDate && activeTimePickerId) {
-        updateDose(activeTimePickerId, { time: selectedDate });
-      }
-    },
-    [activeTimePickerId],
-  );
+  const handleTimeConfirm = (date: Date) => {
+    if (activeTimePickerId) {
+      updateDose(activeTimePickerId, { time: date });
+    }
+    setActiveTimePickerId(null);
+  };
 
   const handleAmountChange = (id: string, text: string) => {
     updateDose(id, { amount: sanitizeDecimalInput(text) });
@@ -184,7 +177,7 @@ const Step3Screen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* --------------------------------- Summary -------------------------------- */}
+          {/* Summary — only visible when all doses are filled */}
           {allDosesComplete && (
             <DailySummaryCard
               doses={timeDoses}
@@ -206,15 +199,12 @@ const Step3Screen = () => {
               <TimeDoseCard
                 key={td.id}
                 index={index}
-                time={td.time}
                 amount={td.amount}
                 selectedUnit={selectedUnit}
                 unitLabel={unitLabel}
-                isTimePickerOpen={activeTimePickerId === td.id}
                 canRemove={timeDoses.length > 1}
                 onRemove={() => removeDose(td.id)}
                 onOpenTimePicker={() => setActiveTimePickerId(td.id)}
-                onTimeChange={handleTimeChange}
                 onAmountChange={(text) => handleAmountChange(td.id, text)}
                 formattedTime={formatTime(td.time)}
               />
@@ -247,6 +237,14 @@ const Step3Screen = () => {
 
         <NextButton disabled={!allDosesComplete} onPress={handleNext} />
       </View>
+
+      <TimePickerModal
+        visible={activeTimePickerId !== null}
+        value={activeTime}
+        is24Hour={is24Hour}
+        onConfirm={handleTimeConfirm}
+        onDismiss={() => setActiveTimePickerId(null)}
+      />
     </KeyboardAwareScrollView>
   );
 };

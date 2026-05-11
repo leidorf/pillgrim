@@ -1,29 +1,15 @@
-import {
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
-import DateTimePicker, {
-  DateTimePickerEvent,
-} from "@react-native-community/datetimepicker";
+import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import TrashIcon from "../../../../assets/icons/trash.svg";
 import { Colors } from "../../../../constants/theme";
-import { useTimeFormat } from "../../../../hooks/useTimeFormat";
 
 type Props = {
   index: number;
-  time: Date;
   amount: string;
   selectedUnit: string;
   unitLabel: string;
-  isTimePickerOpen: boolean;
   canRemove: boolean;
   onRemove: () => void;
   onOpenTimePicker: () => void;
-  onTimeChange: (event: DateTimePickerEvent, date?: Date) => void;
   onAmountChange: (text: string) => void;
   formattedTime: string;
 };
@@ -36,20 +22,16 @@ const isValidAmount = (amount: string) => {
 
 export const TimeDoseCard = ({
   index,
-  time,
   amount,
   selectedUnit,
   unitLabel,
-  isTimePickerOpen,
   canRemove,
   onRemove,
   onOpenTimePicker,
-  onTimeChange,
   onAmountChange,
   formattedTime,
 }: Props) => {
   const hasInvalidAmount = amount.length > 0 && !isValidAmount(amount);
-  const is24Hour = useTimeFormat().timeFormat === "24h";
 
   return (
     <View style={styles.card}>
@@ -69,23 +51,11 @@ export const TimeDoseCard = ({
         )}
       </View>
 
-      {/* --------------------------- Time Picker Trigger -------------------------- */}
       <Pressable style={styles.timeButton} onPress={onOpenTimePicker}>
         <Text style={styles.timeText}>{formattedTime}</Text>
         <Text style={styles.timeHint}>Tap to change time</Text>
       </Pressable>
 
-      {isTimePickerOpen && (
-        <DateTimePicker
-          value={time}
-          mode="time"
-          is24Hour={is24Hour}
-          display="spinner"
-          onChange={onTimeChange}
-        />
-      )}
-
-      {/* ------------------------------ Amount Input ------------------------------ */}
       {selectedUnit ? (
         <View
           style={[styles.amountRow, hasInvalidAmount && styles.amountRowError]}
