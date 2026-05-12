@@ -13,7 +13,6 @@ import AddMedicationHeader from "../components/AddMedicationHeader";
 import NextButton from "../components/NextButton";
 import PlusIcon from "../../../assets/icons/plus.svg";
 
-import { UnitSelector } from "./components/UnitSelector";
 import { TimeDoseCard } from "./components/TimeDoseCard";
 import { DailySummaryCard } from "./components/DailySummaryCard";
 import { TimePickerModal } from "./components/TimePickerModal";
@@ -117,6 +116,10 @@ const Step3Screen = () => {
     setTimeDoses((prev) => prev.filter((d) => d.id !== id));
   };
 
+  const handleUnitChange = (value: string) => {
+    setSelectedUnit(value);
+  };
+
   /* ------------------------------- Time Picker ------------------------------ */
   const handleTimeConfirm = (date: Date) => {
     if (activeTimePickerId) {
@@ -186,12 +189,6 @@ const Step3Screen = () => {
             />
           )}
 
-          <UnitSelector
-            units={availableUnits}
-            selected={selectedUnit}
-            onSelect={setSelectedUnit}
-          />
-
           <View style={styles.dosesSection}>
             <Text style={styles.sectionLabel}>When and how much?</Text>
 
@@ -200,12 +197,14 @@ const Step3Screen = () => {
                 key={td.id}
                 index={index}
                 amount={td.amount}
+                availableUnits={availableUnits}
                 selectedUnit={selectedUnit}
                 unitLabel={unitLabel}
                 canRemove={timeDoses.length > 1}
                 onRemove={() => removeDose(td.id)}
                 onOpenTimePicker={() => setActiveTimePickerId(td.id)}
                 onAmountChange={(text) => handleAmountChange(td.id, text)}
+                onUnitChange={handleUnitChange}
                 formattedTime={formatTime(td.time)}
               />
             ))}

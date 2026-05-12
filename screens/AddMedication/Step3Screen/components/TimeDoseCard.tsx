@@ -1,16 +1,33 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { useState } from "react";
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  Modal,
+  ScrollView,
+} from "react-native";
+
 import TrashIcon from "../../../../assets/icons/trash.svg";
+import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
+import CheckIcon from "../../../../assets/icons/check.svg";
+
 import { Colors } from "../../../../constants/theme";
+
+type Unit = { value: string; label: string };
 
 type Props = {
   index: number;
   amount: string;
   selectedUnit: string;
   unitLabel: string;
+  availableUnits: Unit[];
   canRemove: boolean;
   onRemove: () => void;
   onOpenTimePicker: () => void;
   onAmountChange: (text: string) => void;
+  onUnitChange: (value: string) => void;
   formattedTime: string;
 };
 
@@ -25,17 +42,20 @@ export const TimeDoseCard = ({
   amount,
   selectedUnit,
   unitLabel,
+  availableUnits,
   canRemove,
   onRemove,
   onOpenTimePicker,
   onAmountChange,
+  onUnitChange,
   formattedTime,
 }: Props) => {
   const hasInvalidAmount = amount.length > 0 && !isValidAmount(amount);
+  const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
 
   return (
     <View style={styles.card}>
-      {/* Header: dose number + optional remove */}
+      {/* --------------------------------- Header --------------------------------- */}
       <View style={styles.header}>
         <View style={styles.badge}>
           <Text style={styles.badgeText}>#{index + 1}</Text>
@@ -51,35 +71,94 @@ export const TimeDoseCard = ({
         )}
       </View>
 
+      {/* ------------------------------- Time Picker ------------------------------ */}
       <Pressable style={styles.timeButton} onPress={onOpenTimePicker}>
         <Text style={styles.timeText}>{formattedTime}</Text>
         <Text style={styles.timeHint}>Tap to change time</Text>
       </Pressable>
 
-      {selectedUnit ? (
-        <View
-          style={[styles.amountRow, hasInvalidAmount && styles.amountRowError]}
+      {/* ---------------------------- Dose - Unit Input --------------------------- */}
+      <View
+        style={[styles.amountRow, hasInvalidAmount && styles.amountRowError]}
+      >
+        <TextInput
+          style={styles.amountInput}
+          value={amount}
+          onChangeText={onAmountChange}
+          placeholder="Enter amount"
+          placeholderTextColor={Colors.textSecondary}
+          keyboardType="decimal-pad"
+          maxLength={6}
+        />
+
+        <Pressable
+          style={styles.unitDropdownTrigger}
+          onPress={() => setUnitDropdownOpen(true)}
         >
-          <TextInput
-            style={styles.amountInput}
-            value={amount}
-            onChangeText={onAmountChange}
-            placeholder="Enter amount"
-            placeholderTextColor={Colors.textSecondary}
-            keyboardType="decimal-pad"
-            maxLength={6}
-          />
-          <Text style={styles.unitLabel}>{unitLabel}</Text>
-        </View>
-      ) : (
-        <Text style={styles.unitHint}>Please select a unit first</Text>
-      )}
+          <Text style={styles.unitLabel}>{unitLabel || "Select unit"}</Text>
+          <ArrowDownIcon width={14} height={14} stroke={Colors.textSecondary} />
+        </Pressable>
+      </View>
 
       {hasInvalidAmount && (
         <Text style={styles.errorText}>
           Please enter a positive number greater than 0
         </Text>
       )}
+
+      {/* --------------------------- Unit Dropdown Modal -------------------------- */}
+      <Modal
+        visible={unitDropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setUnitDropdownOpen(false)}
+      >
+        <Pressable
+          style={styles.dropdownOverlay}
+          onPress={() => setUnitDropdownOpen(false)}
+        >
+          <View style={styles.dropdownCard}>
+            <Text style={styles.dropdownTitle}>Select Unit</Text>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.dropdownContent}
+            >
+              {availableUnits.map((unit) => {
+                const isActive = selectedUnit === unit.value;
+                return (
+                  <Pressable
+                    key={unit.value}
+                    style={[
+                      styles.dropdownItem,
+                      isActive && styles.dropdownItemActive,
+                    ]}
+                    onPress={() => {
+                      onUnitChange(unit.value);
+                      setUnitDropdownOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        isActive && styles.dropdownItemTextActive,
+                      ]}
+                    >
+                      {unit.label}
+                    </Text>
+                    {isActive && (
+                      <CheckIcon
+                        width={16}
+                        height={16}
+                        stroke={Colors.primary}
+                      />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
     </View>
   );
 };
@@ -138,17 +217,70 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  unitLabel: { color: Colors.textSecondary, fontSize: 14, fontWeight: "500" },
-  unitHint: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    textAlign: "center",
-    paddingVertical: 12,
+  unitDropdownTrigger: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 4,
+    paddingVertical: 4,
+    paddingLeft: 8,
+    borderLeftWidth: 1,
+    borderLeftColor: Colors.textSecondary + "30",
   },
+  unitLabel: { color: Colors.textSecondary, fontSize: 14, fontWeight: "500" },
   errorText: {
     color: Colors.error || "#EF4444",
     fontSize: 12,
     fontWeight: "500",
     marginTop: 4,
+  },
+  dropdownOverlay: {
+    flex: 1,
+    backgroundColor: "rgba(0, 0, 0, 0.4)",
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 24,
+  },
+  dropdownCard: {
+    backgroundColor: Colors.background,
+    borderRadius: 20,
+    width: "100%",
+    maxWidth: 280,
+    maxHeight: 360,
+    paddingTop: 20,
+    paddingHorizontal: 16,
+    paddingBottom: 16,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  dropdownTitle: {
+    fontSize: 18,
+    fontWeight: "700",
+    color: Colors.textPrimary,
+    marginBottom: 12,
+    paddingHorizontal: 4,
+  },
+  dropdownContent: { gap: 2 },
+  dropdownItem: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
+    paddingVertical: 14,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+  },
+  dropdownItemActive: {
+    backgroundColor: Colors.primary + "10",
+  },
+  dropdownItemText: {
+    fontSize: 16,
+    color: Colors.textPrimary,
+    fontWeight: "500",
+  },
+  dropdownItemTextActive: {
+    color: Colors.primary,
+    fontWeight: "600",
   },
 });
