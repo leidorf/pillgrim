@@ -1,16 +1,19 @@
 import { View, Text, StyleSheet, ScrollView } from "react-native";
-import { Colors } from "../../constants/theme";
-import MonthlyCalendar from "./components/MonthlyCalendar";
 import { useState, useMemo } from "react";
+
 import { useLogStore } from "../../store/logsStore";
 import { useMedicationStore } from "../../store/medicationStore";
+
+import { Colors } from "../../constants/theme";
+import { useTimeFormat } from "../../hooks/useTimeFormat";
+
+import MonthlyCalendar from "./components/MonthlyCalendar";
 import ScreenLayout from "../../components/ScreenLayout";
 import LogsHeader from "./components/LogsHeader";
 import SelectedDayHeader from "./components/SelectedDayHeader";
 import MedicationLogCard from "./components/MedicationLogCard";
-import { useTimeFormat } from "../../hooks/useTimeFormat";
 
-const LogsScreen = () => {
+const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonthLabel, setCurrentMonthLabel] = useState(
     new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }),
@@ -65,11 +68,7 @@ const LogsScreen = () => {
       {/* ------------------------------ Selected Day ------------------------------ */}
       <View style={styles.detailContainer}>
         {/* --------------------------- Selected Day Header -------------------------- */}
-        <SelectedDayHeader
-          hasLogs={dayStats.hasLogs}
-          selectedDate={formatSelectedDate(selectedDate)}
-          adherenceRate={dayStats.adherenceRate}
-        />
+        <SelectedDayHeader selectedDate={formatSelectedDate(selectedDate)} />
 
         <ScrollView
           style={styles.logsList}
@@ -95,7 +94,7 @@ const LogsScreen = () => {
   );
 };
 
-export default LogsScreen;
+export default CalendarScreen;
 
 const styles = StyleSheet.create({
   calendarContainer: {

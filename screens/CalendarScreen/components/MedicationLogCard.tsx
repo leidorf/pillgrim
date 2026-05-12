@@ -1,6 +1,13 @@
+import React from "react";
 import { StyleSheet, Text, View } from "react-native";
+
 import { Colors } from "../../../constants/theme";
 import { useTimeFormat } from "../../../hooks/useTimeFormat";
+
+import CheckIcon from "../../../assets/icons/check.svg";
+import SkippedIcon from "../../../assets/icons/minus.svg";
+import MissedIcon from "../../../assets/icons/close.svg";
+import PendingIcon from "../../../assets/icons/circle-dashed.svg";
 
 type MedicationLog = {
   id: string;
@@ -17,7 +24,7 @@ type StatusInfo = {
   label: string;
   subtext: string;
   color: string;
-  icon: string;
+  icon: React.ReactNode;
 };
 
 type MedicationLogCardProps = {
@@ -32,7 +39,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
 
     if (log.takenAt) {
       return {
-        icon: "✓",
+        icon: <CheckIcon width={16} height={16} stroke={Colors.primary} />,
         label: "Taken",
         color: Colors.success || "#22C55E",
         subtext: formatTime(log.takenAt),
@@ -41,7 +48,9 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
 
     if (log.skipped) {
       return {
-        icon: "−",
+        icon: (
+          <SkippedIcon width={16} height={16} stroke={Colors.textPrimary} />
+        ),
         label: "Skipped",
         color: Colors.textSecondary,
         subtext: "Intentionally skipped",
@@ -54,7 +63,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
 
     if (scheduledDateTime < now) {
       return {
-        icon: "✗",
+        icon: <MissedIcon width={16} height={16} stroke={Colors.error} />,
         label: "Missed",
         color: Colors.error || "#EF4444",
         subtext: "Not taken in time",
@@ -62,7 +71,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
     }
 
     return {
-      icon: "○",
+      icon: <PendingIcon width={16} height={16} stroke={Colors.textPrimary} />,
       label: "Pending",
       color: Colors.textSecondary,
       subtext: "It's not time yet",
@@ -124,7 +133,7 @@ const styles = StyleSheet.create({
   timeline: {
     width: 2,
     flex: 1,
-    backgroundColor: Colors.border || "#E5E5E5",
+    backgroundColor: Colors.background || "#E5E5E5",
     borderRadius: 1,
   },
   logContent: {

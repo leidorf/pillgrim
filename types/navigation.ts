@@ -19,7 +19,7 @@ export type AddMedicationParamList = {
 export type MainScreenParamList = {
   Home: undefined;
   Meds: undefined;
-  Logs: undefined;
+  Calendar: undefined;
 };
 
 export type RootStackParamList = {

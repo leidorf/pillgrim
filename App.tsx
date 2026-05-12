@@ -13,7 +13,6 @@ import {
 
 import HomeScreen from "./screens/HomeScreen";
 import MedsScreen from "./screens/MedsScreen";
-import LogsScreen from "./screens/LogsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen/Step1Screen";
 import SettingsScreen from "./screens/Settings";
 
@@ -21,7 +20,7 @@ import { AppTheme } from "./theme/theme";
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
-import LogsIcon from "./assets/icons/logs.svg";
+import CalendarIcon from "./assets/icons/calendar.svg";
 import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
 import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
@@ -30,6 +29,7 @@ import { StatusBar, useColorScheme } from "react-native";
 import AppearanceScreen from "./screens/Settings/AppearanceScreen";
 import LanguageScreen from "./screens/Settings/LanguageScreen";
 import AlarmScreen from "./screens/Settings/AlarmScreen";
+import CalendarScreen from "./screens/CalendarScreen";
 
 const RootStack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<MainScreenParamList>();
@@ -70,11 +70,11 @@ const MainTabs = () => {
         }}
       />
       <Tab.Screen
-        name="Logs"
-        component={LogsScreen}
+        name="Calendar"
+        component={CalendarScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <LogsIcon height={24} width={24} stroke={color} />
+            <CalendarIcon height={24} width={24} stroke={color} />
           ),
         }}
       />
@@ -117,7 +117,9 @@ export default function App() {
       <SafeAreaProvider>
         <BottomSheetModalProvider>
           <NavigationContainer theme={AppTheme}>
-            <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"}   />
+            <StatusBar
+              barStyle={isDarkMode ? "light-content" : "dark-content"}
+            />
             <RootStack.Navigator>
               <RootStack.Screen
                 name="MainTabs"

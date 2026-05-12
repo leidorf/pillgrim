@@ -9,11 +9,11 @@ import {
   ScrollView,
 } from "react-native";
 
-import TrashIcon from "../../../../assets/icons/trash.svg";
+import { Colors } from "../../../../constants/theme";
+
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import CheckIcon from "../../../../assets/icons/check.svg";
-
-import { Colors } from "../../../../constants/theme";
+import TrashIcon from "../../../../assets/icons/trash.svg";
 
 type Unit = { value: string; label: string };
 
