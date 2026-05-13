@@ -2,6 +2,7 @@ import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
 import { Colors } from "../../../../constants/theme";
 import { WEEKDAYS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
+import { useMemo } from "react";
 
 const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -9,32 +10,43 @@ const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 type WeekdayProps = {
   selected: number[];
   onToggle: (day: number) => void;
+  weekStartsOn?: number;
 };
 
-export const WeekdayPicker = ({ selected, onToggle }: WeekdayProps) => (
-  <InlineContainer containerText="Select days">
-    <View style={styles.weekdayRow}>
-      {WEEKDAYS.map(({ id, label }) => {
-        const active = selected.includes(id);
-        return (
-          <Pressable
-            key={id}
-            style={[
-              styles.chip,
-              styles.chipCircle,
-              active && styles.chipActive,
-            ]}
-            onPress={() => onToggle(id)}
-          >
-            <Text style={[styles.chipText, active && styles.chipTextActive]}>
-              {label}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  </InlineContainer>
-);
+export const WeekdayPicker = ({
+  selected,
+  onToggle,
+  weekStartsOn = 1,
+}: WeekdayProps) => {
+  const orderedWeekdays = useMemo(() => {
+    return [...WEEKDAYS.slice(weekStartsOn), ...WEEKDAYS.slice(0, weekStartsOn)];
+  }, [weekStartsOn]);
+
+  return (
+    <InlineContainer containerText="Select days">
+      <View style={styles.weekdayRow}>
+        {orderedWeekdays.map(({ id, label }) => {
+          const active = selected.includes(id);
+          return (
+            <Pressable
+              key={id}
+              style={[
+                styles.chip,
+                styles.chipCircle,
+                active && styles.chipActive,
+              ]}
+              onPress={() => onToggle(id)}
+            >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>
+                {label}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </InlineContainer>
+  );
+};
 
 /* -------------------------------- Interval -------------------------------- */
 type IntervalProps = {

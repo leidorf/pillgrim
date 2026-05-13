@@ -13,6 +13,8 @@ import MedicationActionSheet from "./components/MedicationActionSheet";
 import ScreenLayout from "../../components/ScreenLayout";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
 import { getLocalDateString } from "../../utils/dateUtils";
+import { useSettingsStore } from "../../store/settingsStore";
+import { WeekStart } from "../../types/schedule";
 
 type ScheduleItem = {
   medication: Medication;
@@ -22,18 +24,22 @@ type ScheduleItem = {
   logKey: string;
 };
 
-const WEEKDAY_MAP: Record<number, number> = {
-  0: 7,
-  1: 1,
-  2: 2,
-  3: 3,
-  4: 4,
-  5: 5,
-  6: 6,
+const getWeekdayMap = (weekStartsOn: WeekStart): Record<number, number> => {
+  const map: Record<number, number> = {};
+  for (let i = 0; i < 7; i++) {
+    const jsDay = (weekStartsOn + i) % 7;
+    map[jsDay] = i + 1;
+  }
+  return map;
 };
 
 const HomeScreen = () => {
   const { medications } = useMedicationStore();
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
+  const WEEKDAY_MAP = useMemo(
+    () => getWeekdayMap(weekStartsOn),
+    [weekStartsOn],
+  );
   const [selectedDate, setSelectedDate] = useState(new Date());
   const { logs, addLog, updateLog, deleteLog, getLogsByDate } = useLogStore();
   const [isSheetOpen, setIsSheetOpen] = useState(false);

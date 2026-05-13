@@ -9,6 +9,7 @@ import {
 import { useRef, useState, useMemo, useCallback } from "react";
 import { Colors } from "../../../constants/theme";
 import { useLogStore } from "../../../store/logsStore";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Props = {
   selectedDate: Date;
@@ -23,15 +24,21 @@ type MonthGridProps = {
   currentMonth: number;
   onSelectDate: (date: Date) => void;
   width: number;
+  weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
-const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
 const INITIAL_INDEX = 100;
 const MONTHS_TO_GENERATE = 200;
 
-function getMonthGrid(year: number, month: number): Date[] {
+function getMonthGrid(
+  year: number,
+  month: number,
+  weekStartsOn: number,
+): Date[] {
   const firstDayOfMonth = new Date(year, month, 1);
-  const dayOfWeek = (firstDayOfMonth.getDay() + 6) % 7;
+  let dayOfWeek = firstDayOfMonth.getDay();
+
+  dayOfWeek = (dayOfWeek - weekStartsOn + 7) % 7;
 
   const startDate = new Date(firstDayOfMonth);
   startDate.setDate(firstDayOfMonth.getDate() - dayOfWeek);
@@ -51,6 +58,7 @@ const MonthGrid = ({
   currentMonth,
   onSelectDate,
   width,
+  weekStartsOn,
 }: MonthGridProps) => {
   const today = useMemo(() => {
     const d = new Date();
@@ -58,9 +66,13 @@ const MonthGrid = ({
     return d;
   }, []);
 
-  const dates = useMemo(() => getMonthGrid(year, month), [year, month]);
+  const dates = useMemo(
+    () => getMonthGrid(year, month, weekStartsOn),
+    [year, month, weekStartsOn],
+  );
   const getDayStats = useLogStore((state) => state.getDayStats);
   const logs = useLogStore((state) => state.logs);
+
   const getAdherenceColor = (rate: number) => {
     if (rate === 100) return Colors.success || "#22C55E";
     if (rate > 0) return Colors.warning || "#F59E0B";
@@ -114,6 +126,11 @@ const MonthGrid = ({
     [today, selectedDate, currentMonth, getDayStats, onSelectDate, logs],
   );
 
+  const DAYS = useMemo(() => {
+    const allDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
+  }, [weekStartsOn]);
+
   return (
     <View style={[styles.monthContainer, { width }]}>
       <View style={styles.weekHeader}>
@@ -125,7 +142,7 @@ const MonthGrid = ({
       </View>
 
       <View style={styles.grid}>
-        {dates.map((date, i) => renderDay(date, i))}
+        {dates.map((date: Date, i: number) => renderDay(date, i))}
       </View>
     </View>
   );
@@ -137,6 +154,7 @@ const MonthlyCalendar = ({
   onMonthChange,
 }: Props) => {
   const { width: screenWidth } = useWindowDimensions();
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(INITIAL_INDEX);
 
@@ -179,9 +197,10 @@ const MonthlyCalendar = ({
         currentMonth={item.month}
         onSelectDate={onSelectDate}
         width={screenWidth}
+        weekStartsOn={weekStartsOn}
       />
     ),
-    [selectedDate, onSelectDate, screenWidth],
+    [selectedDate, onSelectDate, screenWidth, weekStartsOn],
   );
 
   return (

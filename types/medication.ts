@@ -1,18 +1,4 @@
-export type ScheduleType =
-  | "daily"
-  | "weekly"
-  | "interval"
-  | "prn"
-  | "monthly"
-  | "biweekly"
-  | "specificmonth";
-
-export type Schedule = {
-  type: ScheduleType;
-  days?: number[];
-  interval?: number;
-  startDate: string;
-};
+import { Schedule } from "./schedule";
 
 export type Medication = {
   id: string;
@@ -68,18 +54,6 @@ export type MedicationProps = Medication & {
   onToggle?: (id: string, time: string) => void;
   onSkip?: (id: string, time: string) => void;
   status?: LogStatus;
-};
-
-export type DailySchedule = {
-  date: string;
-  medications: {
-    medication: Medication;
-    times: {
-      time: string;
-      log?: MedicationLog;
-      status: LogStatus;
-    }[];
-  }[];
 };
 
 export type LogFilter = {

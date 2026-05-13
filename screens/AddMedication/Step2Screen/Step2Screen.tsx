@@ -14,7 +14,7 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 import { NavProp } from "../../../types/navigation";
-import { Schedule, ScheduleType } from "../../../types/medication";
+import { Schedule, ScheduleType } from "../../../types/schedule";
 import { Colors } from "../../../constants/theme";
 import { TIER1_SCHEDULES, TIER2_SCHEDULES } from "../../../constants/schedules";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -31,13 +31,14 @@ import {
   MonthDayPicker,
   PrnInfo,
 } from "./components/ScheduleExpanders";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 const Step2Screen = () => {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<any>();
   const { width: screenWidth } = useWindowDimensions();
   const { draft, setDraft, clearDraft } = useMedicationStore();
-
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
 
@@ -264,7 +265,11 @@ const Step2Screen = () => {
     switch (id) {
       case "weekly":
         return (
-          <WeekdayPicker selected={selectedWeekdays} onToggle={toggleWeekday} />
+          <WeekdayPicker
+            selected={selectedWeekdays}
+            onToggle={toggleWeekday}
+            weekStartsOn={weekStartsOn}
+          />
         );
       case "interval":
         return (

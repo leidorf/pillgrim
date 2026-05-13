@@ -7,7 +7,10 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { useRef, useState } from "react";
+
 import { Colors } from "../../../constants/theme";
+import { WEEKDAYS } from "../../../constants/schedules";
+import { useSettingsStore } from "../../../store/settingsStore";
 
 type Props = {
   selectedDate: Date;
@@ -15,19 +18,29 @@ type Props = {
   hasMedsOnDate: (date: Date) => boolean;
 };
 
-const DAYS = ["Mo", "Tu", "We", "Th", "Fr", "Sa", "Su"];
+type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
+
+const getDaysArray = (weekStartsOn: number) => {
+  const allDays = WEEKDAYS.map((d) => d.label);
+  return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
+};
+
 const INITIAL_INDEX = 100;
 
-function getWeekDates(mondayOffset: number): Date[] {
+function getWeekDates(weekOffset: number, weekStartsOn: WeekStart): Date[] {
   const today = new Date();
-  const dayOfWeek = (today.getDay() + 6) % 7;
-  const thisMonday = new Date(today);
-  thisMonday.setDate(today.getDate() - dayOfWeek);
-  thisMonday.setHours(0, 0, 0, 0);
+  const dayOfWeek = today.getDay();
+
+  let daysFromStart = dayOfWeek - weekStartsOn;
+  if (daysFromStart < 0) daysFromStart += 7;
+
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - daysFromStart);
+  weekStart.setHours(0, 0, 0, 0);
 
   return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(thisMonday);
-    d.setDate(thisMonday.getDate() + mondayOffset * 7 + i);
+    const d = new Date(weekStart);
+    d.setDate(weekStart.getDate() + weekOffset * 7 + i);
     return d;
   });
 }
@@ -38,6 +51,7 @@ type WeekProps = {
   onSelectDate: (date: Date) => void;
   hasMedsOnDate: (date: Date) => boolean;
   width: number;
+  weekStartsOn: WeekStart;
 };
 
 const Week = ({
@@ -46,9 +60,11 @@ const Week = ({
   onSelectDate,
   hasMedsOnDate,
   width,
+  weekStartsOn,
 }: WeekProps) => {
   const today = new Date();
-  const dates = getWeekDates(weekOffset);
+  const dates = getWeekDates(weekOffset, weekStartsOn);
+  const DAYS = getDaysArray(weekStartsOn);
 
   return (
     <View style={[styles.weekRow, { width }]}>
@@ -101,6 +117,7 @@ const WeeklyCalendar = ({
   onSelectDate,
   hasMedsOnDate,
 }: Props) => {
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn) as WeekStart;
   const { width: screenWidth } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
@@ -114,7 +131,7 @@ const WeeklyCalendar = ({
   }).current;
 
   const monthLabel = (() => {
-    const dates = getWeekDates(currentWeekOffset);
+    const dates = getWeekDates(currentWeekOffset, weekStartsOn);
     const first = dates[0];
     const last = dates[6];
     if (first.getMonth() === last.getMonth()) {
@@ -151,6 +168,7 @@ const WeeklyCalendar = ({
             onSelectDate={onSelectDate}
             hasMedsOnDate={hasMedsOnDate}
             width={screenWidth}
+            weekStartsOn={weekStartsOn}
           />
         )}
       />
