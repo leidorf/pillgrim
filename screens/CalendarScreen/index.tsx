@@ -3,6 +3,7 @@ import { useState, useMemo } from "react";
 
 import { useLogStore } from "../../store/logsStore";
 import { useMedicationStore } from "../../store/medicationStore";
+import { useSettingsStore } from "../../store/settingsStore";
 
 import { Colors } from "../../constants/theme";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
@@ -13,43 +14,76 @@ import LogsHeader from "./components/LogsHeader";
 import SelectedDayHeader from "./components/SelectedDayHeader";
 import MedicationLogCard from "./components/MedicationLogCard";
 
+import {
+  buildDailySchedule,
+  computeDayStats,
+  WeekdayMap,
+} from "../../utils/medicationScheduleUtils";
+import { WeekStart } from "../../types/schedule";
+
+const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
+  const map: WeekdayMap = {};
+  for (let i = 0; i < 7; i++) {
+    map[(weekStartsOn + i) % 7] = i + 1;
+  }
+  return map;
+};
+
 const CalendarScreen = () => {
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonthLabel, setCurrentMonthLabel] = useState(
     new Date().toLocaleDateString("en-US", { month: "long", year: "numeric" }),
   );
-  const { getLogsByDate, logs } = useLogStore();
+
+  const { logs } = useLogStore();
   const { medications } = useMedicationStore();
+  const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const { formatTimeString } = useTimeFormat();
 
-  const dayLogs = useMemo(() => {
-    const logList = getLogsByDate(selectedDate);
+  const weekdayMap = useMemo(
+    () => buildWeekdayMap(weekStartsOn),
+    [weekStartsOn],
+  );
 
-    return logList
-      .map((log) => {
-        const medication = medications.find((m) => m.id === log.medicationId);
-        return {
-          ...log,
-          medicationName: medication?.name || "Unknown Medication",
-          form: medication?.form,
-          displayTime: formatTimeString(log.scheduledTime),
-        };
-      })
-      .sort((a, b) => a.scheduledTime.localeCompare(b.scheduledTime));
-  }, [selectedDate, logs, medications, formatTimeString]);
+  const scheduleEntries = useMemo(
+    () =>
+      buildDailySchedule(
+        medications,
+        logs,
+        selectedDate,
+        weekdayMap,
+        formatTimeString,
+      ),
+    [medications, logs, selectedDate, weekdayMap, formatTimeString],
+  );
 
-  const getDayStats = useLogStore((state) => state.getDayStats);
-  const dayStats = useMemo(() => {
-    return getDayStats(selectedDate);
-  }, [selectedDate, logs]);
+  const dayLogs = useMemo(
+    () =>
+      scheduleEntries.map((entry) => ({
+        id: entry.logKey,
+        scheduledDate: entry.scheduledDate,
+        scheduledTime: entry.scheduledTime,
+        displayTime: entry.displayTime,
+        medicationName: entry.medication.name,
+        form: entry.medication.form,
+        doseTaken: entry.log?.doseTaken,
+        takenAt: entry.log?.takenAt,
+        skipped: entry.log?.skipped,
+      })),
+    [scheduleEntries],
+  );
 
-  const formatSelectedDate = (date: Date) => {
-    return date.toLocaleDateString("en-US", {
+  const dayStats = useMemo(
+    () => computeDayStats(scheduleEntries),
+    [scheduleEntries],
+  );
+
+  const formatSelectedDate = (date: Date) =>
+    date.toLocaleDateString("en-US", {
       weekday: "long",
       day: "numeric",
       month: "long",
     });
-  };
 
   return (
     <ScreenLayout>
@@ -67,7 +101,6 @@ const CalendarScreen = () => {
 
       {/* ------------------------------ Selected Day ------------------------------ */}
       <View style={styles.detailContainer}>
-        {/* --------------------------- Selected Day Header -------------------------- */}
         <SelectedDayHeader selectedDate={formatSelectedDate(selectedDate)} />
 
         <ScrollView
@@ -75,18 +108,15 @@ const CalendarScreen = () => {
           contentContainerStyle={styles.logsListContent}
           showsVerticalScrollIndicator={false}
         >
-          {!dayStats.hasLogs ? (
+          {!dayStats.hasSchedule ? (
             <View style={styles.emptyState}>
-              <Text style={styles.emptyText}>No logs found</Text>
+              <Text style={styles.emptyText}>No medications scheduled</Text>
               <Text style={styles.emptySubtext}>
                 The days your medications are scheduled for will appear here
               </Text>
             </View>
           ) : (
-            dayLogs.map((log) => (
-              /* --------------------------- Medication Log Card -------------------------- */
-              <MedicationLogCard key={log.id} log={log} />
-            ))
+            dayLogs.map((log) => <MedicationLogCard key={log.id} log={log} />)
           )}
         </ScrollView>
       </View>

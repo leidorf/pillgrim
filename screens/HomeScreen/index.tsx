@@ -16,21 +16,16 @@ import { getLocalDateString } from "../../utils/dateUtils";
 import { useSettingsStore } from "../../store/settingsStore";
 import { WeekStart } from "../../types/schedule";
 import { snoozeMedicationNotification } from "../../services/notificationService";
-import { getMedicationLogStatus } from "../../utils/medicationUtils";
+import {
+  buildDailySchedule,
+  isMedicationScheduledForDate,
+  WeekdayMap,
+} from "../../utils/medicationScheduleUtils";
 
-type ScheduleItem = {
-  medication: Medication;
-  time: string;
-  displayTime: string;
-  dose: string;
-  logKey: string;
-};
-
-const getWeekdayMap = (weekStartsOn: WeekStart): Record<number, number> => {
-  const map: Record<number, number> = {};
+const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
+  const map: WeekdayMap = {};
   for (let i = 0; i < 7; i++) {
-    const jsDay = (weekStartsOn + i) % 7;
-    map[jsDay] = i + 1;
+    map[(weekStartsOn + i) % 7] = i + 1;
   }
   return map;
 };
@@ -38,95 +33,59 @@ const getWeekdayMap = (weekStartsOn: WeekStart): Record<number, number> => {
 const HomeScreen = () => {
   const { medications } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
-  const WEEKDAY_MAP = useMemo(
-    () => getWeekdayMap(weekStartsOn),
+  const weekdayMap = useMemo(
+    () => buildWeekdayMap(weekStartsOn),
     [weekStartsOn],
   );
+
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const { logs, addLog, updateLog, deleteLog, getLogsByDate } = useLogStore();
+  const { logs, addLog, updateLog, deleteLog } = useLogStore();
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const actionSheetRef = useRef<BottomSheet>(null);
+  const { formatTimeString } = useTimeFormat();
+
   const [selectedItem, setSelectedItem] = useState<{
     medication: Medication;
     time: string;
     log?: MedicationLog;
   } | null>(null);
-  const { formatTimeString } = useTimeFormat();
 
-  const isMedicationScheduledForDate = (
-    med: Medication,
-    date: Date,
-    dayOfMonth: number,
-    weekday: number,
-  ): boolean => {
-    if (!med.schedule || !med.isActive) return false;
-    const { type, days, interval, startDate } = med.schedule;
+  const [now, setNow] = useState(() => new Date());
+  useEffect(() => {
+    const interval = setInterval(() => setNow(new Date()), 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
-    switch (type) {
-      case "daily":
-        return true;
-      case "weekly":
-        return days?.includes(weekday) ?? false;
-      case "biweekly": {
-        if (!startDate) return false;
-        const start = new Date(startDate);
-        const diffDays = Math.floor(
-          (date.getTime() - start.getTime()) / (1000 * 60 * 60 * 24),
-        );
-        return diffDays >= 0 && diffDays % 14 === 0;
-      }
-      case "monthly":
-        if (!startDate) return false;
-        return dayOfMonth === new Date(startDate).getDate();
-      case "specificmonth":
-        return days?.includes(dayOfMonth) ?? false;
-      case "interval": {
-        if (!interval || !startDate) return false;
-        const intervalDiff = Math.floor(
-          (date.getTime() - new Date(startDate).getTime()) /
-            (1000 * 60 * 60 * 24),
-        );
-        return intervalDiff >= 0 && intervalDiff % interval === 0;
-      }
-      case "prn":
-        return false;
-      default:
-        return false;
-    }
-  };
-
-  const getScheduleForDate = (date: Date): ScheduleItem[] => {
-    const dateStr = getLocalDateString(date);
-    const dayOfMonth = date.getDate();
-    const weekday = WEEKDAY_MAP[date.getDay()];
-    const schedule: ScheduleItem[] = [];
-
-    medications.forEach((med) => {
-      if (!isMedicationScheduledForDate(med, date, dayOfMonth, weekday)) return;
-      if (!med.timeDoses || med.timeDoses.length === 0) return;
-
-      med.timeDoses.forEach((td) => {
-        schedule.push({
-          medication: med,
-          time: td.time,
-          displayTime: formatTimeString(td.time),
-          dose: td.dose,
-          logKey: `${med.id}-${dateStr}-${td.time}`,
-        });
-      });
-    });
-
-    return schedule.sort((a, b) => a.time.localeCompare(b.time));
-  };
-
-  const hasMedsOnDate = useCallback(
-    (date: Date) => getScheduleForDate(date).length > 0,
-    [medications],
+  const schedule = useMemo(
+    () =>
+      buildDailySchedule(
+        medications,
+        logs,
+        selectedDate,
+        weekdayMap,
+        formatTimeString,
+        now,
+      ),
+    [medications, logs, selectedDate, weekdayMap, formatTimeString, now],
   );
 
-  const dayLogs = useMemo(() => {
-    return getLogsByDate(selectedDate);
-  }, [selectedDate, logs]);
+  const hasMedsOnDate = useCallback(
+    (date: Date) =>
+      medications.some((med) =>
+        isMedicationScheduledForDate(med, date, weekdayMap),
+      ),
+    [medications, weekdayMap],
+  );
+
+  const selectedLog = useMemo(() => {
+    if (!selectedItem) return undefined;
+    return logs.find(
+      (l) =>
+        l.medicationId === selectedItem.medication.id &&
+        l.scheduledTime === selectedItem.time &&
+        l.scheduledDate === getLocalDateString(selectedDate),
+    );
+  }, [selectedItem, logs, selectedDate]);
 
   const handleOpenSheet = useCallback(
     (medication: Medication, time: string, log?: MedicationLog) => {
@@ -139,9 +98,13 @@ const HomeScreen = () => {
   const handleToggle = useCallback(
     (medicationId: string, time: string, doseAmount?: number) => {
       const dateStr = getLocalDateString(selectedDate);
-      const existingLog = dayLogs.find(
-        (l) => l.medicationId === medicationId && l.scheduledTime === time,
+      const existingLog = logs.find(
+        (l) =>
+          l.medicationId === medicationId &&
+          l.scheduledTime === time &&
+          l.scheduledDate === dateStr,
       );
+
       if (existingLog) {
         if (existingLog.takenAt && !existingLog.skipped) {
           deleteLog(existingLog.id);
@@ -149,7 +112,7 @@ const HomeScreen = () => {
           updateLog(existingLog.id, {
             takenAt: new Date(),
             skipped: false,
-            ...(doseAmount && !existingLog.doseAmount && { doseAmount }),
+            ...(doseAmount && { doseAmount }),
           });
         }
       } else {
@@ -163,15 +126,19 @@ const HomeScreen = () => {
         });
       }
     },
-    [selectedDate, dayLogs, deleteLog, updateLog, addLog],
+    [selectedDate, logs, deleteLog, updateLog, addLog],
   );
 
   const handleSkip = useCallback(
     (medicationId: string, time: string) => {
       const dateStr = getLocalDateString(selectedDate);
-      const existingLog = dayLogs.find(
-        (l) => l.medicationId === medicationId && l.scheduledTime === time,
+      const existingLog = logs.find(
+        (l) =>
+          l.medicationId === medicationId &&
+          l.scheduledTime === time &&
+          l.scheduledDate === dateStr,
       );
+
       if (existingLog) {
         if (existingLog.skipped) {
           deleteLog(existingLog.id);
@@ -187,38 +154,20 @@ const HomeScreen = () => {
         });
       }
     },
-    [selectedDate, dayLogs, deleteLog, updateLog, addLog],
+    [selectedDate, logs, deleteLog, updateLog, addLog],
   );
 
   const handleSnooze = useCallback(
     async (medicationId: string, time: string, minutes: number) => {
       const medication = medications.find((m) => m.id === medicationId);
       if (!medication) return;
-
       const doseStr = medication.timeDoses?.find(
         (td) => td.time === time,
       )?.dose;
-
       await snoozeMedicationNotification(medication, time, minutes, doseStr);
     },
     [medications],
   );
-
-  const selectedLog = selectedItem
-    ? dayLogs.find(
-        (l) =>
-          l.medicationId === selectedItem.medication.id &&
-          l.scheduledTime === selectedItem.time,
-      )
-    : undefined;
-
-  const schedule = getScheduleForDate(selectedDate);
-
-  const [, forceUpdate] = useState(0);
-  useEffect(() => {
-    const interval = setInterval(() => forceUpdate((n) => n + 1), 60_000);
-    return () => clearInterval(interval);
-  }, []);
 
   return (
     <ScreenLayout>
@@ -233,31 +182,21 @@ const HomeScreen = () => {
         contentContainerStyle={styles.listContent}
         data={schedule}
         keyExtractor={(item) => item.logKey}
-        renderItem={({ item }) => {
-          const log = dayLogs.find(
-            (l) =>
-              l.medicationId === item.medication.id &&
-              l.scheduledTime === item.time,
-          );
-          const dateStr = getLocalDateString(selectedDate);
-          const status = getMedicationLogStatus(log, dateStr, item.time);
-
-          return (
-            <MedicationCard
-              medication={item.medication}
-              time={item.time}
-              displayTime={item.displayTime}
-              dose={item.dose}
-              log={log}
-              isMissed={status === "missed"}
-              onToggle={(medId, time) => {
-                const amount = parseFloat(item.dose) || 1;
-                handleToggle(medId, time, amount);
-              }}
-              onOpenSheet={handleOpenSheet}
-            />
-          );
-        }}
+        renderItem={({ item }) => (
+          <MedicationCard
+            medication={item.medication}
+            time={item.scheduledTime}
+            displayTime={item.displayTime}
+            dose={item.dose}
+            log={item.log}
+            isMissed={item.status === "missed"}
+            onToggle={(medId, time) => {
+              const amount = parseFloat(item.dose) || 1;
+              handleToggle(medId, time, amount);
+            }}
+            onOpenSheet={handleOpenSheet}
+          />
+        )}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
@@ -303,6 +242,7 @@ const HomeScreen = () => {
           selectedItem &&
           handleSnooze(selectedItem.medication.id, selectedItem.time, minutes)
         }
+        onChange={(index) => setIsSheetOpen(index >= 0)}
       />
     </ScreenLayout>
   );

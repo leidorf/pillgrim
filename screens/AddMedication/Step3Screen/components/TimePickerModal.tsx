@@ -242,6 +242,7 @@ export const TimePickerModal = ({
       transparent
       animationType="none"
       onRequestClose={onDismiss}
+      statusBarTranslucent
     >
       {/* -------------------------------- Backdrop -------------------------------- */}
       <Animated.View style={[styles.backdrop, { opacity: fadeAnim }]}>
@@ -250,8 +251,6 @@ export const TimePickerModal = ({
 
       {/* ------------------------------ Bottom Sheet ------------------------------ */}
       <Animated.View style={[styles.sheet, { transform: [{ translateY }] }]}>
-        <View style={styles.handle} />
-
         {/* --------------------------------- Header --------------------------------- */}
         <View style={styles.header}>
           <Pressable onPress={onDismiss} hitSlop={12}>
@@ -307,7 +306,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surface,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingBottom: 40,
@@ -327,7 +326,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 24,
-    paddingVertical: 16,
+    paddingVertical: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
     borderBottomColor: Colors.textSecondary + "25",
   },
@@ -346,7 +345,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: "700",
   },
-
   pickerArea: {
     flexDirection: "row",
     alignItems: "center",
@@ -367,7 +365,6 @@ const styles = StyleSheet.create({
     borderWidth: 1.5,
     borderColor: Colors.primary + "30",
   },
-
   column: {
     width: 72,
     height: PICKER_HEIGHT,

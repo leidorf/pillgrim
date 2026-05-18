@@ -9,8 +9,10 @@ import {
   TextInput,
   View,
 } from "react-native";
-import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import { Colors } from "../../../../constants/theme";
+
+import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
+import CheckIcon from "../../../../assets/icons/check.svg";
 
 const INSTRUCTION_OPTIONS = [
   { id: "before_meal", label: "Before meal" },
@@ -86,6 +88,7 @@ export const InstructionPicker = ({
         transparent
         animationType="none"
         onRequestClose={() => setIsOpen(false)}
+        statusBarTranslucent
       >
         <Pressable style={styles.overlay} onPress={() => setIsOpen(false)}>
           <Animated.View
@@ -113,7 +116,6 @@ export const InstructionPicker = ({
             <FlatList
               data={INSTRUCTION_OPTIONS}
               keyExtractor={(item) => item.id}
-              ItemSeparatorComponent={() => <View style={styles.separator} />}
               renderItem={({ item }) => {
                 const isSelected = selected === item.id;
                 return (
@@ -132,7 +134,13 @@ export const InstructionPicker = ({
                     >
                       {item.label}
                     </Text>
-                    {isSelected && <Text style={styles.checkmark}>✓</Text>}
+                    {isSelected && (
+                      <CheckIcon
+                        width={16}
+                        height={16}
+                        stroke={Colors.primary}
+                      />
+                    )}
                   </Pressable>
                 );
               }}
@@ -174,19 +182,20 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   menu: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "70%",
     paddingTop: 16,
-    paddingBottom: 32,
+    paddingBottom: 24,
   },
   menuHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     paddingHorizontal: 20,
-    paddingBottom: 16,
+    paddingVertical: 5,
+    paddingBottom: 15,
     borderBottomWidth: 1,
     borderBottomColor: Colors.textSecondary + "20",
   },
@@ -203,9 +212,4 @@ const styles = StyleSheet.create({
   menuItemText: { color: Colors.textPrimary, fontSize: 16 },
   menuItemTextActive: { color: Colors.primary, fontWeight: "600" },
   checkmark: { color: Colors.primary, fontSize: 18, fontWeight: "600" },
-  separator: {
-    height: 1,
-    backgroundColor: Colors.textSecondary + "20",
-    marginLeft: 20,
-  },
 });

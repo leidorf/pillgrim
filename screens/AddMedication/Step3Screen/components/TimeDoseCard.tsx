@@ -112,6 +112,7 @@ export const TimeDoseCard = ({
         transparent
         animationType="fade"
         onRequestClose={() => setUnitDropdownOpen(false)}
+        statusBarTranslucent
       >
         <Pressable
           style={styles.dropdownOverlay}
@@ -119,6 +120,8 @@ export const TimeDoseCard = ({
         >
           <View style={styles.dropdownCard}>
             <Text style={styles.dropdownTitle}>Select Unit</Text>
+            <View style={styles.separator} />
+
             <ScrollView
               showsVerticalScrollIndicator={false}
               contentContainerStyle={styles.dropdownContent}
@@ -241,7 +244,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   dropdownCard: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surface,
     borderRadius: 20,
     width: "100%",
     maxWidth: 280,
@@ -259,7 +262,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: Colors.textPrimary,
-    marginBottom: 12,
     paddingHorizontal: 4,
   },
   dropdownContent: { gap: 2 },
@@ -282,5 +284,10 @@ const styles = StyleSheet.create({
   dropdownItemTextActive: {
     color: Colors.primary,
     fontWeight: "600",
+  },
+  separator: {
+    height: 1,
+    backgroundColor: Colors.textSecondary + "20",
+    marginVertical: 10,
   },
 });
