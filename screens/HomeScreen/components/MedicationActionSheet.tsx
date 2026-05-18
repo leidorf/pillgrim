@@ -1,12 +1,5 @@
 import { forwardRef, useCallback, useRef, useState } from "react";
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  Animated,
-  useWindowDimensions,
-} from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
 import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop,
@@ -49,9 +42,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
     },
     ref,
   ) => {
-    const { width } = useWindowDimensions();
     const [view, setView] = useState<"actions" | "snooze">("actions");
-    const slideAnim = useRef(new Animated.Value(0)).current;
 
     const handleClose = useCallback(() => {
       (ref as React.RefObject<BottomSheet>).current?.close();
@@ -61,28 +52,16 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
       if (index === -1) {
         setTimeout(() => {
           setView("actions");
-          slideAnim.setValue(0);
         }, 300);
       }
     }, []);
 
     const goToSnooze = useCallback(() => {
       setView("snooze");
-      Animated.spring(slideAnim, {
-        toValue: -width,
-        damping: 20,
-        stiffness: 200,
-        useNativeDriver: true,
-      }).start();
-    }, [width]);
+    }, []);
 
     const goBack = useCallback(() => {
-      Animated.spring(slideAnim, {
-        toValue: 0,
-        damping: 20,
-        stiffness: 200,
-        useNativeDriver: true,
-      }).start(() => setView("actions"));
+      setView("actions");
     }, []);
 
     const handleTaken = useCallback(() => {
@@ -129,175 +108,182 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
         }}
       >
         <BottomSheetView style={styles.container}>
-          <View style={styles.overflow}>
-            <Animated.View
-              style={[
-                styles.slideWrapper,
-                { transform: [{ translateX: slideAnim }] },
-              ]}
-            >
-              {/* ------------------------------- Action View ------------------------------ */}
-              <View style={[styles.viewPane, { width }]}>
-                <View style={styles.header}>
-                  <Text style={styles.medName}>{medicationName}</Text>
-                  <Text style={styles.medTime}>{displayTime}</Text>
-                </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.actions}>
-                  {/* ---------------------------------- Taken --------------------------------- */}
-                  <Pressable
-                    style={[styles.actionRow, isTaken && styles.actionRowTaken]}
-                    onPress={handleTaken}
-                  >
-                    <View
-                      style={[
-                        styles.actionIcon,
-                        {
-                          backgroundColor: (Colors.success || "#22C55E") + "20",
-                        },
-                      ]}
-                    >
-                      <CheckIcon
-                        width={20}
-                        height={20}
-                        color={Colors.success || "#22C55E"}
-                      />
-                    </View>
-                    <View style={styles.actionTexts}>
-                      <Text style={styles.actionLabel}>
-                        {isTaken ? "Mark as not taken" : "Mark as taken"}
-                      </Text>
-                      <Text style={styles.actionSub}>
-                        {isTaken ? "Undo taken status" : "Record this dose"}
-                      </Text>
-                    </View>
-                    {isTaken && (
-                      <View style={styles.badge}>
-                        <CheckIcon
-                          width={16}
-                          height={16}
-                          stroke={Colors.success}
-                        />
-                      </View>
-                    )}
-                  </Pressable>
-
-                  {/* --------------------------------- Skipped -------------------------------- */}
-                  <Pressable
-                    style={[
-                      styles.actionRow,
-                      isSkipped && styles.actionRowSkipped,
-                    ]}
-                    onPress={handleSkip}
-                  >
-                    <View
-                      style={[
-                        styles.actionIcon,
-                        {
-                          backgroundColor:
-                            (Colors.textSecondary || "#6B7280") + "20",
-                        },
-                      ]}
-                    >
-                      <SkipIcon
-                        width={20}
-                        height={20}
-                        stroke={Colors.textSecondary || "#6B7280"}
-                      />
-                    </View>
-                    <View style={styles.actionTexts}>
-                      <Text style={styles.actionLabel}>
-                        {isSkipped ? "Undo skip" : "Skip this dose"}
-                      </Text>
-                      <Text style={styles.actionSub}>
-                        {isSkipped
-                          ? "Mark as pending again"
-                          : "Intentionally skip"}
-                      </Text>
-                    </View>
-                    {isSkipped && (
-                      <View style={styles.badge}>
-                        <SkipIcon
-                          height={16}
-                          width={16}
-                          stroke={Colors.textSecondary}
-                        />
-                      </View>
-                    )}
-                  </Pressable>
-
-                  {/* --------------------------------- Snooze --------------------------------- */}
-                  <Pressable style={styles.actionRow} onPress={goToSnooze}>
-                    <View
-                      style={[
-                        styles.actionIcon,
-                        {
-                          backgroundColor: (Colors.warning || "#F59E0B") + "20",
-                        },
-                      ]}
-                    >
-                      <ClockIcon
-                        width={20}
-                        height={20}
-                        stroke={Colors.warning || "#F59E0B"}
-                      />
-                    </View>
-                    <View style={styles.actionTexts}>
-                      <Text style={styles.actionLabel}>Snooze reminder</Text>
-                      <Text style={styles.actionSub}>Remind me later</Text>
-                    </View>
-                    <Text style={styles.chevron}>›</Text>
-                  </Pressable>
-                </View>
-
-                <Pressable style={styles.cancelButton} onPress={handleClose}>
-                  <Text style={styles.cancelText}>Cancel</Text>
-                </Pressable>
+          {view === "actions" ? (
+            <View style={styles.viewPane}>
+              <View style={styles.header}>
+                <Text style={styles.medName}>{medicationName}</Text>
+                <Text style={styles.medTime}>{displayTime}</Text>
               </View>
 
-              {/* ------------------------------- Snooze View ------------------------------ */}
-              <View style={[styles.viewPane, { width }]}>
-                {/* ------------------------------ Snooze Header ----------------------------- */}
-                <View style={styles.snoozeHeader}>
-                  <Pressable
-                    onPress={goBack}
-                    style={styles.backButton}
-                    hitSlop={8}
+              <View style={styles.divider} />
+
+              <View style={styles.actions}>
+                {/* ---------------------------------- Taken --------------------------------- */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={[styles.actionRow, isTaken && styles.actionRowTaken]}
+                  onPress={handleTaken}
+                >
+                  <View
+                    style={[
+                      styles.actionIcon,
+                      {
+                        backgroundColor: (Colors.success || "#22C55E") + "20",
+                      },
+                    ]}
                   >
-                    <ChevronLeftIcon
+                    <CheckIcon
                       width={20}
                       height={20}
-                      stroke={Colors.textPrimary}
+                      color={Colors.success || "#22C55E"}
                     />
-                  </Pressable>
-                  <View>
-                    <Text style={styles.medName}>Snooze reminder</Text>
-                    <Text style={styles.medTime}>Remind me again in...</Text>
                   </View>
-                </View>
+                  <View style={styles.actionTexts}>
+                    <Text style={styles.actionLabel}>
+                      {isTaken ? "Mark as not taken" : "Mark as taken"}
+                    </Text>
+                    <Text style={styles.actionSub}>
+                      {isTaken ? "Undo taken status" : "Record this dose"}
+                    </Text>
+                  </View>
+                  {isTaken && (
+                    <View style={styles.badge}>
+                      <CheckIcon
+                        width={16}
+                        height={16}
+                        stroke={Colors.success}
+                      />
+                    </View>
+                  )}
+                </TouchableOpacity>
 
-                <View style={styles.divider} />
+                {/* --------------------------------- Skipped -------------------------------- */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={[
+                    styles.actionRow,
+                    isSkipped && styles.actionRowSkipped,
+                  ]}
+                  onPress={handleSkip}
+                >
+                  <View
+                    style={[
+                      styles.actionIcon,
+                      {
+                        backgroundColor:
+                          (Colors.textSecondary || "#6B7280") + "20",
+                      },
+                    ]}
+                  >
+                    <SkipIcon
+                      width={20}
+                      height={20}
+                      stroke={Colors.textSecondary || "#6B7280"}
+                    />
+                  </View>
+                  <View style={styles.actionTexts}>
+                    <Text style={styles.actionLabel}>
+                      {isSkipped ? "Undo skip" : "Skip this dose"}
+                    </Text>
+                    <Text style={styles.actionSub}>
+                      {isSkipped
+                        ? "Mark as pending again"
+                        : "Intentionally skip"}
+                    </Text>
+                  </View>
+                  {isSkipped && (
+                    <View style={styles.badge}>
+                      <SkipIcon
+                        height={16}
+                        width={16}
+                        stroke={Colors.textSecondary}
+                      />
+                    </View>
+                  )}
+                </TouchableOpacity>
 
-                <View style={styles.snoozeOptions}>
-                  {SNOOZE_OPTIONS.map((opt) => (
-                    <Pressable
-                      key={opt.value}
-                      style={styles.snoozeOption}
-                      onPress={() => handleSnooze(opt.value)}
-                    >
-                      <Text style={styles.snoozeLabel}>{opt.label}</Text>
-                    </Pressable>
-                  ))}
-                </View>
-
-                <Pressable style={styles.cancelButton} onPress={handleClose}>
-                  <Text style={styles.cancelText}>Cancel</Text>
-                </Pressable>
+                {/* --------------------------------- Snooze --------------------------------- */}
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  style={styles.actionRow}
+                  onPress={goToSnooze}
+                >
+                  <View
+                    style={[
+                      styles.actionIcon,
+                      {
+                        backgroundColor: (Colors.warning || "#F59E0B") + "20",
+                      },
+                    ]}
+                  >
+                    <ClockIcon
+                      width={20}
+                      height={20}
+                      stroke={Colors.warning || "#F59E0B"}
+                    />
+                  </View>
+                  <View style={styles.actionTexts}>
+                    <Text style={styles.actionLabel}>Snooze reminder</Text>
+                    <Text style={styles.actionSub}>Remind me later</Text>
+                  </View>
+                  <Text style={styles.chevron}>›</Text>
+                </TouchableOpacity>
               </View>
-            </Animated.View>
-          </View>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.cancelButton}
+                onPress={handleClose}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <View style={styles.viewPane}>
+              {/* ------------------------------ Snooze Header ----------------------------- */}
+              <View style={styles.snoozeHeader}>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={goBack}
+                  style={styles.backButton}
+                  hitSlop={12}
+                >
+                  <ChevronLeftIcon
+                    width={20}
+                    height={20}
+                    stroke={Colors.textPrimary}
+                  />
+                </TouchableOpacity>
+                <View>
+                  <Text style={styles.medName}>Snooze reminder</Text>
+                  <Text style={styles.medTime}>Remind me again in...</Text>
+                </View>
+              </View>
+
+              <View style={styles.divider} />
+
+              <View style={styles.snoozeOptions}>
+                {SNOOZE_OPTIONS.map((opt) => (
+                  <TouchableOpacity
+                    key={opt.value}
+                    activeOpacity={0.7}
+                    style={styles.snoozeOption}
+                    onPress={() => handleSnooze(opt.value)}
+                  >
+                    <Text style={styles.snoozeLabel}>{opt.label}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              <TouchableOpacity
+                activeOpacity={0.7}
+                style={styles.cancelButton}
+                onPress={handleClose}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </BottomSheetView>
       </BottomSheet>
     );
@@ -316,12 +302,6 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingBottom: 32,
-  },
-  overflow: {
-    overflow: "hidden",
-  },
-  slideWrapper: {
-    flexDirection: "row",
   },
   viewPane: {
     paddingHorizontal: 20,

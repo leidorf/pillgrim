@@ -356,3 +356,38 @@ export async function scheduleLowStockNotification(
 
   return id;
 }
+
+/* ------------------------------- Snooze ----------------------------------- */
+export async function snoozeMedicationNotification(
+  medication: Medication,
+  time: string,
+  minutes: number,
+  dose?: string,
+): Promise<{ id: string | null; title: string; body: string }> {
+  const hasPermission = await requestNotificationPermission();
+  if (!hasPermission) return { id: null, title: "", body: "" };
+
+  const title = buildTitle(medication);
+  const body = buildBody(medication, dose || "", time);
+
+  const triggerDate = new Date(Date.now() + minutes * 60000);
+
+  const id = await Notifications.scheduleNotificationAsync({
+    content: {
+      title,
+      body,
+      data: {
+        medicationId: medication.id,
+        scheduledTime: time,
+        snoozed: true,
+        snoozeMinutes: minutes,
+      },
+    },
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: triggerDate,
+    },
+  });
+
+  return { id, title, body };
+}

@@ -73,8 +73,6 @@ export const useMedicationStore = create<MedicationStore>()(
 
         try {
           const notificationIds = await scheduleMedicationNotifications(newMed);
-          // TODO: development log - remove before publish
-          console.log("Scheduled IDs:", notificationIds);
           set((state) => ({
             medications: state.medications.map((m) =>
               m.id === newMed.id ? { ...m, notificationIds } : m,

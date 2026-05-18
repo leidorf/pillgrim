@@ -3,6 +3,7 @@ import { Medication, MedicationLog } from "../../../types/medication";
 import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import CircleIcon from "../../../assets/icons/circle.svg";
 import CloseIcon from "../../../assets/icons/circle-close.svg";
+import MinusIcon from "../../../assets/icons/circle-minus.svg";
 import { Colors } from "../../../constants/theme";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
 import { useCallback, useMemo } from "react";
@@ -10,9 +11,10 @@ import { useCallback, useMemo } from "react";
 type MedicationCardProps = {
   medication: Medication;
   time: string;
-  displayTime:string;
+  displayTime: string;
   dose: string;
   log?: MedicationLog;
+  isMissed?: boolean;
   onToggle?: (medicationId: string, time: string) => void;
   onOpenSheet?: (
     medication: Medication,
@@ -27,6 +29,7 @@ const MedicationCard = ({
   displayTime,
   dose,
   log,
+  isMissed,
   onToggle,
   onOpenSheet,
 }: MedicationCardProps) => {
@@ -45,40 +48,51 @@ const MedicationCard = ({
         backgroundColor: Colors.textSecondary + "10",
         opacity: 0.7,
       };
+    if (isMissed)
+      return {
+        backgroundColor: (Colors.error || "#EF4444") + "08",
+        borderColor: (Colors.error || "#EF4444") + "25",
+        opacity: 0.85,
+      };
     return {};
-  }, [isTaken, isSkipped]);
+  }, [isTaken, isSkipped, isMissed]);
 
   const handleTaken = useCallback(() => {
     onToggle?.(medication.id, time);
   }, [onToggle, medication.id, time]);
 
+  const timeTextStyle = useMemo(() => {
+    if (isTaken) return styles.takenText;
+    if (isSkipped) return styles.skippedTimeText;
+    if (isMissed) return styles.missedTimeText;
+    return undefined;
+  }, [isTaken, isSkipped, isMissed]);
+
   return (
     <BaseMedicationCard
       medication={medication}
-      isInactive={isSkipped}
+      isInactive={isSkipped || isMissed}
       style={containerStyle}
       onPress={() => onOpenSheet?.(medication, time, log)}
       dose={dose}
     >
       <View style={styles.timeSection}>
-        <Text
-          style={[
-            styles.timeText,
-            isTaken && styles.takenText,
-            isSkipped && styles.skippedTimeText,
-          ]}
-        >
-          {displayTime}
-        </Text>
+        <Text style={[styles.timeText, timeTextStyle]}>{displayTime}</Text>
         <Pressable
           style={styles.checkButton}
-          onPress={() => onToggle?.(medication.id, time)}
+          onPress={handleTaken}
           hitSlop={8}
         >
           {isTaken ? (
             <CheckIcon width={28} height={28} color={Colors.primary} />
           ) : isSkipped ? (
-            <CloseIcon width={28} height={28} color={Colors.textSecondary} />
+            <MinusIcon width={28} height={28} stroke={Colors.textSecondary} />
+          ) : isMissed ? (
+            <CloseIcon
+              width={28}
+              height={28}
+              stroke={Colors.error || "#EF4444"}
+            />
           ) : (
             <CircleIcon
               width={28}
@@ -103,6 +117,7 @@ const styles = StyleSheet.create({
   },
   takenText: { color: Colors.primary },
   skippedTimeText: { color: Colors.textSecondary },
+  missedTimeText: { color: Colors.error || "#EF4444" },
   checkButton: { padding: 4 },
 });
 

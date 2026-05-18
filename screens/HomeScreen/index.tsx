@@ -2,7 +2,7 @@ import { FlatList, StyleSheet, Text, View } from "react-native";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Medication, MedicationLog } from "../../types/medication";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import { useMedicationStore } from "../../store/medicationStore";
@@ -15,6 +15,8 @@ import { useTimeFormat } from "../../hooks/useTimeFormat";
 import { getLocalDateString } from "../../utils/dateUtils";
 import { useSettingsStore } from "../../store/settingsStore";
 import { WeekStart } from "../../types/schedule";
+import { snoozeMedicationNotification } from "../../services/notificationService";
+import { getMedicationLogStatus } from "../../utils/medicationUtils";
 
 type ScheduleItem = {
   medication: Medication;
@@ -189,11 +191,17 @@ const HomeScreen = () => {
   );
 
   const handleSnooze = useCallback(
-    (medicationId: string, time: string, minutes: number) => {
-      // TODO: expo-notifications
-      console.log(`Snooze ${medicationId} at ${time} for ${minutes} min`);
+    async (medicationId: string, time: string, minutes: number) => {
+      const medication = medications.find((m) => m.id === medicationId);
+      if (!medication) return;
+
+      const doseStr = medication.timeDoses?.find(
+        (td) => td.time === time,
+      )?.dose;
+
+      await snoozeMedicationNotification(medication, time, minutes, doseStr);
     },
-    [],
+    [medications],
   );
 
   const selectedLog = selectedItem
@@ -205,6 +213,12 @@ const HomeScreen = () => {
     : undefined;
 
   const schedule = getScheduleForDate(selectedDate);
+
+  const [, forceUpdate] = useState(0);
+  useEffect(() => {
+    const interval = setInterval(() => forceUpdate((n) => n + 1), 60_000);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
     <ScreenLayout>
@@ -225,6 +239,9 @@ const HomeScreen = () => {
               l.medicationId === item.medication.id &&
               l.scheduledTime === item.time,
           );
+          const dateStr = getLocalDateString(selectedDate);
+          const status = getMedicationLogStatus(log, dateStr, item.time);
+
           return (
             <MedicationCard
               medication={item.medication}
@@ -232,6 +249,7 @@ const HomeScreen = () => {
               displayTime={item.displayTime}
               dose={item.dose}
               log={log}
+              isMissed={status === "missed"}
               onToggle={(medId, time) => {
                 const amount = parseFloat(item.dose) || 1;
                 handleToggle(medId, time, amount);

@@ -1,6 +1,7 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { Colors } from "../../../../constants/theme";
-import { ScheduleType } from "../../../../types/medication";
+import { ScheduleType } from "../../../../types/schedule";
+
 
 type Props = {
   id: ScheduleType;
