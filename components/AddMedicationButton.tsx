@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import { Text } from "./Text";
 import { NavProp } from "../types/navigation";
 import CirclePlusIcon from "../assets/icons//circle-plus.svg";
 

@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import { View, StyleSheet, ScrollView } from "react-native";
+import { Text } from "../../components/Text";
 import { useState, useMemo } from "react";
 
 import { useLogStore } from "../../store/logsStore";

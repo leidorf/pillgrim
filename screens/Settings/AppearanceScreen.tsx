@@ -1,12 +1,6 @@
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-  ScrollView,
-  Modal,
-} from "react-native";
+import { Pressable, StyleSheet, View, ScrollView, Modal } from "react-native";
+import { Text } from "../../components/Text";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
 import { Colors } from "../../constants/theme";
@@ -14,15 +8,29 @@ import { useSettingsStore } from "../../store/settingsStore";
 import { WEEKDAY_LABELS } from "../../constants/schedules";
 import CheckIcon from "../../assets/icons/check.svg";
 import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
+import { FontScale } from "../../theme/typography";
+
+const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
+  { value: "small", label: "Small" },
+  { value: "normal", label: "Normal" },
+  { value: "large", label: "Large" },
+  { value: "xlarge", label: "Extra Large" },
+];
 
 const AppearanceScreen = () => {
   const { timeFormat, setTimeFormat } = useSettingsStore();
   const { weekStartsOn, setWeekStartsOn } = useSettingsStore();
+  const { fontScale, setFontScale } = useSettingsStore();
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
+  const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
 
   const selectedWeekLabel = WEEKDAY_LABELS.find(
     (d) => d.value === weekStartsOn,
   )?.label;
+
+  const selectedFontLabel = FONT_SCALE_OPTIONS.find(
+    (f) => f.value === fontScale,
+  )?.label || "Normal";
 
   return (
     <ScreenLayout>
@@ -92,6 +100,27 @@ const AppearanceScreen = () => {
             />
           </Pressable>
         </View>
+
+        {/* ------------------------------- Font Size ------------------------------- */}
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingLabel}>Font Size</Text>
+            <Text style={styles.settingDescription}>
+              Adjust the text size of the application
+            </Text>
+          </View>
+          <Pressable
+            style={styles.dropdownTrigger}
+            onPress={() => setFontDropdownOpen(true)}
+          >
+            <Text style={styles.dropdownTriggerText}>{selectedFontLabel}</Text>
+            <ArrowDownIcon
+              width={16}
+              height={16}
+              stroke={Colors.textSecondary}
+            />
+          </Pressable>
+        </View>
       </View>
 
       {/* --------------------------- Week Start Dropdown -------------------------- */}
@@ -132,6 +161,60 @@ const AppearanceScreen = () => {
                       ]}
                     >
                       {day.label}
+                    </Text>
+                    {isActive && (
+                      <CheckIcon
+                        width={16}
+                        height={16}
+                        stroke={Colors.primary}
+                      />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* --------------------------- Font Size Dropdown --------------------------- */}
+      <Modal
+        visible={fontDropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setFontDropdownOpen(false)}
+      >
+        <Pressable
+          style={styles.dropdownOverlay}
+          onPress={() => setFontDropdownOpen(false)}
+        >
+          <View style={styles.dropdownCard}>
+            <Text style={styles.dropdownTitle}>Font Size</Text>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.dropdownContent}
+            >
+              {FONT_SCALE_OPTIONS.map((opt) => {
+                const isActive = fontScale === opt.value;
+                return (
+                  <Pressable
+                    key={opt.value}
+                    style={[
+                      styles.dropdownItem,
+                      isActive && styles.dropdownItemActive,
+                    ]}
+                    onPress={() => {
+                      setFontScale(opt.value);
+                      setFontDropdownOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        isActive && styles.dropdownItemTextActive,
+                      ]}
+                    >
+                      {opt.label}
                     </Text>
                     {isActive && (
                       <CheckIcon

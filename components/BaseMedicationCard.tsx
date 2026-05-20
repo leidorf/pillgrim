@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Text } from "./Text";
 import { Medication } from "../types/medication";
 import { MED_FORMS } from "../constants/medication-forms";
 import { Colors } from "../constants/theme";

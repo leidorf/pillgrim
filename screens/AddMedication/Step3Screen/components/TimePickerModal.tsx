@@ -1,16 +1,6 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  Easing,
-  Modal,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Easing, Modal, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 import { useTimeFormat } from "../../../../hooks/useTimeFormat";
 

@@ -1,5 +1,6 @@
 import { useNavigation } from "@react-navigation/native";
-import { FlatList, Linking, StyleSheet, Text, View } from "react-native";
+import { FlatList, Linking, StyleSheet, View } from "react-native";
+import { Text } from "../../components/Text";
 import { NavProp, SettingsParamList } from "../../types/navigation";
 import ScreenHeader from "./components/ScreenHeader";
 import NavigationButton from "./components/NavigationButton";

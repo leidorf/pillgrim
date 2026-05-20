@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useMemo, useRef } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "../../../components/Text";
 import { Pressable } from "react-native";
 import { BottomSheetView, BottomSheetBackdrop } from "@gorhom/bottom-sheet";
 import { Medication } from "../../../types/medication";

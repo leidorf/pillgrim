@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  FlatList,
-  useWindowDimensions,
-} from "react-native";
+import { View, Pressable, StyleSheet, FlatList, useWindowDimensions } from "react-native";
+import { Text } from "../../../components/Text";
 import { useRef, useState, useMemo, useCallback } from "react";
 import { Colors } from "../../../constants/theme";
 import { useLogStore } from "../../../store/logsStore";
@@ -70,8 +64,24 @@ const MonthGrid = ({
     () => getMonthGrid(year, month, weekStartsOn),
     [year, month, weekStartsOn],
   );
-  const getDayStats = useLogStore((state) => state.getDayStats);
   const logs = useLogStore((state) => state.logs);
+
+  const getDayStats = useCallback((dVal: Date) => {
+    const y = dVal.getFullYear();
+    const m = String(dVal.getMonth() + 1).padStart(2, "0");
+    const d = String(dVal.getDate()).padStart(2, "0");
+    const dateStr = `${y}-${m}-${d}`;
+
+    const dayLogs = logs.filter((log) => log.scheduledDate === dateStr);
+    const hasLogs = dayLogs.length > 0;
+    
+    const takenMeds = dayLogs.filter((log) => log.takenAt && !log.skipped).length;
+    const missedMeds = dayLogs.filter((log) => !log.takenAt && !log.skipped).length;
+    const actionable = takenMeds + missedMeds;
+    const adherenceRate = actionable > 0 ? Math.round((takenMeds / actionable) * 100) : 100;
+
+    return { hasLogs, adherenceRate };
+  }, [logs]);
 
   const getAdherenceColor = (rate: number) => {
     if (rate === 100) return Colors.success || "#22C55E";
@@ -268,7 +278,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: "100%",
     aspectRatio: 1,
-    padding: 16,
+    padding: 2,
     alignItems: "center",
     justifyContent: "center",
     borderRadius: 64,

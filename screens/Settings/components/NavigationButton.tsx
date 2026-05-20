@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "../../../components/Text";
 import ArrowRight from "../../../assets/icons/chevron-right.svg";
 import { Colors } from "../../../constants/theme";
 

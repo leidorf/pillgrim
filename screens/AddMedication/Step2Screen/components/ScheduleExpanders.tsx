@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, TextInput, View } from "react-native";
+import { Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 import { WEEKDAYS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
@@ -19,7 +20,10 @@ export const WeekdayPicker = ({
   weekStartsOn = 1,
 }: WeekdayProps) => {
   const orderedWeekdays = useMemo(() => {
-    return [...WEEKDAYS.slice(weekStartsOn), ...WEEKDAYS.slice(0, weekStartsOn)];
+    return [
+      ...WEEKDAYS.slice(weekStartsOn),
+      ...WEEKDAYS.slice(0, weekStartsOn),
+    ];
   }, [weekStartsOn]);
 
   return (
@@ -37,7 +41,12 @@ export const WeekdayPicker = ({
               ]}
               onPress={() => onToggle(id)}
             >
-              <Text style={[styles.chipText, active && styles.chipTextActive]}>
+              <Text
+                style={[
+                  styles.chipText,
+                  active && styles.chipTextActive,
+                ]}
+              >
                 {label}
               </Text>
             </Pressable>
@@ -93,36 +102,37 @@ type MonthDayProps = {
   onToggle: (day: number) => void;
 };
 
-export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => (
-  <InlineContainer containerText="Select days of the month (1–31)">
-    <View style={styles.monthGrid}>
-      {MONTH_DAYS.map((day) => {
-        const active = selected.includes(day);
-        return (
-          <Pressable
-            key={day}
-            style={[
-              styles.chip,
-              styles.chipSquare,
-              active && styles.chipActive,
-            ]}
-            onPress={() => onToggle(day)}
-          >
-            <Text
+export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
+  return (
+    <InlineContainer containerText="Select days of the month (1–31)">
+      <View style={styles.monthGrid}>
+        {MONTH_DAYS.map((day) => {
+          const active = selected.includes(day);
+          return (
+            <Pressable
+              key={day}
               style={[
-                styles.chipText,
-                styles.chipTextSmall,
-                active && styles.chipTextActive,
+                styles.chip,
+                styles.chipSquare,
+                active && styles.chipActive,
               ]}
+              onPress={() => onToggle(day)}
             >
-              {day}
-            </Text>
-          </Pressable>
-        );
-      })}
-    </View>
-  </InlineContainer>
-);
+              <Text
+                style={[
+                  styles.chipText,
+                  active && styles.chipTextActive,
+                ]}
+              >
+                {day}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    </InlineContainer>
+  );
+};
 
 /* -------------------------------- PRN Info -------------------------------- */
 export const PrnInfo = () => (
@@ -158,12 +168,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   chipText: {
-    fontSize: 12,
     fontWeight: "600",
     color: Colors.textPrimary,
-  },
-  chipTextSmall: {
-    fontSize: 13,
+    fontSize: 12,
   },
   chipTextActive: {
     color: "#fff",
@@ -182,10 +189,9 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   stepperText: {
-    fontSize: 20,
-    fontWeight: "500",
     color: Colors.textPrimary,
     lineHeight: 24,
+    fontSize: 18,
   },
   intervalInput: {
     minWidth: 52,
@@ -193,15 +199,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     backgroundColor: Colors.surface,
     color: Colors.textPrimary,
-    fontSize: 18,
     fontWeight: "700",
     textAlign: "center",
     paddingHorizontal: 6,
+    fontSize: 16,
   },
   intervalUnit: {
-    fontSize: 15,
     color: Colors.textSecondary,
-    fontWeight: "500",
+    fontSize: 14,
   },
   monthGrid: {
     flexDirection: "row",

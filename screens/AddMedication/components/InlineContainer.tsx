@@ -1,6 +1,7 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
 import { Colors } from "../../../constants/theme";
 import { PropsWithChildren } from "react";
+import { Text } from "../../../components/Text";
 
 type ContainerProps = {
   containerText: string;
@@ -12,7 +13,12 @@ const InlineContainer = ({
 }: PropsWithChildren<ContainerProps>) => {
   return (
     <View style={styles.expandedContainer}>
-      <Text style={children ? styles.expandedLabel : styles.expandedInfoText}>
+      <Text
+        style={[
+          styles.textStyle,
+          children ? styles.expandedLabel : styles.expandedInfoText,
+        ]}
+      >
         {containerText}
       </Text>
       {children}
@@ -31,15 +37,14 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.primary + "30",
   },
-  expandedLabel: {
+  textStyle: {
+    fontSize: 14,
     color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "500",
+  },
+  expandedLabel: {
     marginBottom: 10,
   },
   expandedInfoText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
     lineHeight: 20,
   },
 });

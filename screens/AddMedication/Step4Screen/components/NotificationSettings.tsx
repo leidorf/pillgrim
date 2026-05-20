@@ -1,5 +1,6 @@
 import { useEffect } from "react";
-import { StyleSheet, Switch, Text, View } from "react-native";
+import { StyleSheet, Switch, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import BellIcon from "../../../../assets/icons/bell.svg";
 import EyeOffIcon from "../../../../assets/icons/eye-off.svg";
 import PackageIcon from "../../../../assets/icons/package.svg";

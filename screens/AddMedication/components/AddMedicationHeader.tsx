@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { Colors } from "../../../constants/theme";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -17,13 +18,12 @@ type AddMedicationHeaderProps = {
 const AddMedicationHeader = ({
   currentStep,
   title,
-  showBackIcon = true,
+  showBackIcon = currentStep !== 1,
   onBack,
 }: AddMedicationHeaderProps) => {
   const navigation = useNavigation();
   const route = useRoute<any>();
   const { clearDraft } = useMedicationStore();
-
   const mode = route.params?.mode;
 
   const handleClose = () => {
@@ -44,13 +44,13 @@ const AddMedicationHeader = ({
   return (
     <>
       <View style={styles.header}>
-        <Pressable onPress={handleBack} style={styles.headerIcon}>
-          {showBackIcon ? (
+        {showBackIcon ? (
+          <Pressable onPress={handleBack} style={styles.headerIcon}>
             <BackIcon height={24} width={24} stroke={Colors.textPrimary} />
-          ) : (
-            <View style={styles.placeholder} />
-          )}
-        </Pressable>
+          </Pressable>
+        ) : (
+          <View style={styles.placeholder} />
+        )}
 
         <Text style={styles.headerTitle}>{title}</Text>
 
@@ -69,11 +69,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    marginBottom: 10,
+    marginBottom: 24,
   },
   headerIcon: {
     padding: 4,
     minWidth: 32,
+    borderRadius: 16,
+    backgroundColor: Colors.border,
   },
   headerTitle: {
     color: Colors.textPrimary,

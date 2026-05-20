@@ -1,5 +1,6 @@
 import { useRef, useState, useCallback } from "react";
-import { FlatList, StyleSheet, Text, View } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
+import { Text } from "../../components/Text";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import MedicationInfoCard from "./components/MedicationInfoCard";

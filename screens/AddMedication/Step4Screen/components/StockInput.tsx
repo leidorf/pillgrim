@@ -1,5 +1,6 @@
 import { useRef } from "react";
-import { Pressable, StyleSheet, Text, TextInput } from "react-native";
+import { Pressable, StyleSheet, TextInput } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 
 type Props = {

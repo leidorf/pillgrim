@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import { Text } from "../../../components/Text";
 import { Colors } from "../../../constants/theme";
 import InlineContainer from "./InlineContainer";
 
@@ -19,7 +20,10 @@ const DateInputInfoCard = ({
     <InlineContainer containerText={cardLabel}>
       <Pressable style={styles.dateInput} onPress={onPress}>
         <Text
-          style={[styles.dateText, isEmpty && { color: Colors.textSecondary }]}
+          style={[
+            styles.dateText,
+            isEmpty && { color: Colors.textSecondary },
+          ]}
         >
           {cardText}
         </Text>
@@ -39,17 +43,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.primary + "30",
   },
-  expandedLabel: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "500",
-    marginBottom: 10,
-  },
-  expandedInfoText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    lineHeight: 20,
-  },
   dateInput: {
     backgroundColor: Colors.surface,
     borderRadius: 12,
@@ -59,7 +52,7 @@ const styles = StyleSheet.create({
   },
   dateText: {
     color: Colors.textPrimary,
-    fontSize: 15,
     fontWeight: "500",
+    fontSize: 14,
   },
 });

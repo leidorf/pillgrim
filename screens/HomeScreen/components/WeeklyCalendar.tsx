@@ -1,11 +1,5 @@
-import {
-  View,
-  Text,
-  Pressable,
-  StyleSheet,
-  FlatList,
-  useWindowDimensions,
-} from "react-native";
+import { View, Pressable, StyleSheet, FlatList, useWindowDimensions } from "react-native";
+import { Text } from "../../../components/Text";
 import { useRef, useState } from "react";
 
 import { Colors } from "../../../constants/theme";

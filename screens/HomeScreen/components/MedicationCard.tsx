@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text, View, ViewStyle } from "react-native";
+import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
+import { Text } from "../../../components/Text";
 import { Medication, MedicationLog } from "../../../types/medication";
 import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import CircleIcon from "../../../assets/icons/circle.svg";

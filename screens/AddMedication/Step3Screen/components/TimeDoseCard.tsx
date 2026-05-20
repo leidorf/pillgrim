@@ -1,13 +1,6 @@
 import { useState } from "react";
-import {
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-  Modal,
-  ScrollView,
-} from "react-native";
+import { Pressable, StyleSheet, TextInput, View, Modal, ScrollView } from "react-native";
+import { Text } from "../../../../components/Text";
 
 import { Colors } from "../../../../constants/theme";
 
@@ -57,9 +50,6 @@ export const TimeDoseCard = ({
     <View style={styles.card}>
       {/* --------------------------------- Header --------------------------------- */}
       <View style={styles.header}>
-        <View style={styles.badge}>
-          <Text style={styles.badgeText}>#{index + 1}</Text>
-        </View>
         {canRemove && (
           <Pressable onPress={onRemove} style={styles.removeButton}>
             <TrashIcon
@@ -73,8 +63,12 @@ export const TimeDoseCard = ({
 
       {/* ------------------------------- Time Picker ------------------------------ */}
       <Pressable style={styles.timeButton} onPress={onOpenTimePicker}>
-        <Text style={styles.timeText}>{formattedTime}</Text>
-        <Text style={styles.timeHint}>Tap to change time</Text>
+        <Text style={styles.timeText}>
+          {formattedTime}
+        </Text>
+        <Text style={styles.timeHint}>
+          Tap to change time
+        </Text>
       </Pressable>
 
       {/* ---------------------------- Dose - Unit Input --------------------------- */}
@@ -95,7 +89,9 @@ export const TimeDoseCard = ({
           style={styles.unitDropdownTrigger}
           onPress={() => setUnitDropdownOpen(true)}
         >
-          <Text style={styles.unitLabel}>{unitLabel || "Select unit"}</Text>
+          <Text style={styles.unitLabel}>
+            {unitLabel || "Select unit"}
+          </Text>
           <ArrowDownIcon width={14} height={14} stroke={Colors.textSecondary} />
         </Pressable>
       </View>
@@ -119,7 +115,9 @@ export const TimeDoseCard = ({
           onPress={() => setUnitDropdownOpen(false)}
         >
           <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Select Unit</Text>
+            <Text style={styles.dropdownTitle}>
+              Select Unit
+            </Text>
             <View style={styles.separator} />
 
             <ScrollView
@@ -177,16 +175,9 @@ const styles = StyleSheet.create({
   },
   header: {
     flexDirection: "row",
-    justifyContent: "space-between",
+    justifyContent: "flex-end",
     alignItems: "center",
   },
-  badge: {
-    backgroundColor: Colors.primary + "20",
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
-  },
-  badgeText: { color: Colors.primary, fontSize: 13, fontWeight: "600" },
   removeButton: { padding: 4 },
   timeButton: {
     backgroundColor: Colors.background,
@@ -197,7 +188,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: Colors.textSecondary + "30",
   },
-  timeText: { color: Colors.textPrimary, fontSize: 28, fontWeight: "700" },
+  timeText: { color: Colors.textPrimary, fontWeight: "700", fontSize: 30 },
   timeHint: { color: Colors.textSecondary, fontSize: 12 },
   amountRow: {
     flexDirection: "row",
@@ -217,8 +208,8 @@ const styles = StyleSheet.create({
   amountInput: {
     flex: 1,
     color: Colors.textPrimary,
-    fontSize: 14,
     fontWeight: "600",
+    fontSize: 14,
   },
   unitDropdownTrigger: {
     flexDirection: "row",
@@ -229,12 +220,11 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: Colors.textSecondary + "30",
   },
-  unitLabel: { color: Colors.textSecondary, fontSize: 14, fontWeight: "500" },
+  unitLabel: { color: Colors.textSecondary, fontSize: 14 },
   errorText: {
     color: Colors.error || "#EF4444",
-    fontSize: 12,
-    fontWeight: "500",
     marginTop: 4,
+    fontSize: 12,
   },
   dropdownOverlay: {
     flex: 1,
@@ -259,10 +249,10 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   dropdownTitle: {
-    fontSize: 18,
     fontWeight: "700",
     color: Colors.textPrimary,
     paddingHorizontal: 4,
+    fontSize: 18,
   },
   dropdownContent: { gap: 2 },
   dropdownItem: {
@@ -277,9 +267,8 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.primary + "10",
   },
   dropdownItemText: {
-    fontSize: 16,
     color: Colors.textPrimary,
-    fontWeight: "500",
+    fontSize: 16,
   },
   dropdownItemTextActive: {
     color: Colors.primary,

@@ -1,12 +1,6 @@
 import { useRef, useState } from "react";
-import {
-  Animated,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from "react-native";
+import { Animated, Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import PillIcon from "../../../../assets/icons/pill.svg";
 import { MED_FORMS } from "../../../../constants/medication-forms";
 import { Colors } from "../../../../constants/theme";
@@ -20,7 +14,6 @@ type Props = {
 export const MedicationFormPicker = ({ value, onChange }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
-
   const SelectedIcon = MED_FORMS.find((f) => f.id === value)?.Icon ?? PillIcon;
 
   const toggle = () => {
@@ -111,11 +104,11 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   formLabel: {
-    fontSize: 16,
     textTransform: "capitalize",
     marginTop: 8,
     textAlign: "center",
     color: Colors.textPrimary,
+    fontSize: 18,
   },
   picker: {
     width: "100%",
@@ -131,19 +124,19 @@ const styles = StyleSheet.create({
     gap: 4,
     paddingVertical: 10,
     paddingHorizontal: 12,
-    borderRadius: 8,
+    borderRadius: 12,
     backgroundColor: Colors.surface,
     marginRight: 8,
     minWidth: 64,
   },
   formItemSelected: {
-    backgroundColor: Colors.primary + "22",
+    backgroundColor: Colors.subtle,
     borderWidth: 1.5,
     borderColor: Colors.primary,
   },
   formItemLabel: {
-    fontSize: 11,
     color: Colors.textSecondary,
+    fontSize: 10,
   },
   formItemLabelSelected: {
     color: Colors.primary,

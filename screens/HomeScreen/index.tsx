@@ -1,26 +1,34 @@
-import { FlatList, StyleSheet, Text, View } from "react-native";
-import AddMedicationButton from "../../components/AddMedicationButton";
-import MedicationCard from "./components/MedicationCard";
-import WeeklyCalendar from "./components/WeeklyCalendar";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Medication, MedicationLog } from "../../types/medication";
-import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
-import { useMedicationStore } from "../../store/medicationStore";
-import { Colors } from "../../constants/theme";
-import { useLogStore } from "../../store/logsStore";
+import { FlatList, StyleSheet, View } from "react-native";
 import BottomSheet from "@gorhom/bottom-sheet";
-import MedicationActionSheet from "./components/MedicationActionSheet";
-import ScreenLayout from "../../components/ScreenLayout";
-import { useTimeFormat } from "../../hooks/useTimeFormat";
-import { getLocalDateString } from "../../utils/dateUtils";
-import { useSettingsStore } from "../../store/settingsStore";
+
+import { Colors } from "../../constants/theme";
+import { Medication, MedicationLog } from "../../types/medication";
 import { WeekStart } from "../../types/schedule";
+
+import { useMedicationStore } from "../../store/medicationStore";
+import { useLogStore } from "../../store/logsStore";
+import { useSettingsStore } from "../../store/settingsStore";
+
+import { useTimeFormat } from "../../hooks/useTimeFormat";
+
 import { snoozeMedicationNotification } from "../../services/notificationService";
+
+import { getLocalDateString } from "../../utils/dateUtils";
 import {
   buildDailySchedule,
   isMedicationScheduledForDate,
   WeekdayMap,
 } from "../../utils/medicationScheduleUtils";
+
+import MedicationActionSheet from "./components/MedicationActionSheet";
+import ScreenLayout from "../../components/ScreenLayout";
+import { Text } from "../../components/Text";
+import AddMedicationButton from "../../components/AddMedicationButton";
+import MedicationCard from "./components/MedicationCard";
+import WeeklyCalendar from "./components/WeeklyCalendar";
+
+import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 
 const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
   const map: WeekdayMap = {};
@@ -31,7 +39,7 @@ const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
 };
 
 const HomeScreen = () => {
-  const { medications } = useMedicationStore();
+  const { medications, updateStock } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const weekdayMap = useMemo(
     () => buildWeekdayMap(weekStartsOn),
@@ -50,6 +58,7 @@ const HomeScreen = () => {
     log?: MedicationLog;
   } | null>(null);
 
+  // Minutely missed state check
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60_000);
@@ -108,12 +117,15 @@ const HomeScreen = () => {
       if (existingLog) {
         if (existingLog.takenAt && !existingLog.skipped) {
           deleteLog(existingLog.id);
+          if (doseAmount) updateStock(medicationId, doseAmount);
         } else {
+          const wasTaken = !!existingLog.takenAt && !existingLog.skipped;
           updateLog(existingLog.id, {
             takenAt: new Date(),
             skipped: false,
             ...(doseAmount && { doseAmount }),
           });
+          if (!wasTaken && doseAmount) updateStock(medicationId, -doseAmount);
         }
       } else {
         addLog({
@@ -124,9 +136,10 @@ const HomeScreen = () => {
           skipped: false,
           doseAmount,
         });
+        if (doseAmount) updateStock(medicationId, -doseAmount);
       }
     },
-    [selectedDate, logs, deleteLog, updateLog, addLog],
+    [selectedDate, logs, deleteLog, updateLog, addLog, updateStock],
   );
 
   const handleSkip = useCallback(
@@ -143,7 +156,11 @@ const HomeScreen = () => {
         if (existingLog.skipped) {
           deleteLog(existingLog.id);
         } else {
+          const wasTaken = !!existingLog.takenAt && !existingLog.skipped;
           updateLog(existingLog.id, { takenAt: undefined, skipped: true });
+          if (wasTaken && existingLog.doseAmount) {
+            updateStock(medicationId, existingLog.doseAmount);
+          }
         }
       } else {
         addLog({
@@ -154,7 +171,7 @@ const HomeScreen = () => {
         });
       }
     },
-    [selectedDate, logs, deleteLog, updateLog, addLog],
+    [selectedDate, logs, deleteLog, updateLog, addLog, updateStock],
   );
 
   const handleSnooze = useCallback(

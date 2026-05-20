@@ -1,4 +1,5 @@
-import { Modal, Pressable, StyleSheet, Text, View } from "react-native";
+import { Modal, Pressable, StyleSheet, View } from "react-native";
+import { Text } from "./Text";
 import { Colors } from "../constants/theme";
 
 export type ModalButton = {
@@ -48,9 +49,6 @@ const BaseModal = ({
                 style={[
                   styles.button,
                   isHorizontal && styles.buttonRow,
-                  !isHorizontal &&
-                    index < buttons.length - 1 &&
-                    styles.buttonBorderBottom,
                 ]}
                 onPress={button.onPress}
               >
@@ -97,13 +95,13 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "700",
     color: Colors.textPrimary,
-    marginBottom: 8,
+    marginBottom: 4,
   },
   message: {
     fontSize: 14,
     color: Colors.textSecondary,
     lineHeight: 20,
-    marginBottom: 20,
+    marginBottom: 12,
   },
   buttonContainer: {
     borderTopWidth: 1,

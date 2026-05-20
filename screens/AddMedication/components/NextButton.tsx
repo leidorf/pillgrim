@@ -1,4 +1,5 @@
-import { Pressable, StyleSheet, Text } from "react-native";
+import { Pressable, StyleSheet } from "react-native";
+import { Text } from "../../../components/Text";
 import { Colors } from "../../../constants/theme";
 
 type NextButtonProps = {
@@ -13,7 +14,9 @@ const NextButton = ({ disabled = false, onPress }: NextButtonProps) => {
       disabled={disabled}
       onPress={onPress}
     >
-      <Text style={styles.buttonText}>Next</Text>
+      <Text style={[styles.text, disabled && styles.disabledText]}>
+        Next
+      </Text>
     </Pressable>
   );
 };
@@ -25,10 +28,22 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     width: "100%",
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.primary,
     borderRadius: 16,
     padding: 16,
   },
-  buttonText: { color: Colors.textPrimary, fontSize: 18, fontWeight: 600 },
-  disabledButton: { backgroundColor: Colors.surface, opacity: 0.5 },
+  disabledButton: {
+    backgroundColor: Colors.background,
+    borderWidth: 1.5,
+    padding: 14.5,
+    borderColor: Colors.border,
+  },
+  text: {
+    color: Colors.surface,
+    fontSize: 18,
+    fontWeight: "600",
+  },
+  disabledText: {
+    color: Colors.textSecondary,
+  },
 });

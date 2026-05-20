@@ -1,14 +1,6 @@
 import { useEffect, useRef, useState } from "react";
-import {
-  Animated,
-  FlatList,
-  Modal,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from "react-native";
+import { Animated, FlatList, Modal, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";

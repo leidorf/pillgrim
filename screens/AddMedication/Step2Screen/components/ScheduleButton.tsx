@@ -1,7 +1,7 @@
-import { Pressable, StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 import { ScheduleType } from "../../../../types/schedule";
-
 
 type Props = {
   id: ScheduleType;
@@ -17,20 +17,27 @@ export const ScheduleButton = ({
   isSelected,
   onPress,
   children,
-}: Props) => (
-  <View>
-    <Pressable
-      style={[styles.button, isSelected && styles.buttonSelected]}
-      onPress={() => onPress(id)}
-    >
-      <Text style={[styles.label, isSelected && styles.labelSelected]}>
-        {label}
-      </Text>
-    </Pressable>
+}: Props) => {
+  return (
+    <View>
+      <Pressable
+        style={[styles.button, isSelected && styles.buttonSelected]}
+        onPress={() => onPress(id)}
+      >
+        <Text
+          style={[
+            styles.label,
+            isSelected && styles.labelSelected,
+          ]}
+        >
+          {label}
+        </Text>
+      </Pressable>
 
-    {isSelected && children}
-  </View>
-);
+      {isSelected && children}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   button: {
@@ -38,7 +45,7 @@ const styles = StyleSheet.create({
     borderRadius: 16,
     padding: 16,
     backgroundColor: Colors.surface,
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: "transparent",
   },
   buttonSelected: {
@@ -46,10 +53,9 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   label: {
-    fontSize: 16,
-    fontWeight: "500",
     color: Colors.textPrimary,
     textAlign: "center",
+    fontSize: 16,
   },
   labelSelected: {
     color: Colors.primary,

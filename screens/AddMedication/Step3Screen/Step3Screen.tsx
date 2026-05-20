@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, View } from "react-native";
+import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
@@ -180,17 +181,10 @@ const Step3Screen = () => {
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          {/* Summary — only visible when all doses are filled */}
-          {allDosesComplete && (
-            <DailySummaryCard
-              doses={timeDoses}
-              unitLabel={unitLabel}
-              formatTime={formatTime}
-            />
-          )}
-
           <View style={styles.dosesSection}>
-            <Text style={styles.sectionLabel}>When and how much?</Text>
+            <Text style={styles.sectionLabel}>
+              When and how much?
+            </Text>
 
             {timeDoses.map((td, index) => (
               <TimeDoseCard
@@ -232,6 +226,15 @@ const Step3Screen = () => {
               </Text>
             </Pressable>
           </View>
+
+          {/* Summary — only visible when all doses are filled */}
+          {allDosesComplete && (
+            <DailySummaryCard
+              doses={timeDoses}
+              unitLabel={unitLabel}
+              formatTime={formatTime}
+            />
+          )}
         </ScrollView>
 
         <NextButton disabled={!allDosesComplete} onPress={handleNext} />
@@ -269,8 +272,9 @@ const styles = StyleSheet.create({
   dosesSection: { gap: 12 },
   sectionLabel: {
     color: Colors.textPrimary,
-    fontSize: 18,
     fontWeight: "600",
+    fontSize: 18,
+    marginTop: 16,
     marginBottom: 4,
   },
   addButton: {
@@ -286,7 +290,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   addButtonDisabled: { borderColor: Colors.textSecondary + "30" },
-  addButtonText: { color: Colors.primary, fontSize: 15, fontWeight: "600" },
+  addButtonText: { color: Colors.primary, fontWeight: "600", fontSize: 16 },
   addButtonTextDisabled: { color: Colors.textSecondary },
 });
 

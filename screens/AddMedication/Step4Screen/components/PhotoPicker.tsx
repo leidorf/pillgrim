@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import * as ImagePicker from "expo-image-picker";
 import ImageIcon from "../../../../assets/icons/image.svg";
 import { Colors } from "../../../../constants/theme";

@@ -1,4 +1,5 @@
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View } from "react-native";
+import { Text } from "../../../../components/Text";
 import { Colors } from "../../../../constants/theme";
 
 type DoseEntry = {
@@ -13,19 +14,25 @@ type Props = {
   formatTime: (date: Date) => string;
 };
 
-export const DailySummaryCard = ({ doses, unitLabel, formatTime }: Props) => (
-  <View style={styles.card}>
-    <Text style={styles.heading}>Daily Schedule</Text>
-    {doses.map((dose) => (
-      <View key={dose.id} style={styles.row}>
-        <Text style={styles.time}>{formatTime(dose.time)}</Text>
-        <Text style={styles.dose}>
-          {dose.amount} {unitLabel}
-        </Text>
-      </View>
-    ))}
-  </View>
-);
+export const DailySummaryCard = ({ doses, unitLabel, formatTime }: Props) => {
+  return (
+    <View style={styles.card}>
+      <Text style={styles.heading}>
+        Daily Schedule
+      </Text>
+      {doses.map((dose) => (
+        <View key={dose.id} style={styles.row}>
+          <Text style={styles.time}>
+            {formatTime(dose.time)}
+          </Text>
+          <Text style={styles.dose}>
+            {dose.amount} {unitLabel}
+          </Text>
+        </View>
+      ))}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   card: {
@@ -37,9 +44,8 @@ const styles = StyleSheet.create({
   },
   heading: {
     color: Colors.textSecondary,
-    fontSize: 13,
-    fontWeight: "500",
     marginBottom: 12,
+    fontSize: 14,
   },
   row: {
     flexDirection: "row",
@@ -49,6 +55,6 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: Colors.textSecondary + "20",
   },
-  time: { color: Colors.textPrimary, fontSize: 16, fontWeight: "600" },
-  dose: { color: Colors.primary, fontSize: 14, fontWeight: "500" },
+  time: { color: Colors.textPrimary, fontWeight: "600", fontSize: 16 },
+  dose: { color: Colors.primary, fontSize: 14 },
 });

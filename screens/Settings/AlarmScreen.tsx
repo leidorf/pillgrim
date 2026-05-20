@@ -1,4 +1,5 @@
-import { StyleSheet, Text } from "react-native";
+import { StyleSheet } from "react-native";
+import { Text } from "../../components/Text";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
 

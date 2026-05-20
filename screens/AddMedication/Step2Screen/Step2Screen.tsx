@@ -1,15 +1,6 @@
 import { useCallback, useRef, useState } from "react";
-import {
-  Animated,
-  LayoutAnimation,
-  Platform,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  useWindowDimensions,
-  View,
-} from "react-native";
+import { Animated, LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
@@ -370,12 +361,16 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>How often?</Text>
+              <Text style={styles.sectionLabel}>
+                How often?
+              </Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER1_SCHEDULES)}
 
                 <Pressable style={styles.otherButton} onPress={slideToOther}>
-                  <Text style={styles.otherText}>Something else</Text>
+                  <Text style={styles.otherText}>
+                    Something else
+                  </Text>
                   <RightArrowIcon
                     height={18}
                     width={18}
@@ -392,7 +387,9 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>Advanced Options</Text>
+              <Text style={styles.sectionLabel}>
+                Advanced Options
+              </Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER2_SCHEDULES)}
               </View>
@@ -427,9 +424,9 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 20 },
   sectionLabel: {
     color: Colors.textPrimary,
-    fontSize: 22,
-    fontWeight: "700",
+    fontWeight: "600",
     marginVertical: 16,
+    fontSize: 18,
   },
   optionList: { gap: 10 },
   otherButton: {
@@ -439,7 +436,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 8,
   },
-  otherText: { color: Colors.textSecondary, fontSize: 16, fontWeight: "500" },
+  otherText: { color: Colors.textSecondary, fontSize: 16 },
 });
 
 export default Step2Screen;

@@ -1,5 +1,6 @@
 import { forwardRef, useCallback, useRef, useState } from "react";
-import { View, Text, StyleSheet, TouchableOpacity } from "react-native";
+import { View, StyleSheet, TouchableOpacity } from "react-native";
+import { Text } from "../../../components/Text";
 import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop,

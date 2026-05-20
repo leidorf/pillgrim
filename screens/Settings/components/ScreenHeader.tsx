@@ -1,4 +1,5 @@
-import { View, Text, StyleSheet, Pressable } from "react-native";
+import { View, StyleSheet, Pressable } from "react-native";
+import { Text } from "../../../components/Text";
 import { useNavigation } from "@react-navigation/native";
 import BackIcon from "../../../assets/icons/arrow-left.svg";
 import { Colors } from "../../../constants/theme";
