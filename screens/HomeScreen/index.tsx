@@ -1,11 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-  BackHandler,
-  FlatList,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet from "@gorhom/bottom-sheet";
 
@@ -64,6 +58,13 @@ const HomeScreen = () => {
     time: string;
     log?: MedicationLog;
   } | null>(null);
+
+  const handleSheetAnimate = useCallback(
+    (_fromIndex: number, toIndex: number) => {
+      setIsSheetOpen(toIndex >= 0);
+    },
+    [],
+  );
 
   // Minutely missed state check
   const [now, setNow] = useState(() => new Date());
@@ -214,6 +215,7 @@ const HomeScreen = () => {
 
     const onBackPress = () => {
       actionSheetRef.current?.close();
+      setIsSheetOpen(false);
       return true;
     };
 
@@ -297,7 +299,7 @@ const HomeScreen = () => {
           selectedItem &&
           handleSnooze(selectedItem.medication.id, selectedItem.time, minutes)
         }
-        onAnimate={(_fromIndex, toIndex) => setIsSheetOpen(toIndex >= 0)}
+        onAnimate={handleSheetAnimate}
       />
     </ScreenLayout>
   );

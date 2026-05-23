@@ -1,11 +1,5 @@
 import { useRef, useState, useCallback, useEffect } from "react";
-import {
-  BackHandler,
-  FlatList,
-  Platform,
-  StyleSheet,
-  View,
-} from "react-native";
+import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { Text } from "../../components/Text";
@@ -43,13 +37,12 @@ const MedsScreen = () => {
     bottomSheetRef.current?.snapToIndex(0);
   }, []);
 
-  const handleAnimate = useCallback((fromIndex: number, toIndex: number) => {
-    if (toIndex === -1) {
-      setIsSheetOpen(false);
-    } else if (toIndex === 0) {
-      setIsSheetOpen(true);
-    }
-  }, []);
+  const handleSheetAnimate = useCallback(
+    (_fromIndex: number, toIndex: number) => {
+      setIsSheetOpen(toIndex >= 0);
+    },
+    [],
+  );
 
   const handleEdit = useCallback(
     (medicationId: string) => {
@@ -134,6 +127,7 @@ const MedsScreen = () => {
 
     const onBackPress = () => {
       bottomSheetRef.current?.close();
+      setIsSheetOpen(false);
       return true;
     };
 
@@ -194,7 +188,7 @@ const MedsScreen = () => {
         onEdit={handleEditFromSheet}
         onDelete={handleDeleteFromSheet}
         onToggleActive={handleToggleActive}
-        onAnimate={handleAnimate}
+        onAnimate={handleSheetAnimate}
       />
 
       <BaseModal

@@ -27,7 +27,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
     { medication, scheduleLabel, onEdit, onDelete, onToggleActive, onAnimate },
     ref,
   ) => {
-    const { name, form, isActive, timeDoses, stock, note } = medication || {};
+    const { name, form, isActive, stock, note } = medication || {};
 
     const handleClose = () => {
       (ref as React.RefObject<BottomSheet>).current?.close();
