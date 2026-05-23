@@ -32,3 +32,18 @@ export const WEEKDAYS = [
   { id: 5, label: "Fr" },
   { id: 6, label: "Sa" },
 ];
+
+export const MONTHS = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];

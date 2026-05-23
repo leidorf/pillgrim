@@ -1,8 +1,15 @@
 import { useCallback, useRef, useState } from "react";
-import { Animated, LayoutAnimation, Platform, Pressable, ScrollView, StyleSheet, useWindowDimensions, View } from "react-native";
+import {
+  Animated,
+  LayoutAnimation,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  useWindowDimensions,
+  View,
+} from "react-native";
 import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
-import { DateTimePickerAndroid } from "@react-native-community/datetimepicker";
 
 import { NavProp } from "../../../types/navigation";
 import { Schedule, ScheduleType } from "../../../types/schedule";
@@ -12,10 +19,10 @@ import { useMedicationStore } from "../../../store/medicationStore";
 
 import AddMedicationHeader from "../components/AddMedicationHeader";
 import NextButton from "../components/NextButton";
-import DateInputInfoCard from "../components/DateInputInfoCard";
 import RightArrowIcon from "../../../assets/icons/arrow-right.svg";
 
 import { ScheduleButton } from "./components/ScheduleButton";
+import DateInputFields from "./components/DateInputFields";
 import {
   WeekdayPicker,
   IntervalPicker,
@@ -62,9 +69,6 @@ const Step2Screen = () => {
       ? new Date(draft.schedule.startDate)
       : null,
   );
-  const [activeDatePickerConfig, setActiveDatePickerConfig] = useState<
-    "biweekly" | "monthly" | null
-  >(null);
 
   /* ----------------------------- Slider Helpers ----------------------------- */
   const slideToOther = () => {
@@ -148,59 +152,30 @@ const Step2Screen = () => {
     setDraft({ schedule });
   };
 
-  /* ------------------------------ Date Pickers ------------------------------ */
-  const applyDateSelection = (type: "biweekly" | "monthly", date: Date) => {
-    if (type === "biweekly") {
-      setBiweeklyStartDay(date);
-      setDraft({
-        schedule: { type: "biweekly", startDate: date.toISOString() },
-      });
-    } else {
+  /* ------------------------------ Date Fields ------------------------------ */
+  const handleMonthlyDateChange = useCallback(
+    (date: Date | null) => {
       setMonthlyStartDay(date);
-      setDraft({
-        schedule: { type: "monthly", startDate: date.toISOString() },
-      });
-    }
-  };
-
-  const openDatePicker = (type: "biweekly" | "monthly") => {
-    const currentDate =
-      type === "biweekly"
-        ? biweeklyStartDay || new Date()
-        : monthlyStartDay || new Date();
-
-    if (Platform.OS === "android") {
-      // Pass a self-contained callback — no stale closure risk
-      DateTimePickerAndroid.open({
-        value: currentDate,
-        mode: "date",
-        minimumDate: new Date(),
-        onChange: (event, date) => {
-          if (event.type === "set" && date) applyDateSelection(type, date);
-        },
-      });
-    } else {
-      setActiveDatePickerConfig(type);
-    }
-  };
-
-  const openMonthlyPicker = useCallback(
-    () => openDatePicker("monthly"),
-    [monthlyStartDay],
-  );
-  const openBiweeklyPicker = useCallback(
-    () => openDatePicker("biweekly"),
-    [biweeklyStartDay],
+      if (date) {
+        setDraft({
+          schedule: { type: "monthly", startDate: date.toISOString() },
+        });
+      }
+    },
+    [setDraft],
   );
 
-  const formatDate = (date: Date | null) =>
-    date
-      ? date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "numeric",
-          year: "numeric",
-        })
-      : "Select a date";
+  const handleBiweeklyDateChange = useCallback(
+    (date: Date | null) => {
+      setBiweeklyStartDay(date);
+      if (date) {
+        setDraft({
+          schedule: { type: "biweekly", startDate: date.toISOString() },
+        });
+      }
+    },
+    [setDraft],
+  );
 
   /* ----------------- Weekday & Interval & Month Day Handlers ---------------- */
   const toggleWeekday = (day: number) => {
@@ -264,20 +239,18 @@ const Step2Screen = () => {
         );
       case "monthly":
         return (
-          <DateInputInfoCard
-            cardText={formatDate(monthlyStartDay)}
-            cardLabel="Which day of the month should this repeat?"
-            onPress={openMonthlyPicker}
-            isEmpty={!monthlyStartDay}
+          <DateInputFields
+            value={monthlyStartDay}
+            onChange={handleMonthlyDateChange}
+            label="Which day of the month should this repeat?"
           />
         );
       case "biweekly":
         return (
-          <DateInputInfoCard
-            cardText={formatDate(biweeklyStartDay)}
-            cardLabel="Which day of the month should this start?"
-            onPress={openBiweeklyPicker}
-            isEmpty={!biweeklyStartDay}
+          <DateInputFields
+            value={biweeklyStartDay}
+            onChange={handleBiweeklyDateChange}
+            label="Which day should this start?"
           />
         );
       case "specificmonth":
@@ -354,16 +327,12 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>
-                How often?
-              </Text>
+              <Text style={styles.sectionLabel}>How often?</Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER1_SCHEDULES)}
 
                 <Pressable style={styles.otherButton} onPress={slideToOther}>
-                  <Text style={styles.otherText}>
-                    Something else
-                  </Text>
+                  <Text style={styles.otherText}>Something else</Text>
                   <RightArrowIcon
                     height={18}
                     width={18}
@@ -380,9 +349,7 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>
-                Advanced Options
-              </Text>
+              <Text style={styles.sectionLabel}>Advanced Options</Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER2_SCHEDULES)}
               </View>
