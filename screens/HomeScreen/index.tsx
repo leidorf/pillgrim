@@ -1,5 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import {
+  BackHandler,
+  FlatList,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import BottomSheet from "@gorhom/bottom-sheet";
 
 import { Colors } from "../../constants/theme";
@@ -186,6 +193,37 @@ const HomeScreen = () => {
     [medications],
   );
 
+  const navigation = useNavigation();
+
+  // Hide tab bar when sheet is open
+  useEffect(() => {
+    navigation.setOptions({
+      tabBarStyle: isSheetOpen
+        ? { display: "none" }
+        : {
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            borderTopWidth: 0,
+            boxShadow: "none",
+            elevation: 0,
+          },
+    });
+  }, [isSheetOpen, navigation]);
+
+  useEffect(() => {
+    if (!isSheetOpen) return;
+
+    const onBackPress = () => {
+      actionSheetRef.current?.close();
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress,
+    );
+    return () => subscription.remove();
+  }, [isSheetOpen]);
+
   return (
     <ScreenLayout>
       <WeeklyCalendar
@@ -259,7 +297,7 @@ const HomeScreen = () => {
           selectedItem &&
           handleSnooze(selectedItem.medication.id, selectedItem.time, minutes)
         }
-        onChange={(index) => setIsSheetOpen(index >= 0)}
+        onAnimate={(_fromIndex, toIndex) => setIsSheetOpen(toIndex >= 0)}
       />
     </ScreenLayout>
   );

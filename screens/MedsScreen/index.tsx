@@ -1,13 +1,20 @@
-import { useRef, useState, useCallback } from "react";
-import { FlatList, StyleSheet, View } from "react-native";
+import { useRef, useState, useCallback, useEffect } from "react";
+import {
+  BackHandler,
+  FlatList,
+  Platform,
+  StyleSheet,
+  View,
+} from "react-native";
+import { useNavigation } from "@react-navigation/native";
+import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { Text } from "../../components/Text";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import MedicationInfoCard from "./components/MedicationInfoCard";
 import MedicationBottomSheet from "./components/MedicationBottomSheet";
 import { useMedicationStore } from "../../store/medicationStore";
-import { useNavigation } from "@react-navigation/native";
-import { NavProp } from "../../types/navigation";
+import { NavProp, MainScreenParamList } from "../../types/navigation";
 import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
 import { Colors } from "../../constants/theme";
@@ -104,6 +111,38 @@ const MedsScreen = () => {
       handleDelete(selectedMed.id, selectedMed.name);
     }
   }, [selectedMed, handleDelete]);
+
+  const tabNavigation =
+    useNavigation<BottomTabNavigationProp<MainScreenParamList>>();
+
+  // Hide tab bar when sheet is open
+  useEffect(() => {
+    tabNavigation.setOptions({
+      tabBarStyle: isSheetOpen
+        ? { display: "none" }
+        : {
+            backgroundColor: "rgba(0, 0, 0, 0)",
+            borderTopWidth: 0,
+            boxShadow: "none",
+            elevation: 0,
+          },
+    });
+  }, [isSheetOpen, tabNavigation]);
+
+  useEffect(() => {
+    if (!isSheetOpen) return;
+
+    const onBackPress = () => {
+      bottomSheetRef.current?.close();
+      return true;
+    };
+
+    const subscription = BackHandler.addEventListener(
+      "hardwareBackPress",
+      onBackPress,
+    );
+    return () => subscription.remove();
+  }, [isSheetOpen]);
 
   return (
     <ScreenLayout>

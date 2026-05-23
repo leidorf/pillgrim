@@ -27,7 +27,7 @@ type Props = {
   onTaken: () => void;
   onSkip: () => void;
   onSnooze: (minutes: number) => void;
-  onChange?: (index: number) => void;
+  onAnimate?: (_fromIndex: number, toIndex: number) => void;
 };
 
 const MedicationActionSheet = forwardRef<BottomSheet, Props>(
@@ -40,7 +40,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
       onTaken,
       onSkip,
       onSnooze,
-      onChange,
+      onAnimate,
     },
     ref,
   ) => {
@@ -50,13 +50,15 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
       (ref as React.RefObject<BottomSheet>).current?.close();
     }, [ref]);
 
-    const handleSheetChange = useCallback((index: number) => {
-      if (index === -1) {
-        setTimeout(() => {
+    const handleSheetAnimate = useCallback(
+      (_fromIndex: number, toIndex: number) => {
+        if (toIndex === -1) {
           setView("actions");
-        }, 300);
-      }
-    }, []);
+        }
+        onAnimate?.(_fromIndex, toIndex); 
+      },
+      [onAnimate],
+    );
 
     const goToSnooze = useCallback(() => {
       setView("snooze");
@@ -102,12 +104,9 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
         enableDynamicSizing
         enablePanDownToClose
         backdropComponent={renderBackdrop}
-        handleIndicatorStyle={styles.handle}
-        backgroundStyle={styles.background}
-        onChange={(index) => {
-          handleSheetChange(index);
-          onChange?.(index);
-        }}
+        handleIndicatorStyle={styles.handleIndicator}
+        backgroundStyle={styles.sheetBackground}
+        onAnimate={handleSheetAnimate}
       >
         <BottomSheetView style={styles.container}>
           {view === "actions" ? (
@@ -272,11 +271,11 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
 export default MedicationActionSheet;
 
 const styles = StyleSheet.create({
-  handle: {
+  handleIndicator: {
     backgroundColor: Colors.textSecondary + "40",
     width: 40,
   },
-  background: {
+  sheetBackground: {
     backgroundColor: Colors.surfaceElevated,
   },
   container: {

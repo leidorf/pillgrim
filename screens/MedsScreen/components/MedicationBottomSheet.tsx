@@ -74,7 +74,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
         ref={ref}
         index={-1}
         enableDynamicSizing
-        enablePanDownToClose={true}
+        enablePanDownToClose
         backdropComponent={renderBackdrop}
         handleIndicatorStyle={styles.handleIndicator}
         backgroundStyle={styles.sheetBackground}
