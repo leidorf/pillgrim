@@ -203,5 +203,4 @@ const styles = StyleSheet.create({
   menuItemActive: { backgroundColor: Colors.primary + "10" },
   menuItemText: { color: Colors.textPrimary, fontSize: 16 },
   menuItemTextActive: { color: Colors.primary, fontWeight: "600" },
-  checkmark: { color: Colors.primary, fontSize: 18, fontWeight: "600" },
 });

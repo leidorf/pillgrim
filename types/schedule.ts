@@ -1,4 +1,3 @@
-import { LogStatus, Medication, MedicationLog } from "./medication";
 
 export type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -18,14 +17,3 @@ export type Schedule = {
   startDate: string;
 };
 
-export type DailySchedule = {
-    date: string;
-    medications: {
-      medication: Medication;
-      times: {
-        time: string;
-        log?: MedicationLog;
-        status: LogStatus;
-      }[];
-    }[];
-  };

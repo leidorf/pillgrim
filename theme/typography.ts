@@ -18,8 +18,3 @@ export const FontSize = {
   xxxl: 30,
 } as const;
 
-export const LineHeight = {
-  tight: 1,
-  normal: 1.2,
-  loose: 1.5,
-} as const;

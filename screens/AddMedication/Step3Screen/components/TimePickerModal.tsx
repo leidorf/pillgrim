@@ -302,15 +302,6 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
     overflow: "hidden",
   },
-  handle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    backgroundColor: Colors.textSecondary + "40",
-    alignSelf: "center",
-    marginTop: 10,
-    marginBottom: 4,
-  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",

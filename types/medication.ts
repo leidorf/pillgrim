@@ -50,11 +50,6 @@ export type MedicationLog = {
 
 export type LogStatus = "pending" | "taken" | "skipped" | "missed";
 
-export type MedicationProps = Medication & {
-  onToggle?: (id: string, time: string) => void;
-  onSkip?: (id: string, time: string) => void;
-  status?: LogStatus;
-};
 
 export type LogFilter = {
   startDate: string;

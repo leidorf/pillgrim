@@ -98,15 +98,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.surface,
     marginBottom: 8,
   },
-  takenContainer: {
-    backgroundColor: Colors.primary + "10",
-    borderColor: Colors.primary + "30",
-    opacity: 0.9,
-  },
-  skippedContainer: {
-    backgroundColor: Colors.textSecondary + "10",
-    opacity: 0.7,
-  },
   leftSection: {
     flexDirection: "row",
     alignItems: "center",
@@ -126,9 +117,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  takenIconContainer: {
-    backgroundColor: Colors.primary + "20",
-  },
   infoContainer: {
     flex: 1,
     gap: 2,
@@ -147,31 +135,6 @@ const styles = StyleSheet.create({
     color: Colors.primary,
     fontWeight: "500",
     marginTop: 2,
-  },
-  timeText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: Colors.textPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  takenText: {
-    color: Colors.primary,
-  },
-  checkButton: {
-    padding: 4,
-  },
-  skippedCircle: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    backgroundColor: Colors.textSecondary + "30",
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  skippedText: {
-    color: Colors.textSecondary,
-    fontSize: 14,
-    fontWeight: "600",
   },
   inactiveContainer: {
     opacity: 0.6,

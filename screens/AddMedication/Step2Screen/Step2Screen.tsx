@@ -163,13 +163,6 @@ const Step2Screen = () => {
     }
   };
 
-  // iOS only — called by the inline DateTimePicker component
-  const handleIOSDateChange = (event: any, selectedDate?: Date) => {
-    if (event.type !== "set" || !selectedDate || !activeDatePickerConfig)
-      return;
-    applyDateSelection(activeDatePickerConfig, selectedDate);
-  };
-
   const openDatePicker = (type: "biweekly" | "monthly") => {
     const currentDate =
       type === "biweekly"

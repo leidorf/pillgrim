@@ -246,14 +246,6 @@ const styles = StyleSheet.create({
   monthContainer: {
     paddingHorizontal: 16,
   },
-  monthLabel: {
-    fontSize: 24,
-    fontWeight: "600",
-    textAlign: "center",
-    marginBottom: 16,
-    color: Colors.textPrimary,
-    textTransform: "capitalize",
-  },
   weekHeader: {
     flexDirection: "row",
     marginBottom: 8,

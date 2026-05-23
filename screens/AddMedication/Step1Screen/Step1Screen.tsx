@@ -12,7 +12,6 @@ import AddMedicationHeader from "../components/AddMedicationHeader";
 import NextButton from "../components/NextButton";
 import { MedicationFormPicker } from "./components/MedicationFormPicker";
 import { MedicationNameInput } from "./components/MedicationNameInput";
-import { PixelRatio } from "react-native";
 
 type FormErrors = {
   medName?: string;
@@ -62,10 +61,6 @@ const Step1Screen = () => {
     if (mode !== "edit") clearDraft();
     navigation.getParent()?.goBack();
   };
-
-
-// Bu değer muhtemelen 0.85 çıkacak
-console.log("System font scale:", PixelRatio.getFontScale());
 
   return (
     <KeyboardAwareScrollView

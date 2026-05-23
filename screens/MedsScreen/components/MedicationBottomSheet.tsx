@@ -1,4 +1,4 @@
-import { forwardRef, useCallback, useMemo, useRef } from "react";
+import { forwardRef, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import { Pressable } from "react-native";

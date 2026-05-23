@@ -6,7 +6,7 @@ import ScreenLayout from "../../components/ScreenLayout";
 const AlarmScreen = () => {
   return (
     <ScreenLayout>
-      <ScreenHeader title="Appearance" />
+      <ScreenHeader title="Alarm" />
       <Text>Alarm Screen</Text>
     </ScreenLayout>
   );

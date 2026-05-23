@@ -117,10 +117,6 @@ const styles = StyleSheet.create({
   buttonRow: {
     flex: 1,
   },
-  buttonBorderBottom: {
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "20",
-  },
   buttonText: {
     fontSize: 16,
     fontWeight: "600",

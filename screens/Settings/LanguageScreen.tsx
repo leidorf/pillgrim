@@ -6,7 +6,7 @@ import ScreenLayout from "../../components/ScreenLayout";
 const LanguageScreen = () => {
   return (
     <ScreenLayout>
-      <ScreenHeader title="Appearance" />
+      <ScreenHeader title="Language" />
       <Text>Language Screen</Text>
     </ScreenLayout>
   );
