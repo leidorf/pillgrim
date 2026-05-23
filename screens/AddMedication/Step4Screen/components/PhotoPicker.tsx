@@ -133,7 +133,7 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
 
 const styles = StyleSheet.create({
   addButton: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
     borderRadius: 12,
     height: 120,
     justifyContent: "center",
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     overflow: "hidden",
     position: "relative",
     height: 160,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
   },
   photo: { width: "100%", height: "100%" },
   removeButton: {
@@ -163,5 +163,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  removeText: { color: "#fff", fontSize: 20, fontWeight: "600" },
+  removeText: { color: Colors.surfaceElevated, fontSize: 20, fontWeight: "600" },
 });

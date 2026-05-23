@@ -30,12 +30,12 @@ export default InlineContainer;
 
 const styles = StyleSheet.create({
   expandedContainer: {
-    backgroundColor: Colors.primary + "0D",
+    backgroundColor: Colors.surface,
     borderRadius: 12,
     padding: 14,
     marginTop: 6,
     borderWidth: 1,
-    borderColor: Colors.primary + "30",
+    borderColor: Colors.border,
   },
   textStyle: {
     fontSize: 14,

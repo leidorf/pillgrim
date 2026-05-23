@@ -10,6 +10,7 @@ import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import SkipIcon from "../../../assets/icons/circle-minus.svg";
 import ClockIcon from "../../../assets/icons/clock.svg";
 import ChevronLeftIcon from "../../../assets/icons/chevron-left.svg";
+import ChevronRightIcon from "../../../assets/icons/chevron-right.svg";
 
 const SNOOZE_OPTIONS = [
   { label: "15 minutes", value: 15 },
@@ -129,15 +130,11 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor: (Colors.success || "#22C55E") + "20",
+                        backgroundColor: Colors.success + "20",
                       },
                     ]}
                   >
-                    <CheckIcon
-                      width={20}
-                      height={20}
-                      color={Colors.success || "#22C55E"}
-                    />
+                    <CheckIcon width={20} height={20} color={Colors.success} />
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>
@@ -147,15 +144,6 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                       {isTaken ? "Undo taken status" : "Record this dose"}
                     </Text>
                   </View>
-                  {isTaken && (
-                    <View style={styles.badge}>
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={Colors.success}
-                      />
-                    </View>
-                  )}
                 </TouchableOpacity>
 
                 {/* --------------------------------- Skipped -------------------------------- */}
@@ -171,15 +159,14 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor:
-                          (Colors.textSecondary || "#6B7280") + "20",
+                        backgroundColor: Colors.textSecondary + "20",
                       },
                     ]}
                   >
                     <SkipIcon
                       width={20}
                       height={20}
-                      stroke={Colors.textSecondary || "#6B7280"}
+                      stroke={Colors.textSecondary}
                     />
                   </View>
                   <View style={styles.actionTexts}>
@@ -192,15 +179,6 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                         : "Intentionally skip"}
                     </Text>
                   </View>
-                  {isSkipped && (
-                    <View style={styles.badge}>
-                      <SkipIcon
-                        height={16}
-                        width={16}
-                        stroke={Colors.textSecondary}
-                      />
-                    </View>
-                  )}
                 </TouchableOpacity>
 
                 {/* --------------------------------- Snooze --------------------------------- */}
@@ -213,21 +191,21 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor: (Colors.warning || "#F59E0B") + "20",
+                        backgroundColor: Colors.warning + "20",
                       },
                     ]}
                   >
-                    <ClockIcon
-                      width={20}
-                      height={20}
-                      stroke={Colors.warning || "#F59E0B"}
-                    />
+                    <ClockIcon width={20} height={20} stroke={Colors.warning} />
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>Snooze reminder</Text>
                     <Text style={styles.actionSub}>Remind me later</Text>
                   </View>
-                  <Text style={styles.chevron}>›</Text>
+                  <ChevronRightIcon
+                    width={20}
+                    height={20}
+                    stroke={Colors.textPrimary}
+                  />
                 </TouchableOpacity>
               </View>
 
@@ -299,7 +277,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   background: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceElevated,
   },
   container: {
     paddingBottom: 32,
@@ -322,7 +300,7 @@ const styles = StyleSheet.create({
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.border || "#E5E5E5",
+    backgroundColor: Colors.border,
     marginVertical: 8,
   },
   actions: {
@@ -334,13 +312,14 @@ const styles = StyleSheet.create({
     alignItems: "center",
     gap: 14,
     paddingVertical: 12,
+    paddingHorizontal: 16,
     borderRadius: 14,
   },
   actionRowTaken: {
-    backgroundColor: (Colors.success || "#22C55E") + "10",
+    backgroundColor: Colors.success + "10",
   },
   actionRowSkipped: {
-    backgroundColor: (Colors.textSecondary || "#6B7280") + "10",
+    backgroundColor: Colors.textSecondary + "10",
   },
   actionIcon: {
     width: 40,
@@ -368,7 +347,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
   },
   chevron: {
-    fontSize: 20,
+    fontSize: 32,
     color: Colors.textSecondary,
   },
   cancelButton: {
@@ -404,7 +383,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 14,
-    backgroundColor: Colors.surface || "#F5F5F5",
+    backgroundColor: Colors.surface,
   },
   snoozeLabel: {
     fontSize: 15,

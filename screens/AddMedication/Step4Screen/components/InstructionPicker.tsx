@@ -146,7 +146,7 @@ export const InstructionPicker = ({
 
 const styles = StyleSheet.create({
   trigger: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -154,12 +154,12 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Colors.textSecondary + "30",
+    borderColor: Colors.border,
   },
   triggerText: { color: Colors.textPrimary, fontSize: 15, fontWeight: "500" },
   placeholder: { color: Colors.textSecondary },
   customInput: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
     borderRadius: 12,
     padding: 14,
     color: Colors.textPrimary,
@@ -174,7 +174,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   menu: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "70%",
@@ -192,7 +192,7 @@ const styles = StyleSheet.create({
     borderBottomColor: Colors.textSecondary + "20",
   },
   menuTitle: { color: Colors.textPrimary, fontSize: 18, fontWeight: "600" },
-  doneButton: { color: Colors.primary, fontSize: 16, fontWeight: "600" },
+  doneButton: { color: Colors.primaryDark, fontSize: 16, fontWeight: "600" },
   menuItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -202,5 +202,5 @@ const styles = StyleSheet.create({
   },
   menuItemActive: { backgroundColor: Colors.primary + "10" },
   menuItemText: { color: Colors.textPrimary, fontSize: 16 },
-  menuItemTextActive: { color: Colors.primary, fontWeight: "600" },
+  menuItemTextActive: { color: Colors.primaryDark, fontWeight: "600" },
 });

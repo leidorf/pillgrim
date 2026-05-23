@@ -19,7 +19,10 @@ export const StockInput = ({ value, onChange }: Props) => {
   const unitLabel = count === 1 ? "unit left" : "units left";
 
   return (
-    <Pressable style={styles.container} onPress={() => inputRef.current?.focus()}>
+    <Pressable
+      style={styles.container}
+      onPress={() => inputRef.current?.focus()}
+    >
       <TextInput
         ref={inputRef}
         style={styles.input}
@@ -40,7 +43,9 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
+    borderWidth: 1,
+    borderColor: Colors.border,
     borderRadius: 12,
     padding: 16,
   },

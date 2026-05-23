@@ -164,8 +164,8 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   chipActive: {
-    backgroundColor: Colors.primary,
-    borderColor: Colors.primary,
+    backgroundColor: Colors.primaryDark,
+    borderColor: Colors.primaryDark,
   },
   chipText: {
     fontWeight: "600",
@@ -173,7 +173,7 @@ const styles = StyleSheet.create({
     fontSize: 12,
   },
   chipTextActive: {
-    color: "#fff",
+    color: Colors.surfaceElevated,
   },
   intervalRow: {
     flexDirection: "row",

@@ -84,9 +84,9 @@ const MonthGrid = ({
   }, [logs]);
 
   const getAdherenceColor = (rate: number) => {
-    if (rate === 100) return Colors.success || "#22C55E";
-    if (rate > 0) return Colors.warning || "#F59E0B";
-    return Colors.error || "#EF4444";
+    if (rate === 100) return Colors.success;
+    if (rate > 0) return Colors.warning;
+    return Colors.error;
   };
 
   const renderDay = useCallback(
@@ -281,7 +281,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.primary,
   },
   daySelected: {
-    backgroundColor: Colors.subtle,
+    backgroundColor: Colors.successLight,
     borderRadius: 32,
   },
   dayOtherMonth: {
@@ -293,7 +293,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
   },
   dayTextSelected: {
-    color: Colors.dark,
+    color: Colors.primaryDark,
     fontWeight: "600",
   },
   dayTextOtherMonth: {

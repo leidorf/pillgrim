@@ -2,6 +2,7 @@ import * as Notifications from "expo-notifications";
 import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { Medication } from "../types/medication";
+import { Colors } from "../constants/theme";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -41,7 +42,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
       name: "Medication Reminders",
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
-      lightColor: "#689F38",
+      lightColor: Colors.primary,
       sound: "default",
     });
   }

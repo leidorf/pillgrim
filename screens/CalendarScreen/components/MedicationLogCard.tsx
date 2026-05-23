@@ -42,7 +42,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
       return {
         icon: <CheckIcon width={16} height={16} stroke={Colors.primary} />,
         label: "Taken",
-        color: Colors.success || "#22C55E",
+        color: Colors.success,
         subtext: formatTime(log.takenAt),
       };
     }
@@ -66,7 +66,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
       return {
         icon: <MissedIcon width={16} height={16} stroke={Colors.error} />,
         label: "Missed",
-        color: Colors.error || "#EF4444",
+        color: Colors.error,
         subtext: "Not taken in time",
       };
     }
@@ -134,7 +134,7 @@ const styles = StyleSheet.create({
   timeline: {
     width: 2,
     flex: 1,
-    backgroundColor: Colors.background || "#E5E5E5",
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 1,
   },
   logContent: {

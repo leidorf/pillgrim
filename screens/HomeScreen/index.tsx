@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     paddingTop: 16,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    backgroundColor: "#e0ead6",
+    backgroundColor: Colors.surface,
   },
   listContent: { paddingBottom: 72 },
   emptyContainer: {

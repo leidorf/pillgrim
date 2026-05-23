@@ -136,7 +136,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
                     )
                   }
                   label={isActive ? "Pause Reminders" : "Resume Reminders"}
-                  color={isActive ? "#FEF3C7" : Colors.primary + "15"}
+                  color={isActive ? Colors.warningLight : Colors.primary + "15"}
                   onPress={handleToggleActive}
                 />
 
@@ -145,7 +145,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
                     <TrashIcon width={20} height={20} stroke={Colors.error} />
                   }
                   label="Delete Medication"
-                  color="#FEE2E2"
+                  color={Colors.errorLight}
                   textColor={Colors.error}
                   onPress={() => {
                     handleClose();
@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
     width: 40,
   },
   sheetBackground: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceElevated,
   },
   contentContainer: {
     flex: 1,
@@ -242,7 +242,7 @@ const styles = StyleSheet.create({
   },
   noteBadgeText: {
     fontSize: 12,
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "500",
   },
   actionsSection: {
@@ -252,9 +252,8 @@ const styles = StyleSheet.create({
   actionRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: "#FFFFFF",
-    gap: 16,
-    paddingVertical: 14,
+    gap: 12,
+    paddingVertical: 8,
     paddingHorizontal: 16,
     borderRadius: 12,
   },

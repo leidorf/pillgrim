@@ -1,6 +1,7 @@
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import { Medication } from "../../../types/medication";
+import { Colors } from "../../../constants/theme";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
 
 type Props = {
@@ -27,7 +28,7 @@ const MedicationInfoCard = ({ medication, isInactive, onPress }: Props) => {
 
 const styles = StyleSheet.create({
   pausedBadge: {
-    backgroundColor: "#FEF3C7",
+    backgroundColor: Colors.warningLight,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -35,7 +36,7 @@ const styles = StyleSheet.create({
   pausedText: {
     fontSize: 11,
     fontWeight: "700",
-    color: "#D97706",
+    color: Colors.warning,
   },
 });
 

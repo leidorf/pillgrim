@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
     minWidth: 64,
   },
   formItemSelected: {
-    backgroundColor: Colors.subtle,
+    backgroundColor: Colors.successLight,
     borderWidth: 1.5,
     borderColor: Colors.primary,
   },
@@ -139,7 +139,7 @@ const styles = StyleSheet.create({
     fontSize: 10,
   },
   formItemLabelSelected: {
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "600",
   },
 });

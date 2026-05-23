@@ -2,6 +2,7 @@ import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet } from "react-native";
 import { Text } from "./Text";
 import { NavProp } from "../types/navigation";
+import { Colors } from "../constants/theme";
 import CirclePlusIcon from "../assets/icons//circle-plus.svg";
 
 const AddMedicationButton = () => {
@@ -12,7 +13,7 @@ const AddMedicationButton = () => {
       onPress={() => navigation.navigate("AddMedication", { screen: "Step1" })}
     >
       <Text style={styles.text}>Add medication</Text>
-      <CirclePlusIcon height={24} width={24} color="#689F38" />
+      <CirclePlusIcon height={24} width={24} color={Colors.surface} />
     </Pressable>
   );
 };
@@ -27,11 +28,11 @@ const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: 16,
     borderRadius: 24,
-    backgroundColor: "#C8DDB4",
+    backgroundColor: Colors.primaryDark,
     gap: 8,
   },
   text: {
-    color: "#212121",
+    color: Colors.surface,
   },
 });
 

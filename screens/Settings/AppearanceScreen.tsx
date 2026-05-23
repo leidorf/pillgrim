@@ -258,9 +258,9 @@ const styles = StyleSheet.create({
     padding: 2,
   },
   segment: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 6 },
-  segmentActive: { backgroundColor: Colors.primary },
+  segmentActive: { backgroundColor: Colors.primaryDark },
   segmentText: { color: Colors.textSecondary, fontSize: 14, fontWeight: "600" },
-  segmentTextActive: { color: "#fff" },
+  segmentTextActive: { color: Colors.surfaceElevated },
   dropdownTrigger: {
     flexDirection: "row",
     alignItems: "center",
@@ -285,7 +285,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   dropdownCard: {
-    backgroundColor: Colors.background,
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 280,
@@ -321,7 +321,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontWeight: "500",
   },
-  dropdownItemTextActive: { color: Colors.primary, fontWeight: "600" },
+  dropdownItemTextActive: { color: Colors.primaryDark, fontWeight: "600" },
 });
 
 export default AppearanceScreen;

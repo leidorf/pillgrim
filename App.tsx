@@ -17,6 +17,7 @@ import Step1Screen from "./screens/AddMedication/Step1Screen/Step1Screen";
 import SettingsScreen from "./screens/Settings";
 
 import { AppTheme } from "./theme/theme";
+import { Colors } from "./constants/theme";
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
@@ -42,7 +43,7 @@ const MainTabs = () => {
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: "#689F38",
+        tabBarActiveTintColor: Colors.primary,
         tabBarStyle: {
           backgroundColor: "rgba(0, 0, 0, 0)",
           borderTopWidth: 0,

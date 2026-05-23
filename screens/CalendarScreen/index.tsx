@@ -133,7 +133,7 @@ const styles = StyleSheet.create({
   },
   detailContainer: {
     flex: 1,
-    backgroundColor: "#e0ead6",
+    backgroundColor: Colors.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,

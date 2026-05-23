@@ -1,4 +1,10 @@
-import { View, Pressable, StyleSheet, FlatList, useWindowDimensions } from "react-native";
+import {
+  View,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  useWindowDimensions,
+} from "react-native";
 import { Text } from "../../../components/Text";
 import { useRef, useState } from "react";
 
@@ -199,16 +205,16 @@ const styles = StyleSheet.create({
     borderWidth: 2,
     borderColor: Colors.primary,
   },
-  dayNumSelected: { backgroundColor: Colors.subtle, borderRadius: 17 },
+  dayNumSelected: { backgroundColor: Colors.successLight, borderRadius: 17 },
   dayNumText: { fontSize: 14, fontWeight: "500", color: Colors.textPrimary },
-  dayNumTextSelected: { color: Colors.dark },
+  dayNumTextSelected: { color: Colors.primaryDark },
   dot: {
     top: -9,
     width: 8,
     height: 8,
     borderWidth: 2,
     borderRadius: 4,
-    borderColor: Colors.subtle,
+    borderColor: Colors.primary,
   },
   dotToday: { borderColor: Colors.primary },
   dotActive: { backgroundColor: Colors.background },

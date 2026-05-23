@@ -95,8 +95,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderRadius: 16,
-    backgroundColor: Colors.surface,
     marginBottom: 8,
+    backgroundColor: Colors.surfaceElevated,
   },
   leftSection: {
     flexDirection: "row",
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
   },
   doseText: {
     fontSize: 13,
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "500",
     marginTop: 2,
   },

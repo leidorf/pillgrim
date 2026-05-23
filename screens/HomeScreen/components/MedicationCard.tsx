@@ -40,20 +40,17 @@ const MedicationCard = ({
   const containerStyle = useMemo((): ViewStyle => {
     if (isTaken)
       return {
-        backgroundColor: Colors.primary + "10",
-        borderColor: Colors.primary + "30",
-        opacity: 0.9,
+        backgroundColor: Colors.successLight,
+        borderColor: Colors.primary,
       };
     if (isSkipped)
       return {
-        backgroundColor: Colors.textSecondary + "10",
-        opacity: 0.7,
+        backgroundColor: Colors.border,
       };
     if (isMissed)
       return {
-        backgroundColor: (Colors.error || "#EF4444") + "08",
-        borderColor: (Colors.error || "#EF4444") + "25",
-        opacity: 0.85,
+        backgroundColor: Colors.warningLight,
+        borderColor: Colors.error,
       };
     return {};
   }, [isTaken, isSkipped, isMissed]);
@@ -79,21 +76,13 @@ const MedicationCard = ({
     >
       <View style={styles.timeSection}>
         <Text style={[styles.timeText, timeTextStyle]}>{displayTime}</Text>
-        <Pressable
-          style={styles.checkButton}
-          onPress={handleTaken}
-          hitSlop={8}
-        >
+        <Pressable style={styles.checkButton} onPress={handleTaken} hitSlop={8}>
           {isTaken ? (
             <CheckIcon width={28} height={28} color={Colors.primary} />
           ) : isSkipped ? (
             <MinusIcon width={28} height={28} stroke={Colors.textSecondary} />
           ) : isMissed ? (
-            <CloseIcon
-              width={28}
-              height={28}
-              stroke={Colors.error || "#EF4444"}
-            />
+            <CloseIcon width={28} height={28} stroke={Colors.error} />
           ) : (
             <CircleIcon
               width={28}
@@ -116,9 +105,9 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     fontVariant: ["tabular-nums"],
   },
-  takenText: { color: Colors.primary },
+  takenText: { color: Colors.primaryDark },
   skippedTimeText: { color: Colors.textSecondary },
-  missedTimeText: { color: Colors.error || "#EF4444" },
+  missedTimeText: { color: Colors.error },
   checkButton: { padding: 4 },
 });
 

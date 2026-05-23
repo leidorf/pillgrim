@@ -290,7 +290,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   addButtonDisabled: { borderColor: Colors.textSecondary + "30" },
-  addButtonText: { color: Colors.primary, fontWeight: "600", fontSize: 16 },
+  addButtonText: { color: Colors.primaryDark, fontWeight: "600", fontSize: 16 },
   addButtonTextDisabled: { color: Colors.textSecondary },
 });
 

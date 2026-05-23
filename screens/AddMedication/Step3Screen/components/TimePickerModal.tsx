@@ -296,7 +296,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingBottom: 40,
@@ -323,7 +323,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
   },
   headerConfirm: {
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "700",
   },
   pickerArea: {
@@ -370,7 +370,7 @@ const styles = StyleSheet.create({
   },
   itemTextSelected: {
     fontWeight: "600",
-    color: Colors.primary,
+    color: Colors.primaryDark,
   },
   colon: {
     fontSize: 28,

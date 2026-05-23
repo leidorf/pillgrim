@@ -79,7 +79,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 320,
@@ -123,10 +123,10 @@ const styles = StyleSheet.create({
   },
   textPrimary: {
     fontWeight: "700",
-    color: Colors.primary,
+    color: Colors.primaryDark,
   },
   textDestructive: {
-    color: Colors.error || "#EF4444",
+    color: Colors.error,
   },
 });
 

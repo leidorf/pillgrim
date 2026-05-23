@@ -58,7 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   labelSelected: {
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "600",
   },
 });

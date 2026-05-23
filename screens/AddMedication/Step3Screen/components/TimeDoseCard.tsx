@@ -55,7 +55,7 @@ export const TimeDoseCard = ({
             <TrashIcon
               width={18}
               height={18}
-              stroke={Colors.error || "#EF4444"}
+              stroke={Colors.error}
             />
           </Pressable>
         )}
@@ -202,7 +202,7 @@ const styles = StyleSheet.create({
     borderColor: Colors.textSecondary + "30",
   },
   amountRowError: {
-    borderColor: Colors.error || "#EF4444",
+    borderColor: Colors.error,
     borderWidth: 2,
   },
   amountInput: {
@@ -222,7 +222,7 @@ const styles = StyleSheet.create({
   },
   unitLabel: { color: Colors.textSecondary, fontSize: 14 },
   errorText: {
-    color: Colors.error || "#EF4444",
+    color: Colors.error,
     marginTop: 4,
     fontSize: 12,
   },
@@ -234,7 +234,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   dropdownCard: {
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 280,
@@ -271,7 +271,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   dropdownItemTextActive: {
-    color: Colors.primary,
+    color: Colors.primaryDark,
     fontWeight: "600",
   },
   separator: {
