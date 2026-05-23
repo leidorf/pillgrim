@@ -108,6 +108,7 @@ const styles = StyleSheet.create({
     marginTop: 8,
     textAlign: "center",
     color: Colors.textPrimary,
+    fontWeight: "600",
     fontSize: 18,
   },
   picker: {

@@ -41,12 +41,7 @@ export const WeekdayPicker = ({
               ]}
               onPress={() => onToggle(id)}
             >
-              <Text
-                style={[
-                  styles.chipText,
-                  active && styles.chipTextActive,
-                ]}
-              >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>
                 {label}
               </Text>
             </Pressable>
@@ -118,12 +113,7 @@ export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
               ]}
               onPress={() => onToggle(day)}
             >
-              <Text
-                style={[
-                  styles.chipText,
-                  active && styles.chipTextActive,
-                ]}
-              >
+              <Text style={[styles.chipText, active && styles.chipTextActive]}>
                 {day}
               </Text>
             </Pressable>
@@ -151,7 +141,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1.5,
     borderColor: "transparent",
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
   },
   chipCircle: {
     width: 40,
@@ -197,7 +187,7 @@ const styles = StyleSheet.create({
     minWidth: 52,
     height: 36,
     borderRadius: 10,
-    backgroundColor: Colors.surface,
+    backgroundColor: Colors.background,
     color: Colors.textPrimary,
     fontWeight: "700",
     textAlign: "center",

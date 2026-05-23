@@ -27,9 +27,7 @@ export const MedicationNameInput = ({ value, onChange, error }: Props) => {
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
       />
-      {error ? (
-        <Text style={styles.error}>{error}</Text>
-      ) : null}
+      {error ? <Text style={styles.error}>{error}</Text> : null}
     </View>
   );
 };
@@ -44,6 +42,7 @@ const styles = StyleSheet.create({
     color: Colors.textPrimary,
     marginBottom: 12,
     textAlign: "center",
+    fontWeight: "600",
     fontSize: 18,
   },
   input: {

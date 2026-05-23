@@ -24,12 +24,7 @@ export const ScheduleButton = ({
         style={[styles.button, isSelected && styles.buttonSelected]}
         onPress={() => onPress(id)}
       >
-        <Text
-          style={[
-            styles.label,
-            isSelected && styles.labelSelected,
-          ]}
-        >
+        <Text style={[styles.label, isSelected && styles.labelSelected]}>
           {label}
         </Text>
       </Pressable>
@@ -55,6 +50,7 @@ const styles = StyleSheet.create({
   label: {
     color: Colors.textPrimary,
     textAlign: "center",
+    fontWeight: "600",
     fontSize: 16,
   },
   labelSelected: {

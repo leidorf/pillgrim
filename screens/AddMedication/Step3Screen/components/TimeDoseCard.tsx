@@ -1,5 +1,12 @@
 import { useState } from "react";
-import { Pressable, StyleSheet, TextInput, View, Modal, ScrollView } from "react-native";
+import {
+  Pressable,
+  StyleSheet,
+  TextInput,
+  View,
+  Modal,
+  ScrollView,
+} from "react-native";
 import { Text } from "../../../../components/Text";
 
 import { Colors } from "../../../../constants/theme";
@@ -31,7 +38,6 @@ const isValidAmount = (amount: string) => {
 };
 
 export const TimeDoseCard = ({
-  index,
   amount,
   selectedUnit,
   unitLabel,
@@ -52,23 +58,15 @@ export const TimeDoseCard = ({
       <View style={styles.header}>
         {canRemove && (
           <Pressable onPress={onRemove} style={styles.removeButton}>
-            <TrashIcon
-              width={18}
-              height={18}
-              stroke={Colors.error}
-            />
+            <TrashIcon width={18} height={18} stroke={Colors.error} />
           </Pressable>
         )}
       </View>
 
       {/* ------------------------------- Time Picker ------------------------------ */}
       <Pressable style={styles.timeButton} onPress={onOpenTimePicker}>
-        <Text style={styles.timeText}>
-          {formattedTime}
-        </Text>
-        <Text style={styles.timeHint}>
-          Tap to change time
-        </Text>
+        <Text style={styles.timeText}>{formattedTime}</Text>
+        <Text style={styles.timeHint}>Tap to change time</Text>
       </Pressable>
 
       {/* ---------------------------- Dose - Unit Input --------------------------- */}
@@ -89,9 +87,7 @@ export const TimeDoseCard = ({
           style={styles.unitDropdownTrigger}
           onPress={() => setUnitDropdownOpen(true)}
         >
-          <Text style={styles.unitLabel}>
-            {unitLabel || "Select unit"}
-          </Text>
+          <Text style={styles.unitLabel}>{unitLabel || "Select unit"}</Text>
           <ArrowDownIcon width={14} height={14} stroke={Colors.textSecondary} />
         </Pressable>
       </View>
@@ -115,9 +111,7 @@ export const TimeDoseCard = ({
           onPress={() => setUnitDropdownOpen(false)}
         >
           <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>
-              Select Unit
-            </Text>
+            <Text style={styles.dropdownTitle}>Select Unit</Text>
             <View style={styles.separator} />
 
             <ScrollView
@@ -220,7 +214,7 @@ const styles = StyleSheet.create({
     borderLeftWidth: 1,
     borderLeftColor: Colors.textSecondary + "30",
   },
-  unitLabel: { color: Colors.textSecondary, fontSize: 14 },
+  unitLabel: { color: Colors.textPrimary, fontWeight: "600", fontSize: 14 },
   errorText: {
     color: Colors.error,
     marginTop: 4,

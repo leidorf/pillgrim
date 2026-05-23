@@ -37,9 +37,10 @@ const styles = StyleSheet.create({
   card: {
     backgroundColor: Colors.background,
     borderRadius: 16,
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
     borderWidth: 1,
-    borderColor: Colors.successLight,
+    borderColor: Colors.primary + "40",
   },
   heading: {
     color: Colors.textSecondary,
