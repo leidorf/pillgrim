@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   value: string;
@@ -12,6 +13,9 @@ type Props = {
 export const MedicationNameInput = ({ value, onChange, error }: Props) => {
   const [isFocused, setIsFocused] = useState(false);
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.container}>
       <Text style={styles.label}>Medication Name</Text>
@@ -21,7 +25,7 @@ export const MedicationNameInput = ({ value, onChange, error }: Props) => {
           isFocused && styles.inputFocus,
           error ? styles.inputError : null,
         ]}
-        placeholderTextColor={Colors.textSecondary}
+        placeholderTextColor={theme.textSecondary}
         value={value}
         onChangeText={onChange}
         onFocus={() => setIsFocused(true)}
@@ -32,14 +36,14 @@ export const MedicationNameInput = ({ value, onChange, error }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     alignItems: "center",
     width: "100%",
     marginTop: 32,
   },
   label: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     marginBottom: 12,
     textAlign: "center",
     fontWeight: "600",
@@ -49,23 +53,23 @@ const styles = StyleSheet.create({
     width: "100%",
     borderRadius: 16,
     padding: 16,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     textAlign: "center",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     borderWidth: 1.5,
     borderColor: "transparent",
     fontSize: 16,
   },
   inputFocus: {
-    borderColor: Colors.primary,
+    borderColor: theme.primary,
   },
   inputError: {
-    borderColor: Colors.error,
+    borderColor: theme.error,
   },
   error: {
     marginTop: 8,
     textAlign: "center",
-    color: Colors.error,
+    color: theme.error,
     fontSize: 14,
   },
 });

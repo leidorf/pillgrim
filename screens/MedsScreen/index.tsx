@@ -1,4 +1,4 @@
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
@@ -11,11 +11,14 @@ import { useMedicationStore } from "../../store/medicationStore";
 import { NavProp, MainScreenParamList } from "../../types/navigation";
 import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
-import { Colors } from "../../constants/theme";
 import ScreenLayout from "../../components/ScreenLayout";
 import BaseModal from "../../components/BaseModal";
+import { useAppTheme } from "../../theme/useAppTheme";
+import { Theme } from "../../constants/theme";
 
 const MedsScreen = () => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
   const { medications, deleteMedication, setDraft, updateMedication } =
     useMedicationStore();
@@ -135,6 +138,7 @@ const MedsScreen = () => {
       "hardwareBackPress",
       onBackPress,
     );
+
     return () => subscription.remove();
   }, [isSheetOpen]);
 
@@ -168,7 +172,7 @@ const MedsScreen = () => {
             <PillBottleIcon
               height={64}
               width={64}
-              stroke={Colors.textSecondary}
+              stroke={theme.textSecondary}
               strokeWidth={1}
             />
             <Text style={styles.emptyText}>No medications found</Text>
@@ -213,7 +217,7 @@ const MedsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   listContent: {
     paddingHorizontal: 24,
     paddingBottom: 56,
@@ -226,11 +230,11 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "500",
     textAlign: "center",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   subHeaderText: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 4,
   },
   emptyContainer: {
@@ -242,11 +246,11 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
 });
 

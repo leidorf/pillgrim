@@ -3,7 +3,6 @@ import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import BottomSheet from "@gorhom/bottom-sheet";
 
-import { Colors } from "../../constants/theme";
 import { Medication, MedicationLog } from "../../types/medication";
 import { WeekStart } from "../../types/schedule";
 
@@ -30,6 +29,8 @@ import MedicationCard from "./components/MedicationCard";
 import WeeklyCalendar from "./components/WeeklyCalendar";
 
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
+import { useAppTheme } from "../../theme/useAppTheme";
+import { Theme } from "../../constants/theme";
 
 const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
   const map: WeekdayMap = {};
@@ -40,6 +41,8 @@ const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
 };
 
 const HomeScreen = () => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { medications, updateStock } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const weekdayMap = useMemo(
@@ -70,6 +73,7 @@ const HomeScreen = () => {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const interval = setInterval(() => setNow(new Date()), 60_000);
+
     return () => clearInterval(interval);
   }, []);
 
@@ -260,7 +264,7 @@ const HomeScreen = () => {
             <PillBottleIcon
               height={64}
               width={64}
-              stroke={Colors.textPrimary}
+              stroke={theme.textPrimary}
               strokeWidth={1}
             />
             <Text style={styles.emptyText}>No medications for today!</Text>
@@ -305,13 +309,13 @@ const HomeScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   medList: {
     paddingHorizontal: 32,
     paddingTop: 16,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
   },
   listContent: { paddingBottom: 72 },
   emptyContainer: {
@@ -323,7 +327,7 @@ const styles = StyleSheet.create({
   emptyText: { fontSize: 18, fontWeight: "500" },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     textTransform: "capitalize",
   },
 });

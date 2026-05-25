@@ -1,8 +1,10 @@
+import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import { Medication } from "../../../types/medication";
-import { Colors } from "../../../constants/theme";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type Props = {
   medication: Medication;
@@ -11,6 +13,9 @@ type Props = {
 };
 
 const MedicationInfoCard = ({ medication, isInactive, onPress }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <BaseMedicationCard
       medication={medication}
@@ -26,9 +31,9 @@ const MedicationInfoCard = ({ medication, isInactive, onPress }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   pausedBadge: {
-    backgroundColor: Colors.warningLight,
+    backgroundColor: theme.warningLight,
     paddingHorizontal: 10,
     paddingVertical: 4,
     borderRadius: 8,
@@ -36,7 +41,7 @@ const styles = StyleSheet.create({
   pausedText: {
     fontSize: 11,
     fontWeight: "700",
-    color: Colors.warning,
+    color: theme.warning,
   },
 });
 

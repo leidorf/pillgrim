@@ -1,10 +1,9 @@
-import { useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { NavProp } from "../../../types/navigation";
-import { Colors } from "../../../constants/theme";
 import { useMedicationStore } from "../../../store/medicationStore";
 
 import AddMedicationHeader from "../components/AddMedicationHeader";
@@ -21,6 +20,8 @@ import {
   NotificationSettingsPanel,
   NotificationSettings,
 } from "./components/NotificationSettings";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 const Step4Screen = () => {
   const route = useRoute<any>();
@@ -30,6 +31,8 @@ const Step4Screen = () => {
 
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   /* ------------------------------- Form State ------------------------------- */
   const [selectedInstruction, setSelectedInstruction] =
@@ -42,6 +45,7 @@ const Step4Screen = () => {
         "empty_stomach",
         "any",
       ] as const;
+
       return knownIds.includes(draft.note as any)
         ? (draft.note as InstructionOption)
         : "other";
@@ -173,7 +177,7 @@ const Step4Screen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: { flex: 1, justifyContent: "flex-end" },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -182,7 +186,7 @@ const styles = StyleSheet.create({
   modal: {
     width: "100%",
     height: "90%",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,

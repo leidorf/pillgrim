@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from "react";
+import { useMemo, useCallback, useRef, useState } from "react";
 import {
   Animated,
   LayoutAnimation,
@@ -13,7 +13,6 @@ import { useNavigation, useRoute } from "@react-navigation/native";
 
 import { NavProp } from "../../../types/navigation";
 import { Schedule, ScheduleType } from "../../../types/schedule";
-import { Colors } from "../../../constants/theme";
 import { TIER1_SCHEDULES, TIER2_SCHEDULES } from "../../../constants/schedules";
 import { useMedicationStore } from "../../../store/medicationStore";
 
@@ -30,6 +29,8 @@ import {
   PrnInfo,
 } from "./components/ScheduleExpanders";
 import { useSettingsStore } from "../../../store/settingsStore";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 const Step2Screen = () => {
   const navigation = useNavigation<NavProp>();
@@ -37,6 +38,8 @@ const Step2Screen = () => {
   const { width: screenWidth } = useWindowDimensions();
   const { draft, setDraft, clearDraft } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
 
@@ -336,7 +339,7 @@ const Step2Screen = () => {
                   <RightArrowIcon
                     height={18}
                     width={18}
-                    stroke={Colors.textSecondary}
+                    stroke={theme.textSecondary}
                   />
                 </Pressable>
               </View>
@@ -363,7 +366,7 @@ const Step2Screen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: { flex: 1, justifyContent: "flex-end" },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -372,7 +375,7 @@ const styles = StyleSheet.create({
   modal: {
     width: "100%",
     height: "90%",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -383,7 +386,7 @@ const styles = StyleSheet.create({
   slider: { flex: 1, flexDirection: "row", overflow: "hidden" },
   scrollContent: { paddingBottom: 20 },
   sectionLabel: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontWeight: "600",
     marginVertical: 16,
     fontSize: 18,
@@ -396,7 +399,7 @@ const styles = StyleSheet.create({
     padding: 16,
     marginTop: 8,
   },
-  otherText: { color: Colors.textSecondary, fontSize: 16 },
+  otherText: { color: theme.textSecondary, fontSize: 16 },
 });
 
 export default Step2Screen;

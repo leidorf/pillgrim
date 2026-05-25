@@ -1,12 +1,14 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
-import { Colors } from "../../../constants/theme";
 
 import FileDownloadIcon from "../../../assets/icons/file-down.svg";
 import SettingsIcon from "../../../assets/icons/settings.svg";
 
 import { useNavigation } from "@react-navigation/native";
 import { NavProp } from "../../../types/navigation";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type HeaderProps = {
   headerText: string;
@@ -18,11 +20,14 @@ const handleExport = () => {
 
 const LogsHeader = ({ headerText }: HeaderProps) => {
   const navigation = useNavigation<NavProp>();
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.topBar}>
       {/* ----------------------------- Download Button ---------------------------- */}
       <Pressable style={styles.iconButton} onPress={handleExport}>
-        <FileDownloadIcon height={24} width={24} stroke={Colors.textPrimary} />
+        <FileDownloadIcon height={24} width={24} stroke={theme.textPrimary} />
       </Pressable>
 
       {/* ------------------------------- Header Text ------------------------------ */}
@@ -35,13 +40,13 @@ const LogsHeader = ({ headerText }: HeaderProps) => {
           navigation.navigate("Settings", { screen: "SettingsMain" })
         }
       >
-        <SettingsIcon height={24} width={24} stroke={Colors.textPrimary} />
+        <SettingsIcon height={24} width={24} stroke={theme.textPrimary} />
       </Pressable>
     </View>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   topBar: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -53,7 +58,7 @@ const styles = StyleSheet.create({
     fontSize: 24,
     fontWeight: "500",
     textAlign: "center",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   iconButton: {
     padding: 8,

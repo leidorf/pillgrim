@@ -16,8 +16,8 @@ import MedsScreen from "./screens/MedsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen/Step1Screen";
 import SettingsScreen from "./screens/Settings";
 
-import { AppTheme } from "./theme/theme";
-import { Colors } from "./constants/theme";
+import { getNavigationTheme } from "./theme/theme";
+import { useAppTheme } from "./theme/useAppTheme";
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
@@ -26,7 +26,7 @@ import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
 import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
 import NotificationsScreen from "./screens/Settings/NotificationsScreen";
-import { StatusBar, useColorScheme } from "react-native";
+import { StatusBar } from "react-native";
 import AppearanceScreen from "./screens/Settings/AppearanceScreen";
 import LanguageScreen from "./screens/Settings/LanguageScreen";
 import AlarmScreen from "./screens/Settings/AlarmScreen";
@@ -38,12 +38,13 @@ const AddMedStack = createNativeStackNavigator<AddMedicationParamList>();
 const SettingsStack = createNativeStackNavigator<SettingsParamList>();
 
 const MainTabs = () => {
+  const theme = useAppTheme();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
-        tabBarActiveTintColor: Colors.primary,
+        tabBarActiveTintColor: theme.primary,
         tabBarStyle: {
           backgroundColor: "rgba(0, 0, 0, 0)",
           borderTopWidth: 0,
@@ -111,13 +112,13 @@ const SettingsNavigator = () => {
 };
 
 export default function App() {
-  const colorScheme = useColorScheme();
-  const isDarkMode = colorScheme === "dark";
+  const theme = useAppTheme();
+  const isDarkMode = theme.background === "#101410";
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
         <BottomSheetModalProvider>
-          <NavigationContainer theme={AppTheme}>
+          <NavigationContainer theme={getNavigationTheme(isDarkMode)}>
             <StatusBar
               barStyle={isDarkMode ? "light-content" : "dark-content"}
             />

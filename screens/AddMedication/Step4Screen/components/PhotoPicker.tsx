@@ -1,10 +1,11 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
 import * as ImagePicker from "expo-image-picker";
 import ImageIcon from "../../../../assets/icons/image.svg";
-import { Colors } from "../../../../constants/theme";
 import BaseModal from "../../../../components/BaseModal";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   uri: string | null;
@@ -60,6 +61,9 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
     }
   };
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <>
       {uri ? (
@@ -77,7 +81,7 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
           style={styles.addButton}
           onPress={() => setAddModalVisible(true)}
         >
-          <ImageIcon width={32} height={32} stroke={Colors.textSecondary} />
+          <ImageIcon width={32} height={32} stroke={theme.textSecondary} />
           <Text style={styles.addText}>Add photo</Text>
         </Pressable>
       )}
@@ -131,25 +135,25 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   addButton: {
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 12,
     height: 120,
     justifyContent: "center",
     alignItems: "center",
     borderWidth: 2,
-    borderColor: Colors.textSecondary + "30",
+    borderColor: theme.textSecondary + "30",
     borderStyle: "dashed",
     gap: 8,
   },
-  addText: { color: Colors.textSecondary, fontSize: 15, fontWeight: "500" },
+  addText: { color: theme.textSecondary, fontSize: 15, fontWeight: "500" },
   photoContainer: {
     borderRadius: 12,
     overflow: "hidden",
     position: "relative",
     height: 160,
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
   },
   photo: { width: "100%", height: "100%" },
   removeButton: {
@@ -163,5 +167,5 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
   },
-  removeText: { color: Colors.surfaceElevated, fontSize: 20, fontWeight: "600" },
+  removeText: { color: theme.surfaceElevated, fontSize: 20, fontWeight: "600" },
 });

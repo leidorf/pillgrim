@@ -1,16 +1,17 @@
-import { forwardRef, useCallback, useState } from "react";
+import { useMemo, forwardRef, useCallback, useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "../../../components/Text";
 import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop,
 } from "@gorhom/bottom-sheet";
-import { Colors } from "../../../constants/theme";
 import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import SkipIcon from "../../../assets/icons/circle-minus.svg";
 import ClockIcon from "../../../assets/icons/clock.svg";
 import ChevronLeftIcon from "../../../assets/icons/chevron-left.svg";
 import ChevronRightIcon from "../../../assets/icons/chevron-right.svg";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 const SNOOZE_OPTIONS = [
   { label: "15 minutes", value: 15 },
@@ -97,6 +98,9 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
       [],
     );
 
+    const theme = useAppTheme();
+    const styles = useMemo(() => createStyles(theme), [theme]);
+
     return (
       <BottomSheet
         ref={ref}
@@ -129,11 +133,11 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor: Colors.success + "20",
+                        backgroundColor: theme.success + "20",
                       },
                     ]}
                   >
-                    <CheckIcon width={20} height={20} color={Colors.success} />
+                    <CheckIcon width={20} height={20} color={theme.success} />
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>
@@ -158,14 +162,14 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor: Colors.textSecondary + "20",
+                        backgroundColor: theme.textSecondary + "20",
                       },
                     ]}
                   >
                     <SkipIcon
                       width={20}
                       height={20}
-                      stroke={Colors.textSecondary}
+                      stroke={theme.textSecondary}
                     />
                   </View>
                   <View style={styles.actionTexts}>
@@ -190,11 +194,11 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={[
                       styles.actionIcon,
                       {
-                        backgroundColor: Colors.warning + "20",
+                        backgroundColor: theme.warning + "20",
                       },
                     ]}
                   >
-                    <ClockIcon width={20} height={20} stroke={Colors.warning} />
+                    <ClockIcon width={20} height={20} stroke={theme.warning} />
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>Snooze reminder</Text>
@@ -203,7 +207,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   <ChevronRightIcon
                     width={20}
                     height={20}
-                    stroke={Colors.textPrimary}
+                    stroke={theme.textPrimary}
                   />
                 </TouchableOpacity>
               </View>
@@ -229,7 +233,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   <ChevronLeftIcon
                     width={20}
                     height={20}
-                    stroke={Colors.textPrimary}
+                    stroke={theme.textPrimary}
                   />
                 </TouchableOpacity>
                 <View>
@@ -270,13 +274,13 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
 
 export default MedicationActionSheet;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   handleIndicator: {
-    backgroundColor: Colors.textSecondary + "40",
+    backgroundColor: theme.textSecondary + "40",
     width: 40,
   },
   sheetBackground: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
   },
   container: {
     paddingBottom: 32,
@@ -290,16 +294,16 @@ const styles = StyleSheet.create({
   medName: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   medTime: {
     fontSize: 13,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 2,
   },
   divider: {
     height: 1,
-    backgroundColor: Colors.border,
+    backgroundColor: theme.border,
     marginVertical: 8,
   },
   actions: {
@@ -315,10 +319,10 @@ const styles = StyleSheet.create({
     borderRadius: 14,
   },
   actionRowTaken: {
-    backgroundColor: Colors.success + "10",
+    backgroundColor: theme.success + "10",
   },
   actionRowSkipped: {
-    backgroundColor: Colors.textSecondary + "10",
+    backgroundColor: theme.textSecondary + "10",
   },
   actionIcon: {
     width: 40,
@@ -333,11 +337,11 @@ const styles = StyleSheet.create({
   actionLabel: {
     fontSize: 15,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   actionSub: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 1,
   },
   badge: {
@@ -347,19 +351,19 @@ const styles = StyleSheet.create({
   },
   chevron: {
     fontSize: 32,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   cancelButton: {
     paddingVertical: 14,
     alignItems: "center",
     borderRadius: 14,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     marginTop: "auto",
   },
   cancelText: {
     fontSize: 15,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   snoozeHeader: {
     paddingVertical: 10,
@@ -382,11 +386,11 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderRadius: 14,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
   },
   snoozeLabel: {
     fontSize: 15,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
 });

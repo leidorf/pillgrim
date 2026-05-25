@@ -6,7 +6,6 @@ import { useLogStore } from "../../store/logsStore";
 import { useMedicationStore } from "../../store/medicationStore";
 import { useSettingsStore } from "../../store/settingsStore";
 
-import { Colors } from "../../constants/theme";
 import { useTimeFormat } from "../../hooks/useTimeFormat";
 
 import MonthlyCalendar from "./components/MonthlyCalendar";
@@ -21,6 +20,8 @@ import {
   WeekdayMap,
 } from "../../utils/medicationScheduleUtils";
 import { WeekStart } from "../../types/schedule";
+import { useAppTheme } from "../../theme/useAppTheme";
+import { Theme } from "../../constants/theme";
 
 const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
   const map: WeekdayMap = {};
@@ -86,6 +87,9 @@ const CalendarScreen = () => {
       month: "long",
     });
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <ScreenLayout>
       {/* --------------------------------- Header --------------------------------- */}
@@ -127,13 +131,13 @@ const CalendarScreen = () => {
 
 export default CalendarScreen;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   calendarContainer: {
     height: 380,
   },
   detailContainer: {
     flex: 1,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     paddingTop: 20,
@@ -153,12 +157,12 @@ const styles = StyleSheet.create({
   emptyText: {
     fontSize: 16,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     marginBottom: 8,
   },
   emptySubtext: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     textAlign: "center",
   },
 });

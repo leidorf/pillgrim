@@ -1,9 +1,10 @@
 import { View, Pressable, StyleSheet, FlatList, useWindowDimensions } from "react-native";
 import { Text } from "../../../components/Text";
 import { useRef, useState, useMemo, useCallback } from "react";
-import { Colors } from "../../../constants/theme";
 import { useLogStore } from "../../../store/logsStore";
 import { useSettingsStore } from "../../../store/settingsStore";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type Props = {
   selectedDate: Date;
@@ -54,6 +55,8 @@ const MonthGrid = ({
   width,
   weekStartsOn,
 }: MonthGridProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -84,9 +87,9 @@ const MonthGrid = ({
   }, [logs]);
 
   const getAdherenceColor = (rate: number) => {
-    if (rate === 100) return Colors.success;
-    if (rate > 0) return Colors.warning;
-    return Colors.error;
+    if (rate === 100) return theme.success;
+    if (rate > 0) return theme.warning;
+    return theme.error;
   };
 
   const renderDay = useCallback(
@@ -163,6 +166,8 @@ const MonthlyCalendar = ({
   onSelectDate,
   onMonthChange,
 }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { width: screenWidth } = useWindowDimensions();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const flatListRef = useRef<FlatList>(null);
@@ -239,7 +244,7 @@ const MonthlyCalendar = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
   },
@@ -255,7 +260,7 @@ const styles = StyleSheet.create({
     textAlign: "center",
     fontSize: 12,
     fontWeight: "500",
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   grid: {
     flexDirection: "row",
@@ -278,10 +283,10 @@ const styles = StyleSheet.create({
   },
   dayToday: {
     borderWidth: 2,
-    borderColor: Colors.primary,
+    borderColor: theme.primary,
   },
   daySelected: {
-    backgroundColor: Colors.successLight,
+    backgroundColor: theme.successLight,
     borderRadius: 32,
   },
   dayOtherMonth: {
@@ -290,14 +295,14 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 14,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   dayTextSelected: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "600",
   },
   dayTextOtherMonth: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   adherenceDot: {
     position: "absolute",

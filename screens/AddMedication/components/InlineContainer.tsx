@@ -1,7 +1,8 @@
 import { StyleSheet, View } from "react-native";
-import { Colors } from "../../../constants/theme";
-import { PropsWithChildren } from "react";
+import { useMemo, PropsWithChildren } from "react";
 import { Text } from "../../../components/Text";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type ContainerProps = {
   containerText: string;
@@ -11,6 +12,9 @@ const InlineContainer = ({
   containerText,
   children,
 }: PropsWithChildren<ContainerProps>) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.expandedContainer}>
       <Text
@@ -28,18 +32,18 @@ const InlineContainer = ({
 
 export default InlineContainer;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   expandedContainer: {
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 12,
     padding: 14,
     marginTop: 6,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: theme.border,
   },
   textStyle: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   expandedLabel: {
     marginBottom: 10,

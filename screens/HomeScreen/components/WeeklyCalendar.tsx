@@ -6,11 +6,12 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Text } from "../../../components/Text";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 
-import { Colors } from "../../../constants/theme";
 import { WEEKDAYS } from "../../../constants/schedules";
 import { useSettingsStore } from "../../../store/settingsStore";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type Props = {
   selectedDate: Date;
@@ -22,6 +23,7 @@ type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 const getDaysArray = (weekStartsOn: number) => {
   const allDays = WEEKDAYS.map((d) => d.label);
+
   return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
 };
 
@@ -62,6 +64,8 @@ const Week = ({
   width,
   weekStartsOn,
 }: WeekProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const today = new Date();
   const dates = getWeekDates(weekOffset, weekStartsOn);
   const DAYS = getDaysArray(weekStartsOn);
@@ -117,6 +121,8 @@ const WeeklyCalendar = ({
   onSelectDate,
   hasMedsOnDate,
 }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn) as WeekStart;
   const { width: screenWidth } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
@@ -176,7 +182,7 @@ const WeeklyCalendar = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     paddingBottom: 12,
   },
@@ -185,7 +191,7 @@ const styles = StyleSheet.create({
     fontWeight: "500",
     textAlign: "center",
     marginBottom: 16,
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   weekRow: {
     flexDirection: "row",
@@ -193,7 +199,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   dayCol: { alignItems: "center", gap: 4 },
-  dayName: { fontSize: 12, color: Colors.textSecondary },
+  dayName: { fontSize: 12, color: theme.textSecondary },
   dayNum: {
     width: 34,
     height: 34,
@@ -203,21 +209,21 @@ const styles = StyleSheet.create({
   },
   dayNumToday: {
     borderWidth: 2,
-    borderColor: Colors.primary,
+    borderColor: theme.primary,
   },
-  dayNumSelected: { backgroundColor: Colors.successLight, borderRadius: 17 },
-  dayNumText: { fontSize: 14, fontWeight: "500", color: Colors.textPrimary },
-  dayNumTextSelected: { color: Colors.primaryDark },
+  dayNumSelected: { backgroundColor: theme.successLight, borderRadius: 17 },
+  dayNumText: { fontSize: 14, fontWeight: "500", color: theme.textPrimary },
+  dayNumTextSelected: { color: theme.primaryDark },
   dot: {
     top: -9,
     width: 8,
     height: 8,
     borderWidth: 2,
     borderRadius: 4,
-    borderColor: Colors.primary,
+    borderColor: theme.primary,
   },
-  dotToday: { borderColor: Colors.primary },
-  dotActive: { backgroundColor: Colors.background },
+  dotToday: { borderColor: theme.primary },
+  dotActive: { backgroundColor: theme.background },
 });
 
 export default WeeklyCalendar;

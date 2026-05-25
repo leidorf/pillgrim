@@ -1,9 +1,11 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 import { Text } from "./Text";
 import { Medication } from "../types/medication";
 import { MED_FORMS } from "../constants/medication-forms";
-import { Colors } from "../constants/theme";
 import { PropsWithChildren } from "react";
+import { Theme } from "../constants/theme";
+import { useAppTheme } from "../theme/useAppTheme";
 
 export type BaseMedicationCardProps = {
   medication: Medication;
@@ -39,6 +41,8 @@ const BaseMedicationCard = ({
   isInactive = false,
   dose,
 }: PropsWithChildren<BaseMedicationCardProps>) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { name, form } = medication;
   const FormIcon = getFormIcon(form) || (() => null);
 
@@ -52,7 +56,7 @@ const BaseMedicationCard = ({
           <FormIcon
             width={24}
             height={24}
-            stroke={isInactive ? Colors.textSecondary : Colors.textPrimary}
+            stroke={isInactive ? theme.textSecondary : theme.textPrimary}
           />
         </View>
 
@@ -87,7 +91,7 @@ const BaseMedicationCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -96,7 +100,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     borderRadius: 16,
     marginBottom: 8,
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
   },
   leftSection: {
     flexDirection: "row",
@@ -113,7 +117,7 @@ const styles = StyleSheet.create({
     width: 48,
     height: 48,
     borderRadius: 12,
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -124,27 +128,27 @@ const styles = StyleSheet.create({
   nameText: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   noteText: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   doseText: {
     fontSize: 13,
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "500",
     marginTop: 2,
   },
   inactiveContainer: {
     opacity: 0.6,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
   },
   inactiveText: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
   inactiveSubtext: {
-    color: Colors.textSecondary + "80",
+    color: theme.textSecondary + "80",
   },
 });
 

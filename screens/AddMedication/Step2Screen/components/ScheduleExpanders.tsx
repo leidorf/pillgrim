@@ -1,9 +1,10 @@
 import { Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
 import { WEEKDAYS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
 import { useMemo } from "react";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 const MONTH_DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 
@@ -25,6 +26,9 @@ export const WeekdayPicker = ({
       ...WEEKDAYS.slice(0, weekStartsOn),
     ];
   }, [weekStartsOn]);
+
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <InlineContainer containerText="Select days">
@@ -59,6 +63,8 @@ type IntervalProps = {
 };
 
 export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const step = (delta: number) => {
     const next = Math.max(1, parseInt(value || "1") + delta);
     onChange(next.toString());
@@ -77,7 +83,7 @@ export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
           onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ""))}
           keyboardType="number-pad"
           placeholder="X"
-          placeholderTextColor={Colors.textSecondary}
+          placeholderTextColor={theme.textSecondary}
           maxLength={3}
         />
 
@@ -98,6 +104,8 @@ type MonthDayProps = {
 };
 
 export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   return (
     <InlineContainer containerText="Select days of the month (1–31)">
       <View style={styles.monthGrid}>
@@ -130,7 +138,7 @@ export const PrnInfo = () => (
 );
 
 /* --------------------------------- Styles --------------------------------- */
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   weekdayRow: {
     flexDirection: "row",
     gap: 6,
@@ -141,7 +149,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     borderWidth: 1.5,
     borderColor: "transparent",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
   },
   chipCircle: {
     width: 40,
@@ -154,16 +162,16 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   chipActive: {
-    backgroundColor: Colors.primaryDark,
-    borderColor: Colors.primaryDark,
+    backgroundColor: theme.primaryDark,
+    borderColor: theme.primaryDark,
   },
   chipText: {
     fontWeight: "600",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontSize: 12,
   },
   chipTextActive: {
-    color: Colors.surfaceElevated,
+    color: theme.surfaceElevated,
   },
   intervalRow: {
     flexDirection: "row",
@@ -174,12 +182,12 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 10,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     alignItems: "center",
     justifyContent: "center",
   },
   stepperText: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     lineHeight: 24,
     fontSize: 18,
   },
@@ -187,15 +195,15 @@ const styles = StyleSheet.create({
     minWidth: 52,
     height: 36,
     borderRadius: 10,
-    backgroundColor: Colors.background,
-    color: Colors.textPrimary,
+    backgroundColor: theme.background,
+    color: theme.textPrimary,
     fontWeight: "700",
     textAlign: "center",
     paddingHorizontal: 6,
     fontSize: 16,
   },
   intervalUnit: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontSize: 14,
   },
   monthGrid: {

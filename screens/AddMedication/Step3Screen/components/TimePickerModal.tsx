@@ -1,8 +1,9 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useMemo, useCallback, useEffect, useRef, useState } from "react";
 import { Animated, Easing, Modal, NativeScrollEvent, NativeSyntheticEvent, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
 import { useTimeFormat } from "../../../../hooks/useTimeFormat";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 const ITEM_HEIGHT = 52;
 const VISIBLE_ITEMS = 5;
@@ -85,6 +86,9 @@ const Column = ({
     [snapToNearest],
   );
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.column}>
       <ScrollView
@@ -144,6 +148,8 @@ export const TimePickerModal = ({
   onConfirm,
   onDismiss,
 }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const slideAnim = useRef(new Animated.Value(0)).current;
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const is24Hour = useTimeFormat().timeFormat === "24h";
@@ -286,7 +292,7 @@ export const TimePickerModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   backdrop: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: "rgba(0,0,0,0.45)",
@@ -296,7 +302,7 @@ const styles = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 28,
     borderTopRightRadius: 28,
     paddingBottom: 40,
@@ -309,21 +315,21 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
     paddingVertical: 20,
     borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: Colors.textSecondary + "25",
+    borderBottomColor: theme.textSecondary + "25",
   },
   headerTitle: {
     fontSize: 16,
     fontWeight: "600",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     letterSpacing: 0.2,
   },
   headerAction: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontWeight: "500",
   },
   headerConfirm: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "700",
   },
   pickerArea: {
@@ -341,10 +347,10 @@ const styles = StyleSheet.create({
     top: "50%",
     marginTop: -(ITEM_HEIGHT / 2),
     height: ITEM_HEIGHT,
-    backgroundColor: Colors.primary + "14",
+    backgroundColor: theme.primary + "14",
     borderRadius: 14,
     borderWidth: 1.5,
-    borderColor: Colors.primary + "30",
+    borderColor: theme.primary + "30",
   },
   column: {
     width: 72,
@@ -365,17 +371,17 @@ const styles = StyleSheet.create({
   itemText: {
     fontSize: 28,
     fontWeight: "300",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     letterSpacing: 1,
   },
   itemTextSelected: {
     fontWeight: "600",
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
   },
   colon: {
     fontSize: 28,
     fontWeight: "300",
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginHorizontal: 4,
     marginBottom: 4,
   },

@@ -1,14 +1,15 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 
-import { Colors } from "../../../constants/theme";
 import { useTimeFormat } from "../../../hooks/useTimeFormat";
 
 import CheckIcon from "../../../assets/icons/check.svg";
 import SkippedIcon from "../../../assets/icons/minus.svg";
 import MissedIcon from "../../../assets/icons/close.svg";
 import PendingIcon from "../../../assets/icons/circle-dashed.svg";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type MedicationLog = {
   id: string;
@@ -33,6 +34,8 @@ type MedicationLogCardProps = {
 };
 
 const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { formatTime } = useTimeFormat();
 
   const getStatusInfo = (): StatusInfo => {
@@ -40,9 +43,9 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
 
     if (log.takenAt) {
       return {
-        icon: <CheckIcon width={16} height={16} stroke={Colors.primary} />,
+        icon: <CheckIcon width={16} height={16} stroke={theme.primary} />,
         label: "Taken",
-        color: Colors.success,
+        color: theme.success,
         subtext: formatTime(log.takenAt),
       };
     }
@@ -50,10 +53,10 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
     if (log.skipped) {
       return {
         icon: (
-          <SkippedIcon width={16} height={16} stroke={Colors.textPrimary} />
+          <SkippedIcon width={16} height={16} stroke={theme.textPrimary} />
         ),
         label: "Skipped",
-        color: Colors.textSecondary,
+        color: theme.textSecondary,
         subtext: "Intentionally skipped",
       };
     }
@@ -64,17 +67,17 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
 
     if (scheduledDateTime < now) {
       return {
-        icon: <MissedIcon width={16} height={16} stroke={Colors.error} />,
+        icon: <MissedIcon width={16} height={16} stroke={theme.error} />,
         label: "Missed",
-        color: Colors.error,
+        color: theme.error,
         subtext: "Not taken in time",
       };
     }
 
     return {
-      icon: <PendingIcon width={16} height={16} stroke={Colors.textPrimary} />,
+      icon: <PendingIcon width={16} height={16} stroke={theme.textPrimary} />,
       label: "Pending",
-      color: Colors.textSecondary,
+      color: theme.textSecondary,
       subtext: "It's not time yet",
     };
   };
@@ -116,7 +119,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   logItem: {
     flexDirection: "row",
     marginBottom: 16,
@@ -128,18 +131,18 @@ const styles = StyleSheet.create({
   logTime: {
     fontSize: 12,
     fontWeight: "500",
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginBottom: 4,
   },
   timeline: {
     width: 2,
     flex: 1,
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: 1,
   },
   logContent: {
     flex: 1,
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 12,
     padding: 16,
     marginLeft: 8,
@@ -153,11 +156,11 @@ const styles = StyleSheet.create({
   medicationName: {
     fontSize: 16,
     fontWeight: "500",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   doseText: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 2,
   },
   statusBadge: {
@@ -173,7 +176,7 @@ const styles = StyleSheet.create({
   },
   statusLabel: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginTop: 4,
   },
 });

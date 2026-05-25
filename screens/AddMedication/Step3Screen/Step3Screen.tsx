@@ -1,11 +1,10 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { NavProp } from "../../../types/navigation";
-import { Colors } from "../../../constants/theme";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../../constants/units";
 import { useMedicationStore } from "../../../store/medicationStore";
 import { useTimeFormat } from "../../../hooks/useTimeFormat";
@@ -17,6 +16,8 @@ import PlusIcon from "../../../assets/icons/plus.svg";
 import { TimeDoseCard } from "./components/TimeDoseCard";
 import { DailySummaryCard } from "./components/DailySummaryCard";
 import { TimePickerModal } from "./components/TimePickerModal";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type TimeDoseEntry = {
   id: string;
@@ -60,6 +61,8 @@ const Step3Screen = () => {
   const navigation = useNavigation<NavProp>();
   const { draft, setDraft, clearDraft } = useMedicationStore();
   const { formatTime } = useTimeFormat();
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
 
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
@@ -214,7 +217,7 @@ const Step3Screen = () => {
               <PlusIcon
                 width={20}
                 height={20}
-                stroke={selectedUnit ? Colors.primary : Colors.textSecondary}
+                stroke={selectedUnit ? theme.primary : theme.textSecondary}
               />
               <Text
                 style={[
@@ -251,7 +254,7 @@ const Step3Screen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: { flex: 1, justifyContent: "flex-end" },
   backdrop: {
     ...StyleSheet.absoluteFillObject,
@@ -260,7 +263,7 @@ const styles = StyleSheet.create({
   modal: {
     width: "100%",
     height: "90%",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,
@@ -271,7 +274,7 @@ const styles = StyleSheet.create({
   scrollContent: { paddingBottom: 20, gap: 16 },
   dosesSection: { gap: 12 },
   sectionLabel: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontWeight: "600",
     fontSize: 18,
     marginTop: 16,
@@ -285,13 +288,13 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 16,
     borderWidth: 2,
-    borderColor: Colors.primary + "40",
+    borderColor: theme.primary + "40",
     borderStyle: "dashed",
     marginTop: 8,
   },
-  addButtonDisabled: { borderColor: Colors.textSecondary + "30" },
-  addButtonText: { color: Colors.primaryDark, fontWeight: "600", fontSize: 16 },
-  addButtonTextDisabled: { color: Colors.textSecondary },
+  addButtonDisabled: { borderColor: theme.textSecondary + "30" },
+  addButtonText: { color: theme.primaryDark, fontWeight: "600", fontSize: 16 },
+  addButtonTextDisabled: { color: theme.textSecondary },
 });
 
 export default Step3Screen;

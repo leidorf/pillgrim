@@ -1,5 +1,7 @@
+import { useMemo } from "react";
 import { View, StyleSheet, Dimensions } from "react-native";
-import { Colors } from "../../../constants/theme";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type Props = {
   currentStep: 1 | 2 | 3 | 4;
@@ -9,6 +11,9 @@ const windowWidth = Dimensions.get("window").width;
 
 const ProgressBar = ({ currentStep }: Props) => {
   const steps = [1, 2, 3, 4];
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.container}>
       {steps.map((step, index) => {
@@ -37,7 +42,7 @@ const ProgressBar = ({ currentStep }: Props) => {
 
 export default ProgressBar;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
@@ -52,19 +57,19 @@ const styles = StyleSheet.create({
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: Colors.textSecondary + "30",
+    backgroundColor: theme.textSecondary + "30",
   },
   dotActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: theme.primary,
     transform: [{ scale: 1.2 }],
   },
   line: {
     width: (windowWidth * 0.9) / 4,
     height: 2,
-    backgroundColor: Colors.textSecondary + "20",
+    backgroundColor: theme.textSecondary + "20",
     marginHorizontal: 6,
   },
   lineActive: {
-    backgroundColor: Colors.primary,
+    backgroundColor: theme.primary,
   },
 });

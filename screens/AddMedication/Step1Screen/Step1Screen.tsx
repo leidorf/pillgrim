@@ -1,17 +1,18 @@
-import { useEffect, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
 import { NavProp } from "../../../types/navigation";
 import { Medication } from "../../../types/medication";
-import { Colors } from "../../../constants/theme";
 import { useMedicationStore } from "../../../store/medicationStore";
 
 import AddMedicationHeader from "../components/AddMedicationHeader";
 import NextButton from "../components/NextButton";
 import { MedicationFormPicker } from "./components/MedicationFormPicker";
 import { MedicationNameInput } from "./components/MedicationNameInput";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type FormErrors = {
   medName?: string;
@@ -62,6 +63,9 @@ const Step1Screen = () => {
     navigation.getParent()?.goBack();
   };
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <KeyboardAwareScrollView
       keyboardShouldPersistTaps="handled"
@@ -98,7 +102,7 @@ const Step1Screen = () => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flex: 1,
     justifyContent: "flex-end",
@@ -110,7 +114,7 @@ const styles = StyleSheet.create({
   modal: {
     width: "100%",
     height: "90%",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     padding: 24,

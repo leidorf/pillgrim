@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { Modal, Pressable, StyleSheet, View } from "react-native";
 import { Text } from "./Text";
-import { Colors } from "../constants/theme";
+import { useAppTheme } from "../theme/useAppTheme";
+import { Theme } from "../constants/theme";
 
 export type ModalButton = {
   text: string;
@@ -23,6 +25,8 @@ const BaseModal = ({
   buttons,
   onDismiss,
 }: BaseModalProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const isHorizontal = buttons.length <= 2;
 
   return (
@@ -70,7 +74,7 @@ const BaseModal = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   overlay: {
     flex: 1,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
@@ -79,7 +83,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   card: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 320,
@@ -94,18 +98,18 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontWeight: "700",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     marginBottom: 4,
   },
   message: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     lineHeight: 20,
     marginBottom: 12,
   },
   buttonContainer: {
     borderTopWidth: 1,
-    borderTopColor: Colors.textSecondary + "20",
+    borderTopColor: theme.textSecondary + "20",
   },
   buttonContainerRow: {
     flexDirection: "row",
@@ -123,10 +127,10 @@ const styles = StyleSheet.create({
   },
   textPrimary: {
     fontWeight: "700",
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
   },
   textDestructive: {
-    color: Colors.error,
+    color: theme.error,
   },
 });
 

@@ -1,10 +1,11 @@
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Animated, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
 import PillIcon from "../../../../assets/icons/pill.svg";
 import { MED_FORMS } from "../../../../constants/medication-forms";
-import { Colors } from "../../../../constants/theme";
 import { Medication } from "../../../../types/medication";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   value: Medication["form"];
@@ -31,10 +32,13 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
     toggle();
   };
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.container}>
       <Pressable style={styles.iconButton} onPress={toggle}>
-        <SelectedIcon width={48} height={48} stroke={Colors.textPrimary} />
+        <SelectedIcon width={48} height={48} stroke={theme.textPrimary} />
       </Pressable>
 
       <Text style={styles.formLabel}>{value}</Text>
@@ -71,7 +75,7 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
                 <Icon
                   width={28}
                   height={28}
-                  stroke={isSelected ? Colors.primary : Colors.textSecondary}
+                  stroke={isSelected ? theme.primary : theme.textSecondary}
                 />
                 <Text
                   style={[
@@ -90,7 +94,7 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     alignItems: "center",
     width: "100%",
@@ -99,7 +103,7 @@ const styles = StyleSheet.create({
     width: 120,
     height: 120,
     borderRadius: 100,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     justifyContent: "center",
     alignItems: "center",
   },
@@ -107,7 +111,7 @@ const styles = StyleSheet.create({
     textTransform: "capitalize",
     marginTop: 8,
     textAlign: "center",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontWeight: "600",
     fontSize: 18,
   },
@@ -126,21 +130,21 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 12,
     borderRadius: 12,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     marginRight: 8,
     minWidth: 64,
   },
   formItemSelected: {
-    backgroundColor: Colors.successLight,
+    backgroundColor: theme.successLight,
     borderWidth: 1.5,
-    borderColor: Colors.primary,
+    borderColor: theme.primary,
   },
   formItemLabel: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontSize: 10,
   },
   formItemLabelSelected: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "600",
   },
 });

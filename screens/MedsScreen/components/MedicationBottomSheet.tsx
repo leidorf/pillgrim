@@ -1,4 +1,4 @@
-import { forwardRef, useCallback } from "react";
+import { useMemo, forwardRef, useCallback } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import { Pressable } from "react-native";
@@ -9,9 +9,10 @@ import EditIcon from "../../../assets/icons/edit.svg";
 import TrashIcon from "../../../assets/icons/trash.svg";
 import PauseIcon from "../../../assets/icons/pause.svg";
 import PlayIcon from "../../../assets/icons/play.svg";
-import { Colors } from "../../../constants/theme";
 import { MED_FORMS } from "../../../constants/medication-forms";
 import BottomSheet from "@gorhom/bottom-sheet";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type Props = {
   medication: Medication | null;
@@ -69,6 +70,9 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
       [],
     );
 
+    const theme = useAppTheme();
+    const styles = useMemo(() => createStyles(theme), [theme]);
+
     return (
       <BottomSheet
         ref={ref}
@@ -85,7 +89,7 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
             <>
               <View style={styles.summarySection}>
                 <View style={styles.summaryIcon}>
-                  <FormIcon height={32} width={32} stroke={Colors.primary} />
+                  <FormIcon height={32} width={32} stroke={theme.primary} />
                 </View>
                 <Text style={styles.summaryName}>{name}</Text>
                 <Text style={styles.summaryDetails}>
@@ -109,10 +113,10 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
               <View style={styles.actionsSection}>
                 <ActionButton
                   icon={
-                    <EditIcon width={20} height={20} stroke={Colors.primary} />
+                    <EditIcon width={20} height={20} stroke={theme.primary} />
                   }
                   label="Edit Medication"
-                  color={Colors.primary + "15"}
+                  color={theme.primary + "15"}
                   onPress={() => {
                     handleClose();
                     onEdit();
@@ -125,28 +129,28 @@ const MedicationBottomSheet = forwardRef<BottomSheet, Props>(
                       <PauseIcon
                         width={20}
                         height={20}
-                        stroke={Colors.warning}
+                        stroke={theme.warning}
                       />
                     ) : (
                       <PlayIcon
                         width={20}
                         height={20}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
                       />
                     )
                   }
                   label={isActive ? "Pause Reminders" : "Resume Reminders"}
-                  color={isActive ? Colors.warningLight : Colors.primary + "15"}
+                  color={isActive ? theme.warningLight : theme.primary + "15"}
                   onPress={handleToggleActive}
                 />
 
                 <ActionButton
                   icon={
-                    <TrashIcon width={20} height={20} stroke={Colors.error} />
+                    <TrashIcon width={20} height={20} stroke={theme.error} />
                   }
                   label="Delete Medication"
-                  color={Colors.errorLight}
-                  textColor={Colors.error}
+                  color={theme.errorLight}
+                  textColor={theme.error}
                   onPress={() => {
                     handleClose();
                     onDelete();
@@ -165,7 +169,7 @@ const ActionButton = ({
   icon,
   label,
   color,
-  textColor = Colors.textPrimary,
+  textColor,
   onPress,
 }: {
   icon: React.ReactNode;
@@ -173,20 +177,24 @@ const ActionButton = ({
   color: string;
   textColor?: string;
   onPress: () => void;
-}) => (
-  <Pressable style={styles.actionRow} onPress={onPress}>
-    <View style={[styles.actionIcon, { backgroundColor: color }]}>{icon}</View>
-    <Text style={[styles.actionText, { color: textColor }]}>{label}</Text>
-  </Pressable>
-);
+}) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  return (
+    <Pressable style={styles.actionRow} onPress={onPress}>
+      <View style={[styles.actionIcon, { backgroundColor: color }]}>{icon}</View>
+      <Text style={[styles.actionText, { color: textColor || theme.textPrimary }]}>{label}</Text>
+    </Pressable>
+  );
+};
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   handleIndicator: {
-    backgroundColor: Colors.textSecondary + "40",
+    backgroundColor: theme.textSecondary + "40",
     width: 40,
   },
   sheetBackground: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
   },
   contentContainer: {
     flex: 1,
@@ -197,13 +205,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     paddingVertical: 24,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "20",
+    borderBottomColor: theme.textSecondary + "20",
   },
   summaryIcon: {
     width: 64,
     height: 64,
     borderRadius: 16,
-    backgroundColor: Colors.primary + "15",
+    backgroundColor: theme.primary + "15",
     justifyContent: "center",
     alignItems: "center",
     marginBottom: 16,
@@ -211,12 +219,12 @@ const styles = StyleSheet.create({
   summaryName: {
     fontSize: 22,
     fontWeight: "700",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     marginBottom: 4,
   },
   summaryDetails: {
     fontSize: 14,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     textTransform: "capitalize",
   },
   detailRow: {
@@ -226,7 +234,7 @@ const styles = StyleSheet.create({
   },
   detailLabel: {
     fontSize: 13,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontWeight: "500",
   },
   detailValue: {
@@ -235,14 +243,14 @@ const styles = StyleSheet.create({
   },
   noteBadge: {
     marginTop: 12,
-    backgroundColor: Colors.primary + "15",
+    backgroundColor: theme.primary + "15",
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 8,
   },
   noteBadgeText: {
     fontSize: 12,
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "500",
   },
   actionsSection: {

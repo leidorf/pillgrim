@@ -5,9 +5,10 @@ import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import CircleIcon from "../../../assets/icons/circle.svg";
 import CloseIcon from "../../../assets/icons/circle-close.svg";
 import MinusIcon from "../../../assets/icons/circle-minus.svg";
-import { Colors } from "../../../constants/theme";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
 import { useCallback, useMemo } from "react";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type MedicationCardProps = {
   medication: Medication;
@@ -34,23 +35,25 @@ const MedicationCard = ({
   onToggle,
   onOpenSheet,
 }: MedicationCardProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const isTaken = !!log?.takenAt && !log?.skipped;
   const isSkipped = !!log?.skipped;
 
   const containerStyle = useMemo((): ViewStyle => {
     if (isTaken)
       return {
-        backgroundColor: Colors.successLight,
-        borderColor: Colors.primary,
+        backgroundColor: theme.successLight,
+        borderColor: theme.primary,
       };
     if (isSkipped)
       return {
-        backgroundColor: Colors.border,
+        backgroundColor: theme.border,
       };
     if (isMissed)
       return {
-        backgroundColor: Colors.warningLight,
-        borderColor: Colors.error,
+        backgroundColor: theme.warningLight,
+        borderColor: theme.error,
       };
     return {};
   }, [isTaken, isSkipped, isMissed]);
@@ -78,16 +81,16 @@ const MedicationCard = ({
         <Text style={[styles.timeText, timeTextStyle]}>{displayTime}</Text>
         <Pressable style={styles.checkButton} onPress={handleTaken} hitSlop={8}>
           {isTaken ? (
-            <CheckIcon width={28} height={28} color={Colors.primary} />
+            <CheckIcon width={28} height={28} color={theme.primary} />
           ) : isSkipped ? (
-            <MinusIcon width={28} height={28} stroke={Colors.textSecondary} />
+            <MinusIcon width={28} height={28} stroke={theme.textSecondary} />
           ) : isMissed ? (
-            <CloseIcon width={28} height={28} stroke={Colors.error} />
+            <CloseIcon width={28} height={28} stroke={theme.error} />
           ) : (
             <CircleIcon
               width={28}
               height={28}
-              stroke={Colors.primary}
+              stroke={theme.primary}
               strokeWidth={2}
             />
           )}
@@ -97,17 +100,17 @@ const MedicationCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   timeSection: { flexDirection: "row", alignItems: "center", gap: 12 },
   timeText: {
     fontSize: 20,
     fontWeight: "700",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontVariant: ["tabular-nums"],
   },
-  takenText: { color: Colors.primaryDark },
-  skippedTimeText: { color: Colors.textSecondary },
-  missedTimeText: { color: Colors.error },
+  takenText: { color: theme.primaryDark },
+  skippedTimeText: { color: theme.textSecondary },
+  missedTimeText: { color: theme.error },
   checkButton: { padding: 4 },
 });
 

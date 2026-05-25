@@ -5,6 +5,9 @@ import { NavProp, SettingsParamList } from "../../types/navigation";
 import ScreenHeader from "./components/ScreenHeader";
 import NavigationButton from "./components/NavigationButton";
 import ScreenLayout from "../../components/ScreenLayout";
+import { useAppTheme } from "../../theme/useAppTheme";
+import { useMemo } from "react";
+import { Theme } from "../../constants/theme";
 
 const SettingsScreen = () => {
   const navigation = useNavigation<NavProp>();
@@ -14,6 +17,8 @@ const SettingsScreen = () => {
     "Appearance",
     "Language",
   ];
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const handleNavigation = (screenName: keyof SettingsParamList) => {
     navigation.navigate("Settings", { screen: screenName });
   };
@@ -38,9 +43,13 @@ const SettingsScreen = () => {
         )}
         ListFooterComponent={
           <View style={styles.footer}>
-            <Text onPress={handlePrivacy}>Privacy Policy</Text>
-            <Text> - </Text>
-            <Text onPress={handleAbout}>About</Text>
+            <Text onPress={handlePrivacy} style={styles.footerText}>
+              Privacy Policy
+            </Text>
+            <Text style={styles.footerText}> - </Text>
+            <Text onPress={handleAbout} style={styles.footerText}>
+              About
+            </Text>
           </View>
         }
       />
@@ -48,16 +57,20 @@ const SettingsScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  listContent: {
-    paddingHorizontal: 24,
-    gap: 8,
-  },
-  footer: {
-    justifyContent: "center",
-    alignItems: "center",
-    flexDirection: "row",
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    listContent: {
+      paddingHorizontal: 24,
+      gap: 8,
+    },
+    footer: {
+      justifyContent: "center",
+      alignItems: "center",
+      flexDirection: "row",
+    },
+    footerText: {
+      color: theme.textPrimary,
+    },
+  });
 
 export default SettingsScreen;

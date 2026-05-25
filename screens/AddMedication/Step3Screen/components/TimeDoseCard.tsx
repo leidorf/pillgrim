@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Pressable,
   StyleSheet,
@@ -9,11 +9,12 @@ import {
 } from "react-native";
 import { Text } from "../../../../components/Text";
 
-import { Colors } from "../../../../constants/theme";
 
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import CheckIcon from "../../../../assets/icons/check.svg";
 import TrashIcon from "../../../../assets/icons/trash.svg";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Unit = { value: string; label: string };
 
@@ -49,6 +50,8 @@ export const TimeDoseCard = ({
   onUnitChange,
   formattedTime,
 }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const hasInvalidAmount = amount.length > 0 && !isValidAmount(amount);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
 
@@ -58,7 +61,7 @@ export const TimeDoseCard = ({
       <View style={styles.header}>
         {canRemove && (
           <Pressable onPress={onRemove} style={styles.removeButton}>
-            <TrashIcon width={18} height={18} stroke={Colors.error} />
+            <TrashIcon width={18} height={18} stroke={theme.error} />
           </Pressable>
         )}
       </View>
@@ -78,7 +81,7 @@ export const TimeDoseCard = ({
           value={amount}
           onChangeText={onAmountChange}
           placeholder="Enter amount"
-          placeholderTextColor={Colors.textSecondary}
+          placeholderTextColor={theme.textSecondary}
           keyboardType="decimal-pad"
           maxLength={6}
         />
@@ -88,7 +91,7 @@ export const TimeDoseCard = ({
           onPress={() => setUnitDropdownOpen(true)}
         >
           <Text style={styles.unitLabel}>{unitLabel || "Select unit"}</Text>
-          <ArrowDownIcon width={14} height={14} stroke={Colors.textSecondary} />
+          <ArrowDownIcon width={14} height={14} stroke={theme.textSecondary} />
         </Pressable>
       </View>
 
@@ -144,7 +147,7 @@ export const TimeDoseCard = ({
                       <CheckIcon
                         width={16}
                         height={16}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
                       />
                     )}
                   </Pressable>
@@ -158,14 +161,14 @@ export const TimeDoseCard = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     borderRadius: 16,
     padding: 16,
     gap: 8,
     borderWidth: 1,
-    borderColor: Colors.textSecondary + "20",
+    borderColor: theme.textSecondary + "20",
   },
   header: {
     flexDirection: "row",
@@ -174,34 +177,34 @@ const styles = StyleSheet.create({
   },
   removeButton: { padding: 4 },
   timeButton: {
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 8,
     padding: 16,
     alignItems: "center",
     gap: 4,
     borderWidth: 1,
-    borderColor: Colors.textSecondary + "30",
+    borderColor: theme.textSecondary + "30",
   },
-  timeText: { color: Colors.textPrimary, fontWeight: "700", fontSize: 30 },
-  timeHint: { color: Colors.textSecondary, fontSize: 12 },
+  timeText: { color: theme.textPrimary, fontWeight: "700", fontSize: 30 },
+  timeHint: { color: theme.textSecondary, fontSize: 12 },
   amountRow: {
     flexDirection: "row",
     alignItems: "center",
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 8,
     paddingHorizontal: 16,
     paddingVertical: 8,
     gap: 12,
     borderWidth: 1,
-    borderColor: Colors.textSecondary + "30",
+    borderColor: theme.textSecondary + "30",
   },
   amountRowError: {
-    borderColor: Colors.error,
+    borderColor: theme.error,
     borderWidth: 2,
   },
   amountInput: {
     flex: 1,
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontWeight: "600",
     fontSize: 14,
   },
@@ -212,11 +215,11 @@ const styles = StyleSheet.create({
     paddingVertical: 4,
     paddingLeft: 8,
     borderLeftWidth: 1,
-    borderLeftColor: Colors.textSecondary + "30",
+    borderLeftColor: theme.textSecondary + "30",
   },
-  unitLabel: { color: Colors.textPrimary, fontWeight: "600", fontSize: 14 },
+  unitLabel: { color: theme.textPrimary, fontWeight: "600", fontSize: 14 },
   errorText: {
-    color: Colors.error,
+    color: theme.error,
     marginTop: 4,
     fontSize: 12,
   },
@@ -228,7 +231,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   dropdownCard: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 280,
@@ -244,7 +247,7 @@ const styles = StyleSheet.create({
   },
   dropdownTitle: {
     fontWeight: "700",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     paddingHorizontal: 4,
     fontSize: 18,
   },
@@ -258,19 +261,19 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   dropdownItemActive: {
-    backgroundColor: Colors.primary + "10",
+    backgroundColor: theme.primary + "10",
   },
   dropdownItemText: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontSize: 16,
   },
   dropdownItemTextActive: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "600",
   },
   separator: {
     height: 1,
-    backgroundColor: Colors.textSecondary + "20",
+    backgroundColor: theme.textSecondary + "20",
     marginVertical: 10,
   },
 });

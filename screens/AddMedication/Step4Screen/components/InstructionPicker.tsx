@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useMemo, useEffect, useRef, useState } from "react";
 import { Animated, FlatList, Modal, Pressable, StyleSheet, TextInput, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
 
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import CheckIcon from "../../../../assets/icons/check.svg";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 const INSTRUCTION_OPTIONS = [
   { id: "before_meal", label: "Before meal" },
@@ -51,6 +52,9 @@ export const InstructionPicker = ({
     setIsOpen(false);
   };
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <>
       {/* --------------------------------- Trigger -------------------------------- */}
@@ -58,7 +62,7 @@ export const InstructionPicker = ({
         <Text style={[styles.triggerText, !selected && styles.placeholder]}>
           {triggerLabel}
         </Text>
-        <ArrowDownIcon width={20} height={20} stroke={Colors.textSecondary} />
+        <ArrowDownIcon width={20} height={20} stroke={theme.textSecondary} />
       </Pressable>
 
       {/* ---------------------------- Custom Text Input --------------------------- */}
@@ -68,7 +72,7 @@ export const InstructionPicker = ({
           value={customText}
           onChangeText={onCustomTextChange}
           placeholder="Enter specific instructions..."
-          placeholderTextColor={Colors.textSecondary}
+          placeholderTextColor={theme.textSecondary}
           multiline
           maxLength={200}
         />
@@ -130,7 +134,7 @@ export const InstructionPicker = ({
                       <CheckIcon
                         width={16}
                         height={16}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
                       />
                     )}
                   </Pressable>
@@ -144,9 +148,9 @@ export const InstructionPicker = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   trigger: {
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 14,
@@ -154,15 +158,15 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     alignItems: "center",
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: theme.border,
   },
-  triggerText: { color: Colors.textPrimary, fontSize: 15, fontWeight: "500" },
-  placeholder: { color: Colors.textSecondary },
+  triggerText: { color: theme.textPrimary, fontSize: 15, fontWeight: "500" },
+  placeholder: { color: theme.textSecondary },
   customInput: {
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 12,
     padding: 14,
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontSize: 15,
     marginTop: 12,
     minHeight: 80,
@@ -174,7 +178,7 @@ const styles = StyleSheet.create({
     justifyContent: "flex-end",
   },
   menu: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderTopLeftRadius: 24,
     borderTopRightRadius: 24,
     maxHeight: "70%",
@@ -189,10 +193,10 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingBottom: 15,
     borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "20",
+    borderBottomColor: theme.textSecondary + "20",
   },
-  menuTitle: { color: Colors.textPrimary, fontSize: 18, fontWeight: "600" },
-  doneButton: { color: Colors.primaryDark, fontSize: 16, fontWeight: "600" },
+  menuTitle: { color: theme.textPrimary, fontSize: 18, fontWeight: "600" },
+  doneButton: { color: theme.primaryDark, fontSize: 16, fontWeight: "600" },
   menuItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -200,7 +204,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
   },
-  menuItemActive: { backgroundColor: Colors.primary + "10" },
-  menuItemText: { color: Colors.textPrimary, fontSize: 16 },
-  menuItemTextActive: { color: Colors.primaryDark, fontWeight: "600" },
+  menuItemActive: { backgroundColor: theme.primary + "10" },
+  menuItemText: { color: theme.textPrimary, fontSize: 16 },
+  menuItemTextActive: { color: theme.primaryDark, fontWeight: "600" },
 });

@@ -1,10 +1,11 @@
-import { useEffect } from "react";
+import { useMemo, useEffect } from "react";
 import { StyleSheet, Switch, View } from "react-native";
 import { Text } from "../../../../components/Text";
 import BellIcon from "../../../../assets/icons/bell.svg";
 import EyeOffIcon from "../../../../assets/icons/eye-off.svg";
 import PackageIcon from "../../../../assets/icons/package.svg";
-import { Colors } from "../../../../constants/theme";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 export type NotificationSettings = {
   enabled: boolean;
@@ -34,11 +35,14 @@ export const NotificationSettingsPanel = ({
     }
   }, [settings.enabled]);
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.container}>
       {/* ---------------------------- Enable Reminders ---------------------------- */}
       <SettingRow
-        icon={<BellIcon width={20} height={20} stroke={Colors.textPrimary} />}
+        icon={<BellIcon width={20} height={20} stroke={theme.textPrimary} />}
         title="Enable reminders"
         description="Get notified when it's time"
         value={settings.enabled}
@@ -53,7 +57,7 @@ export const NotificationSettingsPanel = ({
             width={20}
             height={20}
             stroke={
-              settings.enabled ? Colors.textPrimary : Colors.textSecondary
+              settings.enabled ? theme.textPrimary : theme.textSecondary
             }
           />
         }
@@ -71,7 +75,7 @@ export const NotificationSettingsPanel = ({
           <PackageIcon
             width={20}
             height={20}
-            stroke={hasStock ? Colors.textPrimary : Colors.textSecondary}
+            stroke={hasStock ? theme.textPrimary : theme.textSecondary}
           />
         }
         title="Low stock alert"
@@ -104,36 +108,40 @@ const SettingRow = ({
   onToggle,
   disabled = false,
   withDivider = false,
-}: SettingRowProps) => (
-  <View
-    style={[
-      styles.row,
-      withDivider && styles.rowDivider,
-      disabled && styles.rowDisabled,
-    ]}
-  >
-    <View style={styles.rowInfo}>
-      {icon}
-      <View>
-        <Text style={[styles.rowTitle, disabled && styles.textDisabled]}>
-          {title}
-        </Text>
-        <Text style={[styles.rowDescription, disabled && styles.textDisabled]}>
-          {description}
-        </Text>
+}: SettingRowProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+  return (
+    <View
+      style={[
+        styles.row,
+        withDivider && styles.rowDivider,
+        disabled && styles.rowDisabled,
+      ]}
+    >
+      <View style={styles.rowInfo}>
+        {icon}
+        <View>
+          <Text style={[styles.rowTitle, disabled && styles.textDisabled]}>
+            {title}
+          </Text>
+          <Text style={[styles.rowDescription, disabled && styles.textDisabled]}>
+            {description}
+          </Text>
+        </View>
       </View>
+      <Switch
+        value={value}
+        onValueChange={onToggle}
+        disabled={disabled}
+        trackColor={{ false: theme.textSecondary + "40", true: theme.primary }}
+        thumbColor={value ? "#fff" : "#f4f3f4"}
+      />
     </View>
-    <Switch
-      value={value}
-      onValueChange={onToggle}
-      disabled={disabled}
-      trackColor={{ false: Colors.textSecondary + "40", true: Colors.primary }}
-      thumbColor={value ? "#fff" : "#f4f3f4"}
-    />
-  </View>
-);
+  );
+};
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: { gap: 4 },
   row: {
     flexDirection: "row",
@@ -143,7 +151,7 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "15",
+    borderBottomColor: theme.textSecondary + "15",
   },
   rowDisabled: { opacity: 0.5 },
   rowInfo: {
@@ -152,7 +160,7 @@ const styles = StyleSheet.create({
     gap: 12,
     flex: 1,
   },
-  rowTitle: { color: Colors.textPrimary, fontSize: 15, fontWeight: "600" },
-  rowDescription: { color: Colors.textSecondary, fontSize: 13, marginTop: 2 },
-  textDisabled: { color: Colors.textSecondary },
+  rowTitle: { color: theme.textPrimary, fontSize: 15, fontWeight: "600" },
+  rowDescription: { color: theme.textSecondary, fontSize: 13, marginTop: 2 },
+  textDisabled: { color: theme.textSecondary },
 });

@@ -1,12 +1,17 @@
+import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
-import { Colors } from "../../../constants/theme";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type DayHeaderProps = {
   selectedDate: string;
 };
 
 const SelectedDayHeader = ({ selectedDate }: DayHeaderProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.detailHeader}>
       <Text style={styles.detailDate}>{selectedDate}</Text>
@@ -14,7 +19,7 @@ const SelectedDayHeader = ({ selectedDate }: DayHeaderProps) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   detailHeader: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -24,7 +29,7 @@ const styles = StyleSheet.create({
   detailDate: {
     fontSize: 18,
     fontWeight: "600",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     textTransform: "capitalize",
   },
 });

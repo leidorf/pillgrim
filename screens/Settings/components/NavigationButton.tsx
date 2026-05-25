@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
 import ArrowRight from "../../../assets/icons/chevron-right.svg";
-import { Colors } from "../../../constants/theme";
+import { useAppTheme } from "../../../theme/useAppTheme";
+import { Theme } from "../../../constants/theme";
 
 type ButtonProps = {
   icon?: React.ReactNode;
@@ -11,6 +13,9 @@ type ButtonProps = {
 };
 
 const NavigationButton = ({ icon, title, subtext, onPress }: ButtonProps) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <Pressable onPress={onPress} style={styles.button}>
       <View style={styles.leftContainer}>
@@ -20,19 +25,19 @@ const NavigationButton = ({ icon, title, subtext, onPress }: ButtonProps) => {
           {subtext && <Text style={styles.subtext}>{subtext}</Text>}
         </View>
       </View>
-      <ArrowRight height={24} width={24} stroke={Colors.textPrimary} />
+      <ArrowRight height={24} width={24} stroke={theme.textPrimary} />
     </Pressable>
   );
 };
 
 export default NavigationButton;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   button: {
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     padding: 16,
     borderRadius: 12,
   },
@@ -49,10 +54,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 18,
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
   },
   subtext: {
     fontSize: 16,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
   },
 });

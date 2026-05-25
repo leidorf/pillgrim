@@ -1,11 +1,15 @@
+import { useMemo } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { Pressable, StyleSheet } from "react-native";
 import { Text } from "./Text";
 import { NavProp } from "../types/navigation";
-import { Colors } from "../constants/theme";
 import CirclePlusIcon from "../assets/icons//circle-plus.svg";
+import { Theme } from "../constants/theme";
+import { useAppTheme } from "../theme/useAppTheme";
 
 const AddMedicationButton = () => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
   return (
     <Pressable
@@ -13,12 +17,12 @@ const AddMedicationButton = () => {
       onPress={() => navigation.navigate("AddMedication", { screen: "Step1" })}
     >
       <Text style={styles.text}>Add medication</Text>
-      <CirclePlusIcon height={24} width={24} color={Colors.surface} />
+      <CirclePlusIcon height={24} width={24} color={theme.surface} />
     </Pressable>
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     position: "absolute",
     bottom: 24,
@@ -28,11 +32,11 @@ const styles = StyleSheet.create({
     height: 48,
     paddingHorizontal: 16,
     borderRadius: 24,
-    backgroundColor: Colors.primary,
+    backgroundColor: theme.primary,
     gap: 8,
   },
   text: {
-    color: Colors.surface,
+    color: theme.surface,
   },
 });
 

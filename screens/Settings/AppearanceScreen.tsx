@@ -1,14 +1,15 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View, ScrollView, Modal } from "react-native";
 import { Text } from "../../components/Text";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
-import { Colors } from "../../constants/theme";
+import { Theme, ThemeMode } from "../../constants/theme";
 import { useSettingsStore } from "../../store/settingsStore";
 import { WEEKDAY_LABELS } from "../../constants/schedules";
 import CheckIcon from "../../assets/icons/check.svg";
 import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
 import { FontScale } from "../../theme/typography";
+import { useAppTheme } from "../../theme/useAppTheme";
 
 const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
   { value: "small", label: "Small" },
@@ -17,20 +18,29 @@ const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
   { value: "xlarge", label: "Extra Large" },
 ];
 
+const THEME_OPTIONS: { value: ThemeMode; label: string }[] = [
+  { value: "system", label: "System" },
+  { value: "light", label: "Light" },
+  { value: "dark", label: "Dark" },
+];
+
 const AppearanceScreen = () => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const { timeFormat, setTimeFormat } = useSettingsStore();
   const { weekStartsOn, setWeekStartsOn } = useSettingsStore();
   const { fontScale, setFontScale } = useSettingsStore();
+  const { themeMode, setThemeMode } = useSettingsStore();
   const [weekDropdownOpen, setWeekDropdownOpen] = useState(false);
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
+  const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
   const selectedWeekLabel = WEEKDAY_LABELS.find(
     (d) => d.value === weekStartsOn,
   )?.label;
 
-  const selectedFontLabel = FONT_SCALE_OPTIONS.find(
-    (f) => f.value === fontScale,
-  )?.label || "Normal";
+  const selectedFontLabel =
+    FONT_SCALE_OPTIONS.find((f) => f.value === fontScale)?.label || "Normal";
 
   return (
     <ScreenLayout>
@@ -80,6 +90,30 @@ const AppearanceScreen = () => {
           </View>
         </View>
 
+        {/* --------------------------------- Theme ---------------------------------- */}
+        <View style={styles.settingRow}>
+          <View style={styles.settingInfo}>
+            <Text style={styles.settingLabel}>Theme</Text>
+            <Text style={styles.settingDescription}>
+              Choose between light, dark, or system default
+            </Text>
+          </View>
+          <Pressable
+            style={styles.dropdownTrigger}
+            onPress={() => setThemeDropdownOpen(true)}
+          >
+            <Text style={styles.dropdownTriggerText}>
+              {THEME_OPTIONS.find((o) => o.value === themeMode)?.label ||
+                "System"}
+            </Text>
+            <ArrowDownIcon
+              width={16}
+              height={16}
+              stroke={theme.textSecondary}
+            />
+          </Pressable>
+        </View>
+
         {/* ----------------------------- Week Starts On ----------------------------- */}
         <View style={styles.settingRow}>
           <View style={styles.settingInfo}>
@@ -96,7 +130,7 @@ const AppearanceScreen = () => {
             <ArrowDownIcon
               width={16}
               height={16}
-              stroke={Colors.textSecondary}
+              stroke={theme.textSecondary}
             />
           </Pressable>
         </View>
@@ -117,7 +151,7 @@ const AppearanceScreen = () => {
             <ArrowDownIcon
               width={16}
               height={16}
-              stroke={Colors.textSecondary}
+              stroke={theme.textSecondary}
             />
           </Pressable>
         </View>
@@ -166,7 +200,7 @@ const AppearanceScreen = () => {
                       <CheckIcon
                         width={16}
                         height={16}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
                       />
                     )}
                   </Pressable>
@@ -220,7 +254,61 @@ const AppearanceScreen = () => {
                       <CheckIcon
                         width={16}
                         height={16}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
+                      />
+                    )}
+                  </Pressable>
+                );
+              })}
+            </ScrollView>
+          </View>
+        </Pressable>
+      </Modal>
+
+      {/* ----------------------------- Theme Dropdown ------------------------------ */}
+      <Modal
+        visible={themeDropdownOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setThemeDropdownOpen(false)}
+      >
+        <Pressable
+          style={styles.dropdownOverlay}
+          onPress={() => setThemeDropdownOpen(false)}
+        >
+          <View style={styles.dropdownCard}>
+            <Text style={styles.dropdownTitle}>Theme</Text>
+            <ScrollView
+              showsVerticalScrollIndicator={false}
+              contentContainerStyle={styles.dropdownContent}
+            >
+              {THEME_OPTIONS.map((opt) => {
+                const isActive = themeMode === opt.value;
+                return (
+                  <Pressable
+                    key={opt.value}
+                    style={[
+                      styles.dropdownItem,
+                      isActive && styles.dropdownItemActive,
+                    ]}
+                    onPress={() => {
+                      setThemeMode(opt.value);
+                      setThemeDropdownOpen(false);
+                    }}
+                  >
+                    <Text
+                      style={[
+                        styles.dropdownItemText,
+                        isActive && styles.dropdownItemTextActive,
+                      ]}
+                    >
+                      {opt.label}
+                    </Text>
+                    {isActive && (
+                      <CheckIcon
+                        width={16}
+                        height={16}
+                        stroke={theme.primary}
                       />
                     )}
                   </Pressable>
@@ -234,94 +322,99 @@ const AppearanceScreen = () => {
   );
 };
 
-const styles = StyleSheet.create({
-  container: { paddingHorizontal: 16 },
-  settingRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "15",
-  },
-  settingInfo: { flex: 1, marginRight: 16 },
-  settingLabel: { color: Colors.textPrimary, fontSize: 15, fontWeight: "600" },
-  settingDescription: {
-    color: Colors.textSecondary,
-    fontSize: 13,
-    marginTop: 2,
-  },
-  segmentedControl: {
-    flexDirection: "row",
-    backgroundColor: Colors.surface,
-    borderRadius: 8,
-    padding: 2,
-  },
-  segment: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 6 },
-  segmentActive: { backgroundColor: Colors.primaryDark },
-  segmentText: { color: Colors.textSecondary, fontSize: 14, fontWeight: "600" },
-  segmentTextActive: { color: Colors.surfaceElevated },
-  dropdownTrigger: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 8,
-    backgroundColor: Colors.surface,
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 8,
-    minWidth: 120,
-    justifyContent: "space-between",
-  },
-  dropdownTriggerText: {
-    color: Colors.textPrimary,
-    fontSize: 14,
-    fontWeight: "500",
-  },
-  dropdownOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  dropdownCard: {
-    backgroundColor: Colors.surfaceElevated,
-    borderRadius: 20,
-    width: "100%",
-    maxWidth: 280,
-    maxHeight: 400,
-    paddingTop: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  dropdownTitle: {
-    fontSize: 18,
-    fontWeight: "700",
-    color: Colors.textPrimary,
-    marginBottom: 12,
-    paddingHorizontal: 4,
-  },
-  dropdownContent: { gap: 2 },
-  dropdownItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  dropdownItemActive: { backgroundColor: Colors.primary + "10" },
-  dropdownItemText: {
-    fontSize: 16,
-    color: Colors.textPrimary,
-    fontWeight: "500",
-  },
-  dropdownItemTextActive: { color: Colors.primaryDark, fontWeight: "600" },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: { paddingHorizontal: 16 },
+    settingRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 16,
+      borderBottomWidth: 1,
+      borderBottomColor: theme.textSecondary + "15",
+    },
+    settingInfo: { flex: 1, marginRight: 16 },
+    settingLabel: { color: theme.textPrimary, fontSize: 15, fontWeight: "600" },
+    settingDescription: {
+      color: theme.textSecondary,
+      fontSize: 13,
+      marginTop: 2,
+    },
+    segmentedControl: {
+      flexDirection: "row",
+      backgroundColor: theme.surface,
+      borderRadius: 8,
+      padding: 2,
+    },
+    segment: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 6 },
+    segmentActive: { backgroundColor: theme.primaryDark },
+    segmentText: {
+      color: theme.textSecondary,
+      fontSize: 14,
+      fontWeight: "600",
+    },
+    segmentTextActive: { color: theme.surfaceElevated },
+    dropdownTrigger: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 8,
+      backgroundColor: theme.surface,
+      paddingHorizontal: 14,
+      paddingVertical: 8,
+      borderRadius: 8,
+      minWidth: 120,
+      justifyContent: "space-between",
+    },
+    dropdownTriggerText: {
+      color: theme.textPrimary,
+      fontSize: 14,
+      fontWeight: "500",
+    },
+    dropdownOverlay: {
+      flex: 1,
+      backgroundColor: "rgba(0, 0, 0, 0.4)",
+      justifyContent: "center",
+      alignItems: "center",
+      padding: 24,
+    },
+    dropdownCard: {
+      backgroundColor: theme.surfaceElevated,
+      borderRadius: 20,
+      width: "100%",
+      maxWidth: 280,
+      maxHeight: 400,
+      paddingTop: 20,
+      paddingHorizontal: 16,
+      paddingBottom: 16,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 4 },
+      shadowOpacity: 0.15,
+      shadowRadius: 12,
+      elevation: 8,
+    },
+    dropdownTitle: {
+      fontSize: 18,
+      fontWeight: "700",
+      color: theme.textPrimary,
+      marginBottom: 12,
+      paddingHorizontal: 4,
+    },
+    dropdownContent: { gap: 2 },
+    dropdownItem: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingVertical: 14,
+      paddingHorizontal: 12,
+      borderRadius: 10,
+    },
+    dropdownItemActive: { backgroundColor: theme.primary + "10" },
+    dropdownItemText: {
+      fontSize: 16,
+      color: theme.textPrimary,
+      fontWeight: "500",
+    },
+    dropdownItemTextActive: { color: theme.primaryDark, fontWeight: "600" },
+  });
 
 export default AppearanceScreen;

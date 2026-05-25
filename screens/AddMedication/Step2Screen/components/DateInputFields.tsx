@@ -8,11 +8,12 @@ import {
   View,
 } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
 import { MONTHS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import CheckIcon from "../../../../assets/icons/check.svg";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   value: Date | null;
@@ -31,6 +32,8 @@ function getMaxDays(month: number, year: number): number {
 }
 
 const DateInputFields = ({ value, onChange, label }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -163,7 +166,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
             value={day}
             onChangeText={handleDayChange}
             placeholder="DD"
-            placeholderTextColor={Colors.textMuted}
+            placeholderTextColor={theme.textMuted}
             keyboardType="number-pad"
             maxLength={2}
             selectTextOnFocus
@@ -188,7 +191,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
             <ArrowDownIcon
               height={14}
               width={14}
-              stroke={Colors.textSecondary}
+              stroke={theme.textSecondary}
             />
           </Pressable>
           <Text style={styles.fieldLabel}>Month</Text>
@@ -200,7 +203,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
             value={year}
             onChangeText={handleYearChange}
             placeholder="YYYY"
-            placeholderTextColor={Colors.textMuted}
+            placeholderTextColor={theme.textMuted}
             keyboardType="number-pad"
             maxLength={4}
             selectTextOnFocus
@@ -251,7 +254,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
                       <CheckIcon
                         width={16}
                         height={16}
-                        stroke={Colors.primary}
+                        stroke={theme.primary}
                       />
                     )}
                   </Pressable>
@@ -267,7 +270,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
 
 const FIELD_HEIGHT = 52;
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   row: {
     flexDirection: "row",
     gap: 12,
@@ -282,8 +285,8 @@ const styles = StyleSheet.create({
     width: 64,
     height: FIELD_HEIGHT,
     borderRadius: 12,
-    backgroundColor: Colors.surfaceElevated,
-    color: Colors.textPrimary,
+    backgroundColor: theme.surfaceElevated,
+    color: theme.textPrimary,
     fontWeight: "700",
     fontSize: 20,
     textAlign: "center",
@@ -294,14 +297,14 @@ const styles = StyleSheet.create({
   },
   fieldLabel: {
     fontSize: 12,
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontWeight: "500",
   },
   monthSelector: {
     width: 132,
     height: FIELD_HEIGHT,
     borderRadius: 12,
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
@@ -310,13 +313,13 @@ const styles = StyleSheet.create({
   },
   monthSelectorText: {
     flex: 1,
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontWeight: "600",
     fontSize: 16,
     textAlign: "center",
   },
   monthSelectorPlaceholder: {
-    color: Colors.textMuted,
+    color: theme.textMuted,
     fontWeight: "500",
     fontSize: 14,
   },
@@ -328,7 +331,7 @@ const styles = StyleSheet.create({
     padding: 24,
   },
   dropdownCard: {
-    backgroundColor: Colors.surfaceElevated,
+    backgroundColor: theme.surfaceElevated,
     borderRadius: 20,
     width: "100%",
     maxWidth: 280,
@@ -344,13 +347,13 @@ const styles = StyleSheet.create({
   },
   dropdownTitle: {
     fontWeight: "700",
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     paddingHorizontal: 4,
     fontSize: 18,
   },
   separator: {
     height: 1,
-    backgroundColor: Colors.textSecondary + "20",
+    backgroundColor: theme.textSecondary + "20",
     marginVertical: 10,
   },
   dropdownContent: { gap: 2 },
@@ -363,14 +366,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
   },
   dropdownItemActive: {
-    backgroundColor: Colors.primary + "10",
+    backgroundColor: theme.primary + "10",
   },
   dropdownItemText: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontSize: 16,
   },
   dropdownItemTextActive: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "600",
   },
 });

@@ -1,7 +1,8 @@
-import { useRef } from "react";
+import { useMemo, useRef } from "react";
 import { Pressable, StyleSheet, TextInput } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   value: string;
@@ -18,6 +19,9 @@ export const StockInput = ({ value, onChange }: Props) => {
   const count = parseInt(value || "0");
   const unitLabel = count === 1 ? "unit left" : "units left";
 
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <Pressable
       style={styles.container}
@@ -30,7 +34,7 @@ export const StockInput = ({ value, onChange }: Props) => {
         onChangeText={handleChange}
         placeholder="0"
         keyboardType="number-pad"
-        placeholderTextColor={Colors.textSecondary}
+        placeholderTextColor={theme.textSecondary}
         maxLength={4}
       />
       <Text style={styles.label}>{unitLabel}</Text>
@@ -38,26 +42,26 @@ export const StockInput = ({ value, onChange }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   container: {
     flexDirection: "row",
     alignItems: "center",
     gap: 12,
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderWidth: 1,
-    borderColor: Colors.border,
+    borderColor: theme.border,
     borderRadius: 12,
     padding: 16,
   },
   input: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     fontSize: 28,
     fontWeight: "700",
     minWidth: 60,
     textAlign: "center",
   },
   label: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     fontSize: 15,
     fontWeight: "500",
     flex: 1,

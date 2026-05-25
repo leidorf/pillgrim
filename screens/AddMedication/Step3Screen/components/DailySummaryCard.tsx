@@ -1,6 +1,8 @@
+import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type DoseEntry = {
   id: string;
@@ -15,6 +17,9 @@ type Props = {
 };
 
 export const DailySummaryCard = ({ doses, unitLabel, formatTime }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View style={styles.card}>
       <Text style={styles.heading}>Daily Schedule</Text>
@@ -33,17 +38,17 @@ export const DailySummaryCard = ({ doses, unitLabel, formatTime }: Props) => {
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   card: {
-    backgroundColor: Colors.background,
+    backgroundColor: theme.background,
     borderRadius: 16,
     paddingHorizontal: 16,
     paddingVertical: 12,
     borderWidth: 1,
-    borderColor: Colors.primary + "40",
+    borderColor: theme.primary + "40",
   },
   heading: {
-    color: Colors.textSecondary,
+    color: theme.textSecondary,
     marginBottom: 12,
     fontSize: 14,
   },
@@ -55,8 +60,8 @@ const styles = StyleSheet.create({
   },
   rowDivider: {
     borderBottomWidth: 1,
-    borderBottomColor: Colors.textSecondary + "20",
+    borderBottomColor: theme.textSecondary + "20",
   },
-  time: { color: Colors.textPrimary, fontWeight: "600", fontSize: 16 },
-  dose: { color: Colors.primaryDark, fontSize: 14 },
+  time: { color: theme.textPrimary, fontWeight: "600", fontSize: 16 },
+  dose: { color: theme.primaryDark, fontSize: 14 },
 });

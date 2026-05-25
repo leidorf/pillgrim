@@ -1,7 +1,9 @@
+import { useMemo } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
-import { Colors } from "../../../../constants/theme";
 import { ScheduleType } from "../../../../types/schedule";
+import { useAppTheme } from "../../../../theme/useAppTheme";
+import { Theme } from "../../../../constants/theme";
 
 type Props = {
   id: ScheduleType;
@@ -18,6 +20,9 @@ export const ScheduleButton = ({
   onPress,
   children,
 }: Props) => {
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   return (
     <View>
       <Pressable
@@ -34,27 +39,27 @@ export const ScheduleButton = ({
   );
 };
 
-const styles = StyleSheet.create({
+const createStyles = (theme: Theme) => StyleSheet.create({
   button: {
     width: "100%",
     borderRadius: 16,
     padding: 16,
-    backgroundColor: Colors.surface,
+    backgroundColor: theme.surface,
     borderWidth: 1,
     borderColor: "transparent",
   },
   buttonSelected: {
-    backgroundColor: Colors.primary + "15",
-    borderColor: Colors.primary,
+    backgroundColor: theme.primary + "15",
+    borderColor: theme.primary,
   },
   label: {
-    color: Colors.textPrimary,
+    color: theme.textPrimary,
     textAlign: "center",
     fontWeight: "600",
     fontSize: 16,
   },
   labelSelected: {
-    color: Colors.primaryDark,
+    color: theme.primaryDark,
     fontWeight: "600",
   },
 });
