@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Pressable, StyleSheet } from "react-native";
 import { Text } from "../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { Theme } from "../../../constants/theme";
 
@@ -10,6 +11,7 @@ type NextButtonProps = {
 };
 
 const NextButton = ({ disabled = false, onPress }: NextButtonProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -20,7 +22,7 @@ const NextButton = ({ disabled = false, onPress }: NextButtonProps) => {
       onPress={onPress}
     >
       <Text style={[styles.text, disabled && styles.disabledText]}>
-        Next
+        {t("addMedication.next")}
       </Text>
     </Pressable>
   );

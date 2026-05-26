@@ -1,10 +1,17 @@
-import { View, Pressable, StyleSheet, FlatList, useWindowDimensions } from "react-native";
+import {
+  View,
+  Pressable,
+  StyleSheet,
+  FlatList,
+  useWindowDimensions,
+} from "react-native";
 import { Text } from "../../../components/Text";
 import { useRef, useState, useMemo, useCallback } from "react";
 import { useLogStore } from "../../../store/logsStore";
 import { useSettingsStore } from "../../../store/settingsStore";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { Theme } from "../../../constants/theme";
+import { useTranslation } from "react-i18next";
 
 type Props = {
   selectedDate: Date;
@@ -69,22 +76,30 @@ const MonthGrid = ({
   );
   const logs = useLogStore((state) => state.logs);
 
-  const getDayStats = useCallback((dVal: Date) => {
-    const y = dVal.getFullYear();
-    const m = String(dVal.getMonth() + 1).padStart(2, "0");
-    const d = String(dVal.getDate()).padStart(2, "0");
-    const dateStr = `${y}-${m}-${d}`;
+  const getDayStats = useCallback(
+    (dVal: Date) => {
+      const y = dVal.getFullYear();
+      const m = String(dVal.getMonth() + 1).padStart(2, "0");
+      const d = String(dVal.getDate()).padStart(2, "0");
+      const dateStr = `${y}-${m}-${d}`;
 
-    const dayLogs = logs.filter((log) => log.scheduledDate === dateStr);
-    const hasLogs = dayLogs.length > 0;
-    
-    const takenMeds = dayLogs.filter((log) => log.takenAt && !log.skipped).length;
-    const missedMeds = dayLogs.filter((log) => !log.takenAt && !log.skipped).length;
-    const actionable = takenMeds + missedMeds;
-    const adherenceRate = actionable > 0 ? Math.round((takenMeds / actionable) * 100) : 100;
+      const dayLogs = logs.filter((log) => log.scheduledDate === dateStr);
+      const hasLogs = dayLogs.length > 0;
 
-    return { hasLogs, adherenceRate };
-  }, [logs]);
+      const takenMeds = dayLogs.filter(
+        (log) => log.takenAt && !log.skipped,
+      ).length;
+      const missedMeds = dayLogs.filter(
+        (log) => !log.takenAt && !log.skipped,
+      ).length;
+      const actionable = takenMeds + missedMeds;
+      const adherenceRate =
+        actionable > 0 ? Math.round((takenMeds / actionable) * 100) : 100;
+
+      return { hasLogs, adherenceRate };
+    },
+    [logs],
+  );
 
   const getAdherenceColor = (rate: number) => {
     if (rate === 100) return theme.success;
@@ -139,8 +154,19 @@ const MonthGrid = ({
     [today, selectedDate, currentMonth, getDayStats, onSelectDate, logs],
   );
 
+  const { t, i18n } = useTranslation();
+  const locale = i18n.language?.split("-")[0] ?? "en";
+
   const DAYS = useMemo(() => {
-    const allDays = ["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"];
+    const allDays = [
+      t("weekdays.sunShort"),
+      t("weekdays.monShort"),
+      t("weekdays.tueShort"),
+      t("weekdays.wedShort"),
+      t("weekdays.thuShort"),
+      t("weekdays.friShort"),
+      t("weekdays.satShort"),
+    ];
     return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
   }, [weekStartsOn]);
 
@@ -172,6 +198,8 @@ const MonthlyCalendar = ({
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const flatListRef = useRef<FlatList>(null);
   const [currentIndex, setCurrentIndex] = useState(INITIAL_INDEX);
+  const { i18n } = useTranslation();
+  const locale = i18n.language?.split("-")[0] ?? "en";
 
   const months = useMemo(() => {
     const today = new Date();
@@ -194,7 +222,7 @@ const MonthlyCalendar = ({
       if (onMonthChange && months[index]) {
         const monthData = months[index];
         const firstDay = new Date(monthData.year, monthData.month, 1);
-        const label = firstDay.toLocaleDateString("en-US", {
+        const label = firstDay.toLocaleDateString(locale, {
           month: "long",
           year: "numeric",
         });
@@ -244,73 +272,74 @@ const MonthlyCalendar = ({
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  monthContainer: {
-    paddingHorizontal: 16,
-  },
-  weekHeader: {
-    flexDirection: "row",
-    marginBottom: 8,
-  },
-  weekDayText: {
-    flex: 1,
-    textAlign: "center",
-    fontSize: 12,
-    fontWeight: "500",
-    color: theme.textSecondary,
-  },
-  grid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-  },
-  dayCell: {
-    maxWidth: `${100 / 7}%`,
-    aspectRatio: 1,
-    padding: 2,
-  },
-  dayContent: {
-    flex: 1,
-    width: "100%",
-    aspectRatio: 1,
-    padding: 2,
-    alignItems: "center",
-    justifyContent: "center",
-    borderRadius: 64,
-    position: "relative",
-  },
-  dayToday: {
-    borderWidth: 2,
-    borderColor: theme.primary,
-  },
-  daySelected: {
-    backgroundColor: theme.successLight,
-    borderRadius: 32,
-  },
-  dayOtherMonth: {
-    opacity: 0.5,
-  },
-  dayText: {
-    fontSize: 14,
-    fontWeight: "500",
-    color: theme.textPrimary,
-  },
-  dayTextSelected: {
-    color: theme.primaryDark,
-    fontWeight: "600",
-  },
-  dayTextOtherMonth: {
-    color: theme.textSecondary,
-  },
-  adherenceDot: {
-    position: "absolute",
-    bottom: 4,
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+    },
+    monthContainer: {
+      paddingHorizontal: 16,
+    },
+    weekHeader: {
+      flexDirection: "row",
+      marginBottom: 8,
+    },
+    weekDayText: {
+      flex: 1,
+      textAlign: "center",
+      fontSize: 12,
+      fontWeight: "500",
+      color: theme.textSecondary,
+    },
+    grid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+    },
+    dayCell: {
+      maxWidth: `${100 / 7}%`,
+      aspectRatio: 1,
+      padding: 2,
+    },
+    dayContent: {
+      flex: 1,
+      width: "100%",
+      aspectRatio: 1,
+      padding: 2,
+      alignItems: "center",
+      justifyContent: "center",
+      borderRadius: 64,
+      position: "relative",
+    },
+    dayToday: {
+      borderWidth: 2,
+      borderColor: theme.primary,
+    },
+    daySelected: {
+      backgroundColor: theme.successLight,
+      borderRadius: 32,
+    },
+    dayOtherMonth: {
+      opacity: 0.5,
+    },
+    dayText: {
+      fontSize: 14,
+      fontWeight: "500",
+      color: theme.textPrimary,
+    },
+    dayTextSelected: {
+      color: theme.primaryDark,
+      fontWeight: "600",
+    },
+    dayTextOtherMonth: {
+      color: theme.textSecondary,
+    },
+    adherenceDot: {
+      position: "absolute",
+      bottom: 4,
+      width: 6,
+      height: 6,
+      borderRadius: 3,
+    },
+  });
 
 export default MonthlyCalendar;

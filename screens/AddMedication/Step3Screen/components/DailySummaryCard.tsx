@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -17,12 +18,13 @@ type Props = {
 };
 
 export const DailySummaryCard = ({ doses, unitLabel, formatTime }: Props) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.card}>
-      <Text style={styles.heading}>Daily Schedule</Text>
+      <Text style={styles.heading}>{t("addMedication.dailySchedule")}</Text>
       {doses.map((dose, index) => (
         <View
           key={dose.id}

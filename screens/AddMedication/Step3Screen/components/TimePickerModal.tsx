@@ -4,6 +4,7 @@ import { Text } from "../../../../components/Text";
 import { useTimeFormat } from "../../../../hooks/useTimeFormat";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
+import { useTranslation } from "react-i18next";
 
 const ITEM_HEIGHT = 52;
 const VISIBLE_ITEMS = 5;
@@ -148,6 +149,7 @@ export const TimePickerModal = ({
   onConfirm,
   onDismiss,
 }: Props) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const slideAnim = useRef(new Animated.Value(0)).current;
@@ -250,12 +252,12 @@ export const TimePickerModal = ({
         {/* --------------------------------- Header --------------------------------- */}
         <View style={styles.header}>
           <Pressable onPress={onDismiss} hitSlop={12}>
-            <Text style={styles.headerAction}>Cancel</Text>
+            <Text style={styles.headerAction}>{t("common.cancel")}</Text>
           </Pressable>
-          <Text style={styles.headerTitle}>Set Time</Text>
+          <Text style={styles.headerTitle}>{t("timePicker.title")}</Text>
           <Pressable onPress={handleConfirm} hitSlop={12}>
             <Text style={[styles.headerAction, styles.headerConfirm]}>
-              Done
+              {t("common.done")}
             </Text>
           </Pressable>
         </View>

@@ -3,6 +3,8 @@ import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { useTranslation } from "react-i18next";
+
 import { NavProp } from "../../../types/navigation";
 import { useMedicationStore } from "../../../store/medicationStore";
 
@@ -26,6 +28,7 @@ import { Theme } from "../../../constants/theme";
 const Step4Screen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<NavProp>();
+  const { t } = useTranslation();
   const { draft, setDraft, saveMedication, updateMedication, clearDraft } =
     useMedicationStore();
 
@@ -138,14 +141,14 @@ const Step4Screen = () => {
       <Pressable style={styles.backdrop} onPress={handleClose} />
 
       <View style={styles.modal}>
-        <AddMedicationHeader currentStep={4} title="Optional Details" />
+        <AddMedicationHeader currentStep={4} title={t("addMedication.step4Title")} />
 
         <ScrollView
           style={styles.content}
           showsVerticalScrollIndicator={false}
           contentContainerStyle={styles.scrollContent}
         >
-          <InlineContainer containerText="Instructions">
+          <InlineContainer containerText={t("addMedication.instructions")}>
             <InstructionPicker
               selected={selectedInstruction}
               customText={customInstruction}
@@ -154,15 +157,15 @@ const Step4Screen = () => {
             />
           </InlineContainer>
 
-          <InlineContainer containerText="Current Stock">
+          <InlineContainer containerText={t("addMedication.currentStock")}>
             <StockInput value={stock} onChange={setStock} />
           </InlineContainer>
 
-          <InlineContainer containerText="Photo">
+          <InlineContainer containerText={t("addMedication.photo")}>
             <PhotoPicker uri={photoUri} onChange={setPhotoUri} />
           </InlineContainer>
 
-          <InlineContainer containerText="Notification Settings">
+          <InlineContainer containerText={t("addMedication.notificationSettings")}>
             <NotificationSettingsPanel
               settings={notifications}
               hasStock={hasStock}

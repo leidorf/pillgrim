@@ -2,6 +2,7 @@ import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { useTranslation } from "react-i18next";
 import { Text } from "../../components/Text";
 import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
@@ -17,6 +18,7 @@ import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
 
 const MedsScreen = () => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
@@ -79,22 +81,34 @@ const MedsScreen = () => {
     [updateMedication],
   );
 
-  const formatSchedule = (med: Medication) => {
-    if (!med.schedule) return "No schedule";
+  const formatSchedule = useCallback((med: Medication) => {
+    if (!med.schedule) return t("medicationInfo.noSchedule");
 
     const { type, days } = med.schedule;
-    const typeLabels: Record<string, string> = {
-      daily: "Daily",
-      weekly: days ? `${days.length}x per week` : "Weekly",
-      biweekly: "Every 2 weeks",
-      monthly: "Monthly",
-      specificmonth: days ? `${days.length}x per month` : "Monthly",
-      interval: `Every ${med.schedule.interval} days`,
-      prn: "As needed",
-    };
 
-    return typeLabels[type] || type;
-  };
+    switch (type) {
+      case "daily":
+        return t("medicationInfo.daily");
+      case "weekly":
+        return days
+          ? t("medicationInfo.xPerWeek", { count: days.length })
+          : t("schedules.weekly");
+      case "biweekly":
+        return t("schedules.biweekly");
+      case "monthly":
+        return t("schedules.monthly");
+      case "specificmonth":
+        return days
+          ? t("medicationInfo.xPerMonth", { count: days.length })
+          : t("schedules.monthly");
+      case "interval":
+        return t("medicationInfo.everyXDays", { interval: med.schedule.interval });
+      case "prn":
+        return t("schedules.prn");
+      default:
+        return type;
+    }
+  }, [t]);
 
   const handleEditFromSheet = useCallback(() => {
     if (selectedMed?.id) {
@@ -158,11 +172,11 @@ const MedsScreen = () => {
         showsVerticalScrollIndicator={false}
         ListHeaderComponent={
           <View style={styles.headerContainer}>
-            <Text style={styles.headerText}>My Medications</Text>
+            <Text style={styles.headerText}>{t("medsScreen.myMedications")}</Text>
             {medications.length > 0 && (
               <Text style={styles.subHeaderText}>
                 {medications.length}{" "}
-                {medications.length === 1 ? "medication" : "medications"}
+                {medications.length === 1 ? t("medsScreen.medication") : t("medsScreen.medications")}
               </Text>
             )}
           </View>
@@ -175,9 +189,9 @@ const MedsScreen = () => {
               stroke={theme.textSecondary}
               strokeWidth={1}
             />
-            <Text style={styles.emptyText}>No medications found</Text>
+            <Text style={styles.emptyText}>{t("medsScreen.emptyText")}</Text>
             <Text style={styles.emptySubtext}>
-              Tap + to add your first medication
+              {t("medsScreen.emptySubtext")}
             </Text>
           </View>
         }
@@ -197,17 +211,17 @@ const MedsScreen = () => {
 
       <BaseModal
         visible={deleteModal.visible}
-        title="Delete Medication"
-        message={`Are you sure you want to delete "${deleteModal.name}"?`}
+        title={t("medicationSheet.delete")}
+        message={t("medsScreen.deleteConfirm", { name: deleteModal.name })}
         onDismiss={() => setDeleteModal({ visible: false })}
         buttons={[
           {
-            text: "Cancel",
+            text: t("common.cancel"),
             onPress: () => setDeleteModal({ visible: false }),
             variant: "default",
           },
           {
-            text: "Delete",
+            text: t("common.delete"),
             onPress: confirmDelete,
             variant: "destructive",
           },

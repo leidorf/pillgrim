@@ -1,5 +1,7 @@
 import { useMemo, useState } from "react";
 import { Alert, Image, Pressable, StyleSheet, View } from "react-native";
+import { useTranslation } from "react-i18next";
+
 import { Text } from "../../../../components/Text";
 import * as ImagePicker from "expo-image-picker";
 import ImageIcon from "../../../../assets/icons/image.svg";
@@ -61,6 +63,7 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
     }
   };
 
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -82,19 +85,19 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
           onPress={() => setAddModalVisible(true)}
         >
           <ImageIcon width={32} height={32} stroke={theme.textSecondary} />
-          <Text style={styles.addText}>Add photo</Text>
+          <Text style={styles.addText}>{t("addMedication.addPhoto")}</Text>
         </Pressable>
       )}
 
       {/* ---------------------------- Add Photo Options --------------------------- */}
       <BaseModal
         visible={addModalVisible}
-        title="Add Photo"
-        message="Choose an option"
+        title={t("addMedication.addPhoto")}
+        message={t("addMedication.chooseOption")}
         onDismiss={() => setAddModalVisible(false)}
         buttons={[
           {
-            text: "Take Photo",
+            text: t("addMedication.takePhoto"),
             variant: "primary",
             onPress: () => {
               setAddModalVisible(false);
@@ -102,27 +105,27 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
             },
           },
           {
-            text: "Choose from Library",
+            text: t("addMedication.chooseFromLibrary"),
             variant: "primary",
             onPress: () => {
               setAddModalVisible(false);
               pickFromLibrary();
             },
           },
-          { text: "Cancel", onPress: () => setAddModalVisible(false) },
+          { text: t("common.cancel"), onPress: () => setAddModalVisible(false) },
         ]}
       />
 
       {/* ------------------------ Remove Photo Confirmation ----------------------- */}
       <BaseModal
         visible={removeModalVisible}
-        title="Remove Photo"
-        message="Are you sure you want to remove this photo?"
+        title={t("addMedication.removePhoto")}
+        message={t("addMedication.confirmRemovePhoto")}
         onDismiss={() => setRemoveModalVisible(false)}
         buttons={[
-          { text: "Cancel", onPress: () => setRemoveModalVisible(false) },
+          { text: t("common.cancel"), onPress: () => setRemoveModalVisible(false) },
           {
-            text: "Remove",
+            text: t("common.remove"),
             variant: "destructive",
             onPress: () => {
               onChange(null);

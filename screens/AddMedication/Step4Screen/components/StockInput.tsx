@@ -1,6 +1,7 @@
 import { useMemo, useRef } from "react";
 import { Pressable, StyleSheet, TextInput } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export const StockInput = ({ value, onChange }: Props) => {
+  const { t } = useTranslation();
   const inputRef = useRef<TextInput>(null);
 
   const handleChange = (text: string) => {
@@ -17,7 +19,7 @@ export const StockInput = ({ value, onChange }: Props) => {
   };
 
   const count = parseInt(value || "0");
-  const unitLabel = count === 1 ? "unit left" : "units left";
+  const unitLabel = count === 1 ? t("addMedication.unitLeft") : t("addMedication.unitsLeft");
 
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);

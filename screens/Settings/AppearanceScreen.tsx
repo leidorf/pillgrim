@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../components/Text";
+import { useTranslation } from "react-i18next";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
 import { Theme, ThemeMode } from "../../constants/theme";
@@ -11,20 +12,21 @@ import { SettingRow } from "./components/SettingRow";
 import { FontScale } from "../../theme/typography";
 import { useAppTheme } from "../../theme/useAppTheme";
 
-const FONT_SCALE_OPTIONS: { value: FontScale; label: string }[] = [
-  { value: "small", label: "Small" },
-  { value: "normal", label: "Normal" },
-  { value: "large", label: "Large" },
-  { value: "xlarge", label: "Extra Large" },
+const FONT_SCALE_OPTIONS: { value: FontScale; labelKey: string }[] = [
+  { value: "small", labelKey: "fontScale.small" },
+  { value: "normal", labelKey: "fontScale.normal" },
+  { value: "large", labelKey: "fontScale.large" },
+  { value: "xlarge", labelKey: "fontScale.xlarge" },
 ];
 
-const THEME_OPTIONS: { value: ThemeMode; label: string }[] = [
-  { value: "system", label: "System" },
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
+const THEME_OPTIONS: { value: ThemeMode; labelKey: string }[] = [
+  { value: "system", labelKey: "appearance.system" },
+  { value: "light", labelKey: "appearance.light" },
+  { value: "dark", labelKey: "appearance.dark" },
 ];
 
 const AppearanceScreen = () => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { timeFormat, setTimeFormat } = useSettingsStore();
@@ -35,21 +37,43 @@ const AppearanceScreen = () => {
   const [fontDropdownOpen, setFontDropdownOpen] = useState(false);
   const [themeDropdownOpen, setThemeDropdownOpen] = useState(false);
 
-  const selectedWeekLabel = WEEKDAY_LABELS.find(
-    (d) => d.value === weekStartsOn,
-  )?.label;
+  const fontOptions = useMemo(
+    () => FONT_SCALE_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) })),
+    [t],
+  );
 
-  const selectedFontLabel =
-    FONT_SCALE_OPTIONS.find((f) => f.value === fontScale)?.label || "Normal";
+  const themeOptions = useMemo(
+    () => THEME_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) })),
+    [t],
+  );
+
+  const weekdayOptions = useMemo(
+    () =>
+      WEEKDAY_LABELS.map((d) => ({
+        value: d.value,
+        label: t(d.labelKey),
+      })),
+    [t],
+  );
+
+  const selectedWeekLabel = useMemo(() => {
+    const day = WEEKDAY_LABELS.find((d) => d.value === weekStartsOn);
+    return day ? t(day.labelKey) : "";
+  }, [weekStartsOn, t]);
+
+  const selectedFontLabel = t(
+    FONT_SCALE_OPTIONS.find((f) => f.value === fontScale)?.labelKey ??
+      "fontScale.normal",
+  );
 
   return (
     <ScreenLayout>
-      <ScreenHeader title="Appearance" />
+      <ScreenHeader title={t("appearance.title")} />
       <View style={styles.container}>
         {/* ------------------------------- Time Format ------------------------------ */}
         <SettingRow
-          label="Time Format"
-          description="How times are displayed across the app"
+          label={t("appearance.timeFormat")}
+          description={t("appearance.timeFormatDesc")}
         >
           <View style={styles.segmentedControl}>
             <Pressable
@@ -65,7 +89,7 @@ const AppearanceScreen = () => {
                   timeFormat === "12h" && styles.segmentTextActive,
                 ]}
               >
-                12h
+                {t("appearance.12h")}
               </Text>
             </Pressable>
             <Pressable
@@ -81,7 +105,7 @@ const AppearanceScreen = () => {
                   timeFormat === "24h" && styles.segmentTextActive,
                 ]}
               >
-                24h
+                {t("appearance.24h")}
               </Text>
             </Pressable>
           </View>
@@ -89,30 +113,31 @@ const AppearanceScreen = () => {
 
         {/* --------------------------------- Theme ---------------------------------- */}
         <SettingRow
-          label="Theme"
-          description="Choose between light, dark, or system default"
+          label={t("appearance.theme")}
+          description={t("appearance.themeDesc")}
           dropdown={{
-            selectedLabel:
-              THEME_OPTIONS.find((o) => o.value === themeMode)?.label ||
-              "System",
+            selectedLabel: t(
+              THEME_OPTIONS.find((o) => o.value === themeMode)?.labelKey ??
+                "appearance.system",
+            ),
             onPress: () => setThemeDropdownOpen(true),
           }}
         />
 
         {/* ----------------------------- Week Starts On ----------------------------- */}
         <SettingRow
-          label="Week starts on"
-          description="First day of the week in calendars"
+          label={t("appearance.weekStart")}
+          description={t("appearance.weekStartDesc")}
           dropdown={{
-            selectedLabel: selectedWeekLabel,
+            selectedLabel: selectedWeekLabel ?? "",
             onPress: () => setWeekDropdownOpen(true),
           }}
         />
 
         {/* ------------------------------- Font Size ------------------------------- */}
         <SettingRow
-          label="Font Size"
-          description="Adjust the text size of the application"
+          label={t("appearance.fontSize")}
+          description={t("appearance.fontSizeDesc")}
           dropdown={{
             selectedLabel: selectedFontLabel,
             onPress: () => setFontDropdownOpen(true),
@@ -123,8 +148,8 @@ const AppearanceScreen = () => {
       {/* --------------------------- Week Start Dropdown -------------------------- */}
       <DropdownModal
         visible={weekDropdownOpen}
-        title="Week starts on"
-        options={WEEKDAY_LABELS}
+        title={t("appearance.weekStart")}
+        options={weekdayOptions}
         selectedValue={weekStartsOn}
         onSelect={(val) => setWeekStartsOn(val)}
         onClose={() => setWeekDropdownOpen(false)}
@@ -133,8 +158,8 @@ const AppearanceScreen = () => {
       {/* --------------------------- Font Size Dropdown --------------------------- */}
       <DropdownModal
         visible={fontDropdownOpen}
-        title="Font Size"
-        options={FONT_SCALE_OPTIONS}
+        title={t("appearance.fontSize")}
+        options={fontOptions}
         selectedValue={fontScale}
         onSelect={(val) => setFontScale(val)}
         onClose={() => setFontDropdownOpen(false)}
@@ -143,8 +168,8 @@ const AppearanceScreen = () => {
       {/* ----------------------------- Theme Dropdown ------------------------------ */}
       <DropdownModal
         visible={themeDropdownOpen}
-        title="Theme"
-        options={THEME_OPTIONS}
+        title={t("appearance.theme")}
+        options={themeOptions}
         selectedValue={themeMode}
         onSelect={(val) => setThemeMode(val)}
         onClose={() => setThemeDropdownOpen(false)}

@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import { StyleSheet, TextInput, View } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 export const MedicationNameInput = ({ value, onChange, error }: Props) => {
+  const { t } = useTranslation();
   const [isFocused, setIsFocused] = useState(false);
 
   const theme = useAppTheme();
@@ -18,7 +20,7 @@ export const MedicationNameInput = ({ value, onChange, error }: Props) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>Medication Name</Text>
+      <Text style={styles.label}>{t("medication.name")}</Text>
       <TextInput
         style={[
           styles.input,

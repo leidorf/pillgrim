@@ -5,8 +5,9 @@ import {
   TextInput,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
+
 import { Text } from "../../../../components/Text";
-import { MONTHS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import { DropdownModal } from "../../../../components/DropdownModal";
@@ -19,10 +20,20 @@ type Props = {
   label: string;
 };
 
-const MONTH_OPTIONS = MONTHS.map((name, index) => ({
-  value: index + 1,
-  label: name,
-}));
+const MONTH_KEYS = [
+  "months.january",
+  "months.february",
+  "months.march",
+  "months.april",
+  "months.may",
+  "months.june",
+  "months.july",
+  "months.august",
+  "months.september",
+  "months.october",
+  "months.november",
+  "months.december",
+];
 
 function getMaxDays(month: number, year: number): number {
   if (month === 2) {
@@ -35,6 +46,7 @@ function getMaxDays(month: number, year: number): number {
 }
 
 const DateInputFields = ({ value, onChange, label }: Props) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const today = useMemo(() => {
@@ -160,6 +172,15 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
 
   const currentMonthIndex = month ? parseInt(month, 10) - 1 : -1;
 
+  const monthOptions = useMemo(
+    () =>
+      MONTH_KEYS.map((key, index) => ({
+        value: index + 1,
+        label: t(key),
+      })),
+    [t],
+  );
+
   return (
     <InlineContainer containerText={label}>
       <View style={styles.row}>
@@ -168,13 +189,13 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
             style={styles.input}
             value={day}
             onChangeText={handleDayChange}
-            placeholder="DD"
+            placeholder={t("addMedication.dayPlaceholder")}
             placeholderTextColor={theme.textMuted}
             keyboardType="number-pad"
             maxLength={2}
             selectTextOnFocus
           />
-          <Text style={styles.fieldLabel}>Day</Text>
+          <Text style={styles.fieldLabel}>{t("addMedication.dayLabel")}</Text>
         </View>
 
         <View style={styles.fieldWrapper}>
@@ -189,7 +210,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
               ]}
               numberOfLines={1}
             >
-              {month ? MONTHS[parseInt(month, 10) - 1] : "Month"}
+              {month ? t(MONTH_KEYS[parseInt(month, 10) - 1]) : t("addMedication.monthPlaceholder")}
             </Text>
             <ArrowDownIcon
               height={14}
@@ -197,7 +218,7 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
               stroke={theme.textSecondary}
             />
           </Pressable>
-          <Text style={styles.fieldLabel}>Month</Text>
+          <Text style={styles.fieldLabel}>{t("addMedication.monthLabel")}</Text>
         </View>
 
         <View style={styles.fieldWrapper}>
@@ -205,20 +226,20 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
             style={[styles.input, styles.inputYear]}
             value={year}
             onChangeText={handleYearChange}
-            placeholder="YYYY"
+            placeholder={t("addMedication.yearPlaceholder")}
             placeholderTextColor={theme.textMuted}
             keyboardType="number-pad"
             maxLength={4}
             selectTextOnFocus
           />
-          <Text style={styles.fieldLabel}>Year</Text>
+          <Text style={styles.fieldLabel}>{t("addMedication.yearLabel")}</Text>
         </View>
       </View>
 
       <DropdownModal
         visible={isMonthPickerOpen}
-        title="Select Month"
-        options={MONTH_OPTIONS}
+        title={t("addMedication.selectMonth")}
+        options={monthOptions}
         selectedValue={parseInt(month, 10)}
         onSelect={handleMonthSelect}
         onClose={() => setIsMonthPickerOpen(false)}

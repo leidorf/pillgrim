@@ -1,6 +1,7 @@
 import { useMemo, useEffect } from "react";
 import { StyleSheet, Switch, View } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 import BellIcon from "../../../../assets/icons/bell.svg";
 import EyeOffIcon from "../../../../assets/icons/eye-off.svg";
 import PackageIcon from "../../../../assets/icons/package.svg";
@@ -24,6 +25,7 @@ export const NotificationSettingsPanel = ({
   hasStock,
   onChange,
 }: Props) => {
+  const { t } = useTranslation();
   const toggle = (key: keyof NotificationSettings) => {
     onChange({ ...settings, [key]: !settings[key] });
   };
@@ -43,8 +45,8 @@ export const NotificationSettingsPanel = ({
       {/* ---------------------------- Enable Reminders ---------------------------- */}
       <SettingRow
         icon={<BellIcon width={20} height={20} stroke={theme.textPrimary} />}
-        title="Enable reminders"
-        description="Get notified when it's time"
+        title={t("addMedication.enableReminders")}
+        description={t("addMedication.enableRemindersDesc")}
         value={settings.enabled}
         onToggle={() => toggle("enabled")}
         withDivider
@@ -61,8 +63,8 @@ export const NotificationSettingsPanel = ({
             }
           />
         }
-        title="Hide medication name"
-        description='Show "Medication" instead of name'
+        title={t("addMedication.hideName")}
+        description={t("addMedication.hideNameDesc")}
         value={settings.hideName}
         onToggle={() => toggle("hideName")}
         disabled={!settings.enabled}
@@ -78,9 +80,11 @@ export const NotificationSettingsPanel = ({
             stroke={hasStock ? theme.textPrimary : theme.textSecondary}
           />
         }
-        title="Low stock alert"
+        title={t("addMedication.lowStockAlert")}
         description={
-          hasStock ? "Notify when running low" : "Enter stock to enable"
+          hasStock
+            ? t("addMedication.lowStockAlertDescHasStock")
+            : t("addMedication.lowStockAlertDescNoStock")
         }
         value={settings.lowStockAlert && hasStock}
         onToggle={() => toggle("lowStockAlert")}

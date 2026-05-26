@@ -8,6 +8,8 @@ import {
   useWindowDimensions,
   View,
 } from "react-native";
+import { useTranslation } from "react-i18next";
+
 import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 
@@ -35,6 +37,7 @@ import { Theme } from "../../../constants/theme";
 const Step2Screen = () => {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<any>();
+  const { t } = useTranslation();
   const { width: screenWidth } = useWindowDimensions();
   const { draft, setDraft, clearDraft } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
@@ -245,7 +248,7 @@ const Step2Screen = () => {
           <DateInputFields
             value={monthlyStartDay}
             onChange={handleMonthlyDateChange}
-            label="Which day of the month should this repeat?"
+            label={t("addMedication.whichDayRepeat")}
           />
         );
       case "biweekly":
@@ -253,7 +256,7 @@ const Step2Screen = () => {
           <DateInputFields
             value={biweeklyStartDay}
             onChange={handleBiweeklyDateChange}
-            label="Which day should this start?"
+            label={t("addMedication.whichDayStart")}
           />
         );
       case "specificmonth":
@@ -291,11 +294,11 @@ const Step2Screen = () => {
 
   /* --------------------------------- Render --------------------------------- */
   const renderScheduleList = (schedules: typeof TIER1_SCHEDULES) =>
-    schedules.map(({ id, label }) => (
+    schedules.map(({ id, labelKey }) => (
       <ScheduleButton
         key={id}
         id={id}
-        label={label}
+        label={t(labelKey)}
         isSelected={selectedSchedule === id}
         onPress={handleSelectSchedule}
       >
@@ -311,7 +314,7 @@ const Step2Screen = () => {
       />
 
       <View style={styles.modal}>
-        <AddMedicationHeader currentStep={2} title="Schedule" onBack={goBack} />
+        <AddMedicationHeader currentStep={2} title={t("addMedication.step2Title")} onBack={goBack} />
 
         <View style={styles.content}>
           <Animated.View
@@ -330,12 +333,12 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>How often?</Text>
+              <Text style={styles.sectionLabel}>{t("addMedication.howOften")}</Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER1_SCHEDULES)}
 
                 <Pressable style={styles.otherButton} onPress={slideToOther}>
-                  <Text style={styles.otherText}>Something else</Text>
+                  <Text style={styles.otherText}>{t("addMedication.somethingElse")}</Text>
                   <RightArrowIcon
                     height={18}
                     width={18}
@@ -352,7 +355,7 @@ const Step2Screen = () => {
               contentContainerStyle={styles.scrollContent}
               keyboardShouldPersistTaps="handled"
             >
-              <Text style={styles.sectionLabel}>Advanced Options</Text>
+              <Text style={styles.sectionLabel}>{t("addMedication.advancedOptions")}</Text>
               <View style={styles.optionList}>
                 {renderScheduleList(TIER2_SCHEDULES)}
               </View>

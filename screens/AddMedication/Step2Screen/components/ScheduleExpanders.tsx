@@ -3,6 +3,8 @@ import { Text } from "../../../../components/Text";
 import { WEEKDAYS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
 import { useMemo } from "react";
+import { useTranslation } from "react-i18next";
+
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -20,6 +22,10 @@ export const WeekdayPicker = ({
   onToggle,
   weekStartsOn = 1,
 }: WeekdayProps) => {
+  const { t } = useTranslation();
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const orderedWeekdays = useMemo(() => {
     return [
       ...WEEKDAYS.slice(weekStartsOn),
@@ -27,13 +33,10 @@ export const WeekdayPicker = ({
     ];
   }, [weekStartsOn]);
 
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
-
   return (
-    <InlineContainer containerText="Select days">
+    <InlineContainer containerText={t("addMedication.selectDays")}>
       <View style={styles.weekdayRow}>
-        {orderedWeekdays.map(({ id, label }) => {
+        {orderedWeekdays.map(({ id, labelKey }) => {
           const active = selected.includes(id);
           return (
             <Pressable
@@ -46,7 +49,7 @@ export const WeekdayPicker = ({
               onPress={() => onToggle(id)}
             >
               <Text style={[styles.chipText, active && styles.chipTextActive]}>
-                {label}
+                {t(labelKey)}
               </Text>
             </Pressable>
           );
@@ -63,6 +66,7 @@ type IntervalProps = {
 };
 
 export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const step = (delta: number) => {
@@ -71,7 +75,7 @@ export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
   };
 
   return (
-    <InlineContainer containerText="Every how many days?">
+    <InlineContainer containerText={t("addMedication.everyHowManyDays")}>
       <View style={styles.intervalRow}>
         <Pressable style={styles.stepper} onPress={() => step(-1)}>
           <Text style={styles.stepperText}>−</Text>
@@ -80,7 +84,7 @@ export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
         <TextInput
           style={styles.intervalInput}
           value={value}
-          onChangeText={(t) => onChange(t.replace(/[^0-9]/g, ""))}
+          onChangeText={(text: string) => onChange(text.replace(/[^0-9]/g, ""))}
           keyboardType="number-pad"
           placeholder="X"
           placeholderTextColor={theme.textSecondary}
@@ -91,7 +95,7 @@ export const IntervalPicker = ({ value, onChange }: IntervalProps) => {
           <Text style={styles.stepperText}>+</Text>
         </Pressable>
 
-        <Text style={styles.intervalUnit}>days</Text>
+        <Text style={styles.intervalUnit}>{t("addMedication.days")}</Text>
       </View>
     </InlineContainer>
   );
@@ -104,10 +108,11 @@ type MonthDayProps = {
 };
 
 export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   return (
-    <InlineContainer containerText="Select days of the month (1–31)">
+    <InlineContainer containerText={t("addMedication.selectMonthDays")}>
       <View style={styles.monthGrid}>
         {MONTH_DAYS.map((day) => {
           const active = selected.includes(day);
@@ -133,9 +138,12 @@ export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
 };
 
 /* -------------------------------- PRN Info -------------------------------- */
-export const PrnInfo = () => (
-  <InlineContainer containerText="You can mark this medication manually whenever you need it." />
-);
+export const PrnInfo = () => {
+  const { t } = useTranslation();
+  return (
+    <InlineContainer containerText={t("addMedication.prnInfo")} />
+  );
+};
 
 /* --------------------------------- Styles --------------------------------- */
 const createStyles = (theme: Theme) => StyleSheet.create({

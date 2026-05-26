@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { Medication } from "../../../types/medication";
 import BaseMedicationCard from "../../../components/BaseMedicationCard";
 import { useAppTheme } from "../../../theme/useAppTheme";
@@ -13,6 +14,7 @@ type Props = {
 };
 
 const MedicationInfoCard = ({ medication, isInactive, onPress }: Props) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -24,7 +26,7 @@ const MedicationInfoCard = ({ medication, isInactive, onPress }: Props) => {
     >
       {isInactive && (
         <View style={styles.pausedBadge}>
-          <Text style={styles.pausedText}>PAUSED</Text>
+          <Text style={styles.pausedText}>{t("medicationInfo.paused")}</Text>
         </View>
       )}
     </BaseMedicationCard>

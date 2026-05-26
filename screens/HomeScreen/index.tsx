@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from "react-i18next";
 import BottomSheet from "@gorhom/bottom-sheet";
 
 import { Medication, MedicationLog } from "../../types/medication";
@@ -41,6 +42,7 @@ const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
 };
 
 const HomeScreen = () => {
+  const { t, i18n } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { medications, updateStock } = useMedicationStore();
@@ -267,9 +269,9 @@ const HomeScreen = () => {
               stroke={theme.textPrimary}
               strokeWidth={1}
             />
-            <Text style={styles.emptyText}>No medications for today!</Text>
+            <Text style={styles.emptyText}>{t("home.emptyText")}</Text>
             <Text style={styles.emptySubtext}>
-              {selectedDate.toLocaleDateString("en-US", {
+              {selectedDate.toLocaleDateString(i18n.language?.split("-")[0] ?? "en", {
                 weekday: "long",
                 day: "numeric",
                 month: "long",

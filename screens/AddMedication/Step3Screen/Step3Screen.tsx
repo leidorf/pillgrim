@@ -4,6 +4,8 @@ import { Text } from "../../../components/Text";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { useTranslation } from "react-i18next";
+
 import { NavProp } from "../../../types/navigation";
 import { DEFAULT_UNITS, DOSE_UNITS_BY_FORM } from "../../../constants/units";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -59,6 +61,7 @@ const sanitizeDecimalInput = (text: string): string => {
 const Step3Screen = () => {
   const route = useRoute<any>();
   const navigation = useNavigation<NavProp>();
+  const { t } = useTranslation();
   const { draft, setDraft, clearDraft } = useMedicationStore();
   const { formatTime } = useTimeFormat();
   const theme = useAppTheme();
@@ -144,13 +147,10 @@ const Step3Screen = () => {
 
   /* ------------------------------- Navigation ------------------------------- */
   const handleNext = () => {
-    const unitLabel =
-      availableUnits.find((u) => u.value === selectedUnit)?.label ||
-      selectedUnit;
     setDraft({
       timeDoses: timeDoses.map((td) => ({
         time: formatTime24(td.time),
-        dose: `${td.amount} ${unitLabel}`,
+        dose: `${td.amount} ${selectedUnit}`,
       })),
     });
     navigation.navigate("AddMedication", {
@@ -164,8 +164,11 @@ const Step3Screen = () => {
     navigation.getParent()?.goBack();
   };
 
-  const unitLabel =
-    availableUnits.find((u) => u.value === selectedUnit)?.label ?? "";
+  const unitLabel = useMemo(() => {
+    const unit = availableUnits.find((u) => u.value === selectedUnit);
+    if (!unit) return "";
+    return unit.labelKey ? t(unit.labelKey) : unit.label;
+  }, [availableUnits, selectedUnit, t]);
 
   return (
     <KeyboardAwareScrollView
@@ -177,7 +180,7 @@ const Step3Screen = () => {
       <Pressable style={styles.backdrop} onPress={handleClose} />
 
       <View style={styles.modal}>
-        <AddMedicationHeader currentStep={3} title="Time & Dose" />
+        <AddMedicationHeader currentStep={3} title={t("addMedication.step3Title")} />
 
         <ScrollView
           style={styles.content}
@@ -186,7 +189,7 @@ const Step3Screen = () => {
         >
           <View style={styles.dosesSection}>
             <Text style={styles.sectionLabel}>
-              When and how much?
+              {t("addMedication.whenHowMuch")}
             </Text>
 
             {timeDoses.map((td, index) => (
@@ -225,7 +228,7 @@ const Step3Screen = () => {
                   !selectedUnit && styles.addButtonTextDisabled,
                 ]}
               >
-                Add another time
+                {t("addMedication.addAnotherTime")}
               </Text>
             </Pressable>
           </View>

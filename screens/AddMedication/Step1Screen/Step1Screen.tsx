@@ -3,6 +3,8 @@ import { Pressable, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
 
+import { useTranslation } from "react-i18next";
+
 import { NavProp } from "../../../types/navigation";
 import { Medication } from "../../../types/medication";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -22,6 +24,7 @@ type FormErrors = {
 const Step1Screen = () => {
   const navigation = useNavigation<NavProp>();
   const route = useRoute<any>();
+  const { t } = useTranslation();
   const { draft, setDraft, clearDraft } = useMedicationStore();
 
   const mode = route.params?.mode;
@@ -45,8 +48,8 @@ const Step1Screen = () => {
 
   const validateAndProceed = () => {
     const newErrors: FormErrors = {};
-    if (!medName.trim()) newErrors.medName = "Medication name is required";
-    if (!selectedForm) newErrors.selectedForm = "Medication form is required";
+    if (!medName.trim()) newErrors.medName = t("addMedication.errorNameRequired");
+    if (!selectedForm) newErrors.selectedForm = t("addMedication.errorFormRequired");
     setErrors(newErrors);
 
     if (Object.keys(newErrors).length > 0) return;
@@ -78,7 +81,7 @@ const Step1Screen = () => {
       <View style={styles.modal}>
         <AddMedicationHeader
           currentStep={1}
-          title="Add Medication"
+          title={t("addMedication.step1Title")}
           showBackIcon={false}
         />
 

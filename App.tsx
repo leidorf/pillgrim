@@ -1,9 +1,12 @@
+import { useEffect } from "react";
+import { StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+import i18n, { getSystemLanguage } from "./utils/i18n";
 import {
   AddMedicationParamList,
   MainScreenParamList,
@@ -18,6 +21,7 @@ import SettingsScreen from "./screens/Settings";
 
 import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
+import { useSettingsStore } from "./store/settingsStore";
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
@@ -26,7 +30,6 @@ import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
 import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
 import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
 import NotificationsScreen from "./screens/Settings/NotificationsScreen";
-import { StatusBar } from "react-native";
 import AppearanceScreen from "./screens/Settings/AppearanceScreen";
 import LanguageScreen from "./screens/Settings/LanguageScreen";
 import AlarmScreen from "./screens/Settings/AlarmScreen";
@@ -106,7 +109,6 @@ const SettingsNavigator = () => {
       <SettingsStack.Screen name="Alarm" component={AlarmScreen} />
       <SettingsStack.Screen name="Appearance" component={AppearanceScreen} />
       <SettingsStack.Screen name="Language" component={LanguageScreen} />
-      {/* ------------------- other settings screen will be added ------------------  */}
     </SettingsStack.Navigator>
   );
 };
@@ -114,6 +116,13 @@ const SettingsNavigator = () => {
 export default function App() {
   const theme = useAppTheme();
   const isDarkMode = theme.background === "#101410";
+
+  const language = useSettingsStore((s) => s.language);
+  useEffect(() => {
+    const resolved = language === "system" ? getSystemLanguage() : language;
+    i18n.changeLanguage(resolved);
+  }, []);
+
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>

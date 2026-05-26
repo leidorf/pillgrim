@@ -6,21 +6,21 @@ import {
   View,
 } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
 import TrashIcon from "../../../../assets/icons/trash.svg";
 import { DropdownModal } from "../../../../components/DropdownModal";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
-
-type Unit = { value: string; label: string };
+import { UnitOption } from "../../../../constants/units";
 
 type Props = {
   index: number;
   amount: string;
   selectedUnit: string;
   unitLabel: string;
-  availableUnits: Unit[];
+  availableUnits: UnitOption[];
   canRemove: boolean;
   onRemove: () => void;
   onOpenTimePicker: () => void;
@@ -47,10 +47,20 @@ export const TimeDoseCard = ({
   onUnitChange,
   formattedTime,
 }: Props) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const hasInvalidAmount = amount.length > 0 && !isValidAmount(amount);
   const [unitDropdownOpen, setUnitDropdownOpen] = useState(false);
+
+  const translatedUnitOptions = useMemo(
+    () =>
+      availableUnits.map((u) => ({
+        value: u.value,
+        label: u.labelKey ? t(u.labelKey) : u.label,
+      })),
+    [availableUnits, t],
+  );
 
   return (
     <View style={styles.card}>
@@ -66,7 +76,7 @@ export const TimeDoseCard = ({
       {/* ------------------------------- Time Picker ------------------------------ */}
       <Pressable style={styles.timeButton} onPress={onOpenTimePicker}>
         <Text style={styles.timeText}>{formattedTime}</Text>
-        <Text style={styles.timeHint}>Tap to change time</Text>
+        <Text style={styles.timeHint}>{t("addMedication.tapToChangeTime")}</Text>
       </Pressable>
 
       {/* ---------------------------- Dose - Unit Input --------------------------- */}
@@ -77,7 +87,7 @@ export const TimeDoseCard = ({
           style={styles.amountInput}
           value={amount}
           onChangeText={onAmountChange}
-          placeholder="Enter amount"
+          placeholder={t("addMedication.enterAmount")}
           placeholderTextColor={theme.textSecondary}
           keyboardType="decimal-pad"
           maxLength={6}
@@ -87,22 +97,22 @@ export const TimeDoseCard = ({
           style={styles.unitDropdownTrigger}
           onPress={() => setUnitDropdownOpen(true)}
         >
-          <Text style={styles.unitLabel}>{unitLabel || "Select unit"}</Text>
+          <Text style={styles.unitLabel}>{unitLabel || t("addMedication.selectUnit")}</Text>
           <ArrowDownIcon width={14} height={14} stroke={theme.textSecondary} />
         </Pressable>
       </View>
 
       {hasInvalidAmount && (
         <Text style={styles.errorText}>
-          Please enter a positive number greater than 0
+          {t("addMedication.invalidAmount")}
         </Text>
       )}
 
       {/* --------------------------- Unit Dropdown Modal -------------------------- */}
       <DropdownModal
         visible={unitDropdownOpen}
-        title="Select Unit"
-        options={availableUnits}
+        title={t("addMedication.selectUnitTitle")}
+        options={translatedUnitOptions}
         selectedValue={selectedUnit}
         onSelect={onUnitChange}
         onClose={() => setUnitDropdownOpen(false)}

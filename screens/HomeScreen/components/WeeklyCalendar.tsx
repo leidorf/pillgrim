@@ -1,3 +1,4 @@
+import { useTranslation } from "react-i18next";
 import {
   View,
   Pressable,
@@ -21,10 +22,10 @@ type Props = {
 
 type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
-const getDaysArray = (weekStartsOn: number) => {
-  const allDays = WEEKDAYS.map((d) => d.label);
+const getDayKeys = (weekStartsOn: number) => {
+  const allKeys = WEEKDAYS.map((d) => d.labelKey);
 
-  return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
+  return [...allKeys.slice(weekStartsOn), ...allKeys.slice(0, weekStartsOn)];
 };
 
 const INITIAL_INDEX = 100;
@@ -64,11 +65,12 @@ const Week = ({
   width,
   weekStartsOn,
 }: WeekProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const today = new Date();
   const dates = getWeekDates(weekOffset, weekStartsOn);
-  const DAYS = getDaysArray(weekStartsOn);
+  const DAY_KEYS = getDayKeys(weekStartsOn);
 
   return (
     <View style={[styles.weekRow, { width }]}>
@@ -83,7 +85,7 @@ const Week = ({
             style={styles.dayCol}
             onPress={() => onSelectDate(date)}
           >
-            <Text style={styles.dayName}>{DAYS[i]}</Text>
+            <Text style={styles.dayName}>{t(DAY_KEYS[i])}</Text>
             <View
               style={[
                 styles.dayNum,
@@ -121,12 +123,14 @@ const WeeklyCalendar = ({
   onSelectDate,
   hasMedsOnDate,
 }: Props) => {
+  const { i18n } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn) as WeekStart;
   const { width: screenWidth } = useWindowDimensions();
   const flatListRef = useRef<FlatList>(null);
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
+  const locale = i18n.language?.split("-")[0] ?? "en";
 
   const weeks = Array.from({ length: 200 }, (_, i) => i - INITIAL_INDEX);
 
@@ -141,12 +145,12 @@ const WeeklyCalendar = ({
     const first = dates[0];
     const last = dates[6];
     if (first.getMonth() === last.getMonth()) {
-      return first.toLocaleDateString("en-US", {
+      return first.toLocaleDateString(locale, {
         month: "long",
         year: "numeric",
       });
     }
-    return `${first.toLocaleDateString("en-US", { month: "short" })} – ${last.toLocaleDateString("en-US", { month: "long", year: "numeric" })}`;
+    return `${first.toLocaleDateString(locale, { month: "short" })} – ${last.toLocaleDateString(locale, { month: "long", year: "numeric" })}`;
   })();
 
   return (

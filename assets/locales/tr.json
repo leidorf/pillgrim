@@ -1,0 +1,251 @@
+{
+  "common": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "back": "Geri",
+    "done": "Tamam",
+    "yes": "Evet",
+    "no": "Hayır",
+    "loading": "Yükleniyor...",
+    "remove": "Kaldır"
+  },
+  "tabs": {
+    "home": "Ana Ekran",
+    "meds": "İlaçlar",
+    "logs": "Takvim"
+  },
+  "settings": {
+    "title": "Ayarlar",
+    "language": "Dil",
+    "appearance": "Görünüm",
+    "notifications": "Bildirimler",
+    "alarm": "Alarm & Ses",
+    "privacy": "Gizlilik Politikası",
+    "about": "Hakkında"
+  },
+  "language": {
+    "title": "Dil",
+    "systemDefault": "Sistem Varsayılanı",
+    "selected": "Seçili"
+  },
+  "medication": {
+    "addMedication": "İlaç Ekle",
+    "name": "İlaç İsmi",
+    "form": "Biçim",
+    "schedule": "Program",
+    "dose": "Doz",
+    "note": "Not",
+    "stock": "Stok",
+    "units": "birim"
+  },
+  "appearance": {
+    "title": "Görünüm",
+    "timeFormat": "Zaman Formatı",
+    "timeFormatDesc": "Uygulama genelinde saatler nasıl görüntülenir",
+    "theme": "Tema",
+    "themeDesc": "Açık, koyu veya sistem varsayılanı arasında seçim yapın",
+    "weekStart": "Haftanın başlayacağı gün",
+    "weekStartDesc": "Takvimlerde haftanın ilk günü",
+    "fontSize": "Yazı Tipi Boyutu",
+    "fontSizeDesc": "Uygulamanın metin boyutunu ayarla",
+    "system": "Sistem",
+    "light": "Açık",
+    "dark": "Koyu",
+    "12h": "12h",
+    "24h": "24h"
+  },
+  "fontScale": {
+    "small": "Küçük",
+    "normal": "Normal",
+    "large": "Büyük",
+    "xlarge": "Ekstra Büyük"
+  },
+  "addMedication": {
+    "step1Title": "İlaç Ekle",
+    "step2Title": "Program",
+    "step3Title": "Zaman ve Doz",
+    "step4Title": "Opsiyonel Detaylar",
+    "selectDays": "Günleri seç",
+    "everyHowManyDays": "Kaç günde bir?",
+    "selectMonthDays": "Ayın günlerini seç (1–31)",
+    "prnInfo": "Bu ilacı ihtiyacın olduğunda manuel olarak işaretleyebilirsin.",
+    "whichDayRepeat": "Hangi ayın hangi günü tekrarlansın?",
+    "whichDayStart": "Hangi gün başlasın?",
+    "selectMonth": "Ay Seç",
+    "enterAmount": "Miktar girin",
+    "selectUnit": "Birim seç",
+    "selectUnitTitle": "Birim Seç",
+    "addAnotherTime": "Başka bir zaman ekle",
+    "tapToChangeTime": "Saati değiştirmek için dokun",
+    "invalidAmount": "Lütfen 0'dan büyük pozitif bir sayı girin",
+    "instructions": "Talimatlar",
+    "instructionsPlaceholder": "Özel talimatlar girin...",
+    "currentStock": "Mevcut Stok",
+    "photo": "Fotoğraf",
+    "addPhoto": "Fotoğraf Ekle",
+    "removePhoto": "Fotoğrafı Kaldır",
+    "chooseOption": "Bir seçenek seçin",
+    "confirmRemovePhoto": "Bu fotoğrafı kaldırmak istediğinize emin misiniz?",
+    "notificationSettings": "Bildirim Ayarları",
+    "enableReminders": "Hatırlatıcıları etkinleştir",
+    "enableRemindersDesc": "Zamanı geldiğinde bildirim al",
+    "hideName": "İlaç adını gizle",
+    "hideNameDesc": "İsim yerine \"İlaç\" göster",
+    "lowStockAlert": "Düşük stok uyarısı",
+    "lowStockAlertDescHasStock": "Stok azaldığında bildir",
+    "lowStockAlertDescNoStock": "Etkinleştirmek için stok girin",
+    "next": "İleri",
+    "whenHowMuch": "Ne zaman ve ne kadar?",
+    "advancedOptions": "Gelişmiş Seçenekler",
+    "dayPlaceholder": "GG",
+    "monthPlaceholder": "Ay",
+    "yearPlaceholder": "YYYY",
+    "dayLabel": "Gün",
+    "days": "gün",
+    "monthLabel": "Ay",
+    "yearLabel": "Yıl",
+    "howOften": "Ne sıklıkta?",
+    "somethingElse": "Diğer",
+    "errorNameRequired": "İlaç adı gerekli",
+    "errorFormRequired": "İlaç formu gerekli",
+    "dailySchedule": "Günlük Program",
+    "unitLeft": "birim kaldı",
+    "unitsLeft": "birim kaldı",
+    "takePhoto": "Fotoğraf Çek",
+    "chooseFromLibrary": "Galeriden Seç"
+  },
+  "medicationSheet": {
+    "edit": "İlacı Düzenle",
+    "delete": "İlacı Sil",
+    "pause": "Hatırlatıcıları Durdur",
+    "resume": "Hatırlatıcıları Devam Ettir",
+    "deleteConfirm": "İlacı Sil"
+  },
+  "timePicker": {
+    "title": "Saat Ayarla",
+    "cancel": "İptal",
+    "done": "Tamam"
+  },
+  "schedules": {
+    "daily": "Her Gün",
+    "weekly": "Belirli Hafta Günleri",
+    "interval": "Her X Günde Bir",
+    "prn": "Gerektiğinde Kullan",
+    "monthly": "Ayda Bir",
+    "biweekly": "Her 2 Haftada Bir",
+    "specificmonth": "Ayın Belirli Günleri"
+  },
+  "units": {
+    "tablet": "tablet",
+    "capsule": "kapsül",
+    "drops": "damla",
+    "application": "uygulama",
+    "ampule": "ampul",
+    "puff": "puf",
+    "spray": "sprey",
+    "tsp": "tatlı kaşığı",
+    "tbsp": "yemek kaşığı"
+  },
+  "weekdays": {
+    "sunday": "Pazar",
+    "monday": "Pazartesi",
+    "tuesday": "Salı",
+    "wednesday": "Çarşamba",
+    "thursday": "Perşembe",
+    "friday": "Cuma",
+    "saturday": "Cumartesi",
+    "sunShort": "Paz",
+    "monShort": "Pzt",
+    "tueShort": "Sal",
+    "wedShort": "Çar",
+    "thuShort": "Per",
+    "friShort": "Cum",
+    "satShort": "Cmt"
+  },
+  "months": {
+    "january": "Ocak",
+    "february": "Şubat",
+    "march": "Mart",
+    "april": "Nisan",
+    "may": "Mayıs",
+    "june": "Haziran",
+    "july": "Temmuz",
+    "august": "Ağustos",
+    "september": "Eylül",
+    "october": "Ekim",
+    "november": "Kasım",
+    "december": "Aralık"
+  },
+  "medicationForms": {
+    "capsule": "Kapsül",
+    "tablet": "Tablet",
+    "syrup": "Şurup",
+    "drop": "Damla",
+    "injection": "Enjeksiyon",
+    "spray": "Sprey",
+    "cream": "Krem"
+  },
+  "instructions": {
+    "beforeMeal": "Yemekten önce",
+    "withMeal": "Yemekle birlikte",
+    "afterMeal": "Yemekten sonra",
+    "emptyStomach": "Aç karnına",
+    "any": "Fark etmez",
+    "other": "Diğer (belirtin)",
+    "selectInstruction": "Talimat seç...",
+    "title": "Talimat Seç"
+  },
+  "medicationAction": {
+    "markAsTaken": "Alındı olarak işaretle",
+    "markNotTaken": "Alınmadı olarak işaretle",
+    "recordDose": "Bu dozu kaydet",
+    "undoTaken": "Alındı durumunu geri al",
+    "skipDose": "Bu dozu atla",
+    "undoSkip": "Atlamayı geri al",
+    "intentionallySkip": "Bilinçli olarak atla",
+    "markPending": "Tekrar beklemede işaretle",
+    "snooze": "Hatırlatıcıyı ertele",
+    "remindLater": "Daha sonra hatırlat",
+    "remindAgain": "Tekrar ne zaman hatırlatılsın?"
+  },
+  "snooze": {
+    "15min": "15 dakika",
+    "30min": "30 dakika",
+    "1hour": "1 saat",
+    "2hours": "2 saat"
+  },
+  "logStatus": {
+    "taken": "Alındı",
+    "skipped": "Atlandı",
+    "intentionallySkipped": "Bilinçli olarak atlandı",
+    "missed": "Kaçırıldı",
+    "notTakenInTime": "Zamanında alınmadı",
+    "pending": "Beklemede",
+    "notTimeYet": "Henüz zamanı değil"
+  },
+  "medsScreen": {
+    "myMedications": "İlaçlarım",
+    "medication": "ilaç",
+    "medications": "ilaç",
+    "emptyText": "İlaç bulunamadı",
+    "emptySubtext": "İlk ilacınızı eklemek için +'ya dokunun",
+    "deleteConfirm": "\"{{name}}\" silmek istediğinize emin misiniz?"
+  },
+  "calendar": {
+    "emptyText": "Planlanmış ilaç yok",
+    "emptySubtext": "İlaçlarınızın planlandığı günler burada görünecek"
+  },
+  "home": {
+    "emptyText": "Bugün için ilaç yok!"
+  },
+  "medicationInfo": {
+    "paused": "DURAKLATILDI",
+    "noSchedule": "Program yok",
+    "daily": "Günlük",
+    "xPerWeek": "Haftada {{count}}x",
+    "xPerMonth": "Ayda {{count}}x",
+    "everyXDays": "Her {{interval}} günde bir"
+  }
+}

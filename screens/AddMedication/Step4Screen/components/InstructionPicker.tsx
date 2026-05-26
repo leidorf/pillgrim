@@ -1,5 +1,7 @@
 import { useMemo, useEffect, useRef, useState } from "react";
 import { Animated, FlatList, Modal, Pressable, StyleSheet, TextInput, View } from "react-native";
+import { useTranslation } from "react-i18next";
+
 import { Text } from "../../../../components/Text";
 
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
@@ -8,12 +10,12 @@ import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
 const INSTRUCTION_OPTIONS = [
-  { id: "before_meal", label: "Before meal" },
-  { id: "with_meal", label: "With meal" },
-  { id: "after_meal", label: "After meal" },
-  { id: "empty_stomach", label: "Empty stomach" },
-  { id: "any", label: "Doesn't matter" },
-  { id: "other", label: "Other (specify)" },
+  { id: "before_meal", label: "Before meal", labelKey: "instructions.beforeMeal" },
+  { id: "with_meal", label: "With meal", labelKey: "instructions.withMeal" },
+  { id: "after_meal", label: "After meal", labelKey: "instructions.afterMeal" },
+  { id: "empty_stomach", label: "Empty stomach", labelKey: "instructions.emptyStomach" },
+  { id: "any", label: "Doesn't matter", labelKey: "instructions.any" },
+  { id: "other", label: "Other (specify)", labelKey: "instructions.other" },
 ] as const;
 
 export type InstructionOption = (typeof INSTRUCTION_OPTIONS)[number]["id"];
@@ -42,18 +44,20 @@ export const InstructionPicker = ({
     }).start();
   }, [isOpen]);
 
+  const { t } = useTranslation();
+  const theme = useAppTheme();
+  const styles = useMemo(() => createStyles(theme), [theme]);
+
   const triggerLabel = selected
-    ? (INSTRUCTION_OPTIONS.find((o) => o.id === selected)?.label ??
-      "Select instruction...")
-    : "Select instruction...";
+    ? (INSTRUCTION_OPTIONS.find((o) => o.id === selected)?.labelKey
+        ? t(INSTRUCTION_OPTIONS.find((o) => o.id === selected)!.labelKey!)
+        : INSTRUCTION_OPTIONS.find((o) => o.id === selected)?.label ?? "")
+    : t("instructions.selectInstruction");
 
   const handleSelect = (id: InstructionOption) => {
     onSelect(id);
     setIsOpen(false);
   };
-
-  const theme = useAppTheme();
-  const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <>
@@ -71,7 +75,7 @@ export const InstructionPicker = ({
           style={styles.customInput}
           value={customText}
           onChangeText={onCustomTextChange}
-          placeholder="Enter specific instructions..."
+          placeholder={t("addMedication.instructionsPlaceholder")}
           placeholderTextColor={theme.textSecondary}
           multiline
           maxLength={200}
@@ -103,9 +107,9 @@ export const InstructionPicker = ({
             ]}
           >
             <View style={styles.menuHeader}>
-              <Text style={styles.menuTitle}>Select Instructions</Text>
+              <Text style={styles.menuTitle}>{t("instructions.title")}</Text>
               <Pressable onPress={() => setIsOpen(false)}>
-                <Text style={styles.doneButton}>Done</Text>
+                <Text style={styles.doneButton}>{t("common.done")}</Text>
               </Pressable>
             </View>
 
@@ -128,7 +132,7 @@ export const InstructionPicker = ({
                         isSelected && styles.menuItemTextActive,
                       ]}
                     >
-                      {item.label}
+                      {t(item.labelKey)}
                     </Text>
                     {isSelected && (
                       <CheckIcon

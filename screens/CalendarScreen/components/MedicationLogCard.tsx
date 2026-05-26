@@ -1,6 +1,7 @@
 import React, { useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { Text } from "../../../components/Text";
+import { useTranslation } from "react-i18next";
 
 import { useTimeFormat } from "../../../hooks/useTimeFormat";
 
@@ -34,6 +35,7 @@ type MedicationLogCardProps = {
 };
 
 const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { formatTime } = useTimeFormat();
@@ -44,7 +46,7 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
     if (log.takenAt) {
       return {
         icon: <CheckIcon width={16} height={16} stroke={theme.primary} />,
-        label: "Taken",
+        label: t("logStatus.taken"),
         color: theme.success,
         subtext: formatTime(log.takenAt),
       };
@@ -55,9 +57,9 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
         icon: (
           <SkippedIcon width={16} height={16} stroke={theme.textPrimary} />
         ),
-        label: "Skipped",
+        label: t("logStatus.skipped"),
         color: theme.textSecondary,
-        subtext: "Intentionally skipped",
+        subtext: t("logStatus.intentionallySkipped"),
       };
     }
 
@@ -68,17 +70,17 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
     if (scheduledDateTime < now) {
       return {
         icon: <MissedIcon width={16} height={16} stroke={theme.error} />,
-        label: "Missed",
+        label: t("logStatus.missed"),
         color: theme.error,
-        subtext: "Not taken in time",
+        subtext: t("logStatus.notTakenInTime"),
       };
     }
 
     return {
       icon: <PendingIcon width={16} height={16} stroke={theme.textPrimary} />,
-      label: "Pending",
+      label: t("logStatus.pending"),
       color: theme.textSecondary,
-      subtext: "It's not time yet",
+      subtext: t("logStatus.notTimeYet"),
     };
   };
 

@@ -1,6 +1,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Animated, Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { Text } from "../../../../components/Text";
+import { useTranslation } from "react-i18next";
 import PillIcon from "../../../../assets/icons/pill.svg";
 import { MED_FORMS } from "../../../../constants/medication-forms";
 import { Medication } from "../../../../types/medication";
@@ -13,9 +14,13 @@ type Props = {
 };
 
 export const MedicationFormPicker = ({ value, onChange }: Props) => {
+  const { t } = useTranslation();
   const [isOpen, setIsOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(0)).current;
   const SelectedIcon = MED_FORMS.find((f) => f.id === value)?.Icon ?? PillIcon;
+  const selectedLabel = MED_FORMS.find((f) => f.id === value)?.labelKey
+    ? t(MED_FORMS.find((f) => f.id === value)!.labelKey!)
+    : value;
 
   const toggle = () => {
     const toValue = isOpen ? 0 : 1;
@@ -41,7 +46,7 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
         <SelectedIcon width={48} height={48} stroke={theme.textPrimary} />
       </Pressable>
 
-      <Text style={styles.formLabel}>{value}</Text>
+      <Text style={styles.formLabel}>{selectedLabel}</Text>
 
       <Animated.View
         style={[
@@ -64,7 +69,7 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={styles.pickerContent}
         >
-          {MED_FORMS.map(({ id, label, Icon }) => {
+          {MED_FORMS.map(({ id, labelKey, Icon }) => {
             const isSelected = value === id;
             return (
               <Pressable
@@ -83,7 +88,7 @@ export const MedicationFormPicker = ({ value, onChange }: Props) => {
                     isSelected && styles.formItemLabelSelected,
                   ]}
                 >
-                  {label}
+                  {t(labelKey)}
                 </Text>
               </Pressable>
             );

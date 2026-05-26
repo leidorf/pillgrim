@@ -1,6 +1,7 @@
 import { useMemo, forwardRef, useCallback, useState } from "react";
 import { View, StyleSheet, TouchableOpacity } from "react-native";
 import { Text } from "../../../components/Text";
+import { useTranslation } from "react-i18next";
 import BottomSheet, {
   BottomSheetView,
   BottomSheetBackdrop,
@@ -14,10 +15,10 @@ import { useAppTheme } from "../../../theme/useAppTheme";
 import { Theme } from "../../../constants/theme";
 
 const SNOOZE_OPTIONS = [
-  { label: "15 minutes", value: 15 },
-  { label: "30 minutes", value: 30 },
-  { label: "1 hour", value: 60 },
-  { label: "2 hours", value: 120 },
+  { label: "15 minutes", value: 15, labelKey: "snooze.15min" },
+  { label: "30 minutes", value: 30, labelKey: "snooze.30min" },
+  { label: "1 hour", value: 60, labelKey: "snooze.1hour" },
+  { label: "2 hours", value: 120, labelKey: "snooze.2hours" },
 ];
 
 type Props = {
@@ -45,6 +46,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
     },
     ref,
   ) => {
+    const { t } = useTranslation();
     const [view, setView] = useState<"actions" | "snooze">("actions");
 
     const handleClose = useCallback(() => {
@@ -141,10 +143,10 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>
-                      {isTaken ? "Mark as not taken" : "Mark as taken"}
+                      {isTaken ? t("medicationAction.markNotTaken") : t("medicationAction.markAsTaken")}
                     </Text>
                     <Text style={styles.actionSub}>
-                      {isTaken ? "Undo taken status" : "Record this dose"}
+                      {isTaken ? t("medicationAction.undoTaken") : t("medicationAction.recordDose")}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -174,12 +176,12 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   </View>
                   <View style={styles.actionTexts}>
                     <Text style={styles.actionLabel}>
-                      {isSkipped ? "Undo skip" : "Skip this dose"}
+                      {isSkipped ? t("medicationAction.undoSkip") : t("medicationAction.skipDose")}
                     </Text>
                     <Text style={styles.actionSub}>
                       {isSkipped
-                        ? "Mark as pending again"
-                        : "Intentionally skip"}
+                        ? t("medicationAction.markPending")
+                        : t("medicationAction.intentionallySkip")}
                     </Text>
                   </View>
                 </TouchableOpacity>
@@ -201,8 +203,8 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     <ClockIcon width={20} height={20} stroke={theme.warning} />
                   </View>
                   <View style={styles.actionTexts}>
-                    <Text style={styles.actionLabel}>Snooze reminder</Text>
-                    <Text style={styles.actionSub}>Remind me later</Text>
+                    <Text style={styles.actionLabel}>{t("medicationAction.snooze")}</Text>
+                    <Text style={styles.actionSub}>{t("medicationAction.remindLater")}</Text>
                   </View>
                   <ChevronRightIcon
                     width={20}
@@ -217,7 +219,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                 style={styles.cancelButton}
                 onPress={handleClose}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text style={styles.cancelText}>{t("common.cancel")}</Text>
               </TouchableOpacity>
             </View>
           ) : (
@@ -237,8 +239,8 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   />
                 </TouchableOpacity>
                 <View>
-                  <Text style={styles.medName}>Snooze reminder</Text>
-                  <Text style={styles.medTime}>Remind me again in...</Text>
+                  <Text style={styles.medName}>{t("medicationAction.snooze")}</Text>
+                  <Text style={styles.medTime}>{t("medicationAction.remindAgain")}</Text>
                 </View>
               </View>
 
@@ -252,7 +254,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                     style={styles.snoozeOption}
                     onPress={() => handleSnooze(opt.value)}
                   >
-                    <Text style={styles.snoozeLabel}>{opt.label}</Text>
+                    <Text style={styles.snoozeLabel}>{t(opt.labelKey)}</Text>
                   </TouchableOpacity>
                 ))}
               </View>
@@ -262,7 +264,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                 style={styles.cancelButton}
                 onPress={handleClose}
               >
-                <Text style={styles.cancelText}>Cancel</Text>
+                <Text style={styles.cancelText}>{t("common.cancel")}</Text>
               </TouchableOpacity>
             </View>
           )}

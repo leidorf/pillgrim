@@ -1,0 +1,251 @@
+{
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "back": "Back",
+    "done": "Done",
+    "yes": "Yes",
+    "no": "No",
+    "loading": "Loading...",
+    "remove": "Remove"
+  },
+  "tabs": {
+    "home": "Home",
+    "meds": "Medications",
+    "calendar": "Calendar"
+  },
+  "settings": {
+    "title": "Settings",
+    "appearance": "Appearance",
+    "notifications": "Notifications",
+    "alarm": "Alarm & Sound",
+    "language": "Language",
+    "privacy": "Privacy Policy",
+    "about": "About"
+  },
+  "language": {
+    "title": "Language",
+    "systemDefault": "System Default",
+    "selected": "Selected"
+  },
+  "medication": {
+    "addMedication": "Add Medication",
+    "name": "Medication Name",
+    "form": "Form",
+    "schedule": "Schedule",
+    "dose": "Dose",
+    "note": "Note",
+    "stock": "Stock",
+    "units": "units"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "timeFormat": "Time Format",
+    "timeFormatDesc": "How times are displayed across the app",
+    "theme": "Theme",
+    "themeDesc": "Choose between light, dark, or system default",
+    "weekStart": "Week starts on",
+    "weekStartDesc": "First day of the week in calendars",
+    "fontSize": "Font Size",
+    "fontSizeDesc": "Adjust the text size of the application",
+    "system": "System",
+    "light": "Light",
+    "dark": "Dark",
+    "12h": "12h",
+    "24h": "24h"
+  },
+  "fontScale": {
+    "small": "Small",
+    "normal": "Normal",
+    "large": "Large",
+    "xlarge": "Extra Large"
+  },
+  "addMedication": {
+    "step1Title": "Add Medication",
+    "step2Title": "Schedule",
+    "step3Title": "Time & Dose",
+    "step4Title": "Optional Details",
+    "selectDays": "Select days",
+    "everyHowManyDays": "Every how many days?",
+    "selectMonthDays": "Select days of the month (1–31)",
+    "prnInfo": "You can mark this medication manually whenever you need it.",
+    "whichDayRepeat": "Which day of the month should this repeat?",
+    "whichDayStart": "Which day should this start?",
+    "selectMonth": "Select Month",
+    "enterAmount": "Enter amount",
+    "selectUnit": "Select unit",
+    "selectUnitTitle": "Select Unit",
+    "addAnotherTime": "Add another time",
+    "tapToChangeTime": "Tap to change time",
+    "invalidAmount": "Please enter a positive number greater than 0",
+    "instructions": "Instructions",
+    "instructionsPlaceholder": "Enter specific instructions...",
+    "currentStock": "Current Stock",
+    "photo": "Photo",
+    "addPhoto": "Add Photo",
+    "removePhoto": "Remove Photo",
+    "chooseOption": "Choose an option",
+    "confirmRemovePhoto": "Are you sure you want to remove this photo?",
+    "notificationSettings": "Notification Settings",
+    "enableReminders": "Enable reminders",
+    "enableRemindersDesc": "Get notified when it's time",
+    "hideName": "Hide medication name",
+    "hideNameDesc": "Show \"Medication\" instead of name",
+    "lowStockAlert": "Low stock alert",
+    "lowStockAlertDescHasStock": "Notify when running low",
+    "lowStockAlertDescNoStock": "Enter stock to enable",
+    "next": "Next",
+    "whenHowMuch": "When and how much?",
+    "advancedOptions": "Advanced Options",
+    "dayPlaceholder": "DD",
+    "monthPlaceholder": "Month",
+    "yearPlaceholder": "YYYY",
+    "dayLabel": "Day",
+    "days": "days",
+    "monthLabel": "Month",
+    "yearLabel": "Year",
+    "howOften": "How often?",
+    "somethingElse": "Something else",
+    "errorNameRequired": "Medication name is required",
+    "errorFormRequired": "Medication form is required",
+    "dailySchedule": "Daily Schedule",
+    "unitLeft": "unit left",
+    "unitsLeft": "units left",
+    "takePhoto": "Take Photo",
+    "chooseFromLibrary": "Choose from Library"
+  },
+  "medicationSheet": {
+    "edit": "Edit Medication",
+    "delete": "Delete Medication",
+    "pause": "Pause Reminders",
+    "resume": "Resume Reminders",
+    "deleteConfirm": "Delete Medication"
+  },
+  "timePicker": {
+    "title": "Set Time",
+    "cancel": "Cancel",
+    "done": "Done"
+  },
+  "schedules": {
+    "daily": "Every Day",
+    "weekly": "Specific Weekdays",
+    "interval": "Every X Days",
+    "prn": "Use as Needed",
+    "monthly": "Once a Month",
+    "biweekly": "Every 2 Weeks",
+    "specificmonth": "Specific Days of the Month"
+  },
+  "units": {
+    "tablet": "tablet",
+    "capsule": "capsule",
+    "drops": "drops",
+    "application": "application",
+    "ampule": "ampule",
+    "puff": "puff",
+    "spray": "spray",
+    "tsp": "tsp",
+    "tbsp": "tbsp"
+  },
+  "weekdays": {
+    "sunday": "Sunday",
+    "monday": "Monday",
+    "tuesday": "Tuesday",
+    "wednesday": "Wednesday",
+    "thursday": "Thursday",
+    "friday": "Friday",
+    "saturday": "Saturday",
+    "sunShort": "Su",
+    "monShort": "Mo",
+    "tueShort": "Tu",
+    "wedShort": "We",
+    "thuShort": "Th",
+    "friShort": "Fr",
+    "satShort": "Sa"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "medicationForms": {
+    "capsule": "Capsule",
+    "tablet": "Tablet",
+    "syrup": "Syrup",
+    "drop": "Drop",
+    "injection": "Injection",
+    "spray": "Spray",
+    "cream": "Cream"
+  },
+  "instructions": {
+    "beforeMeal": "Before meal",
+    "withMeal": "With meal",
+    "afterMeal": "After meal",
+    "emptyStomach": "Empty stomach",
+    "any": "Doesn't matter",
+    "other": "Other (specify)",
+    "selectInstruction": "Select instruction...",
+    "title": "Select Instructions"
+  },
+  "medicationAction": {
+    "markAsTaken": "Mark as taken",
+    "markNotTaken": "Mark as not taken",
+    "recordDose": "Record this dose",
+    "undoTaken": "Undo taken status",
+    "skipDose": "Skip this dose",
+    "undoSkip": "Undo skip",
+    "intentionallySkip": "Intentionally skip",
+    "markPending": "Mark as pending again",
+    "snooze": "Snooze reminder",
+    "remindLater": "Remind me later",
+    "remindAgain": "Remind me again in..."
+  },
+  "snooze": {
+    "15min": "15 minutes",
+    "30min": "30 minutes",
+    "1hour": "1 hour",
+    "2hours": "2 hours"
+  },
+  "logStatus": {
+    "taken": "Taken",
+    "skipped": "Skipped",
+    "intentionallySkipped": "Intentionally skipped",
+    "missed": "Missed",
+    "notTakenInTime": "Not taken in time",
+    "pending": "Pending",
+    "notTimeYet": "It's not time yet"
+  },
+  "medsScreen": {
+    "myMedications": "My Medications",
+    "medication": "medication",
+    "medications": "medications",
+    "emptyText": "No medications found",
+    "emptySubtext": "Tap + to add your first medication",
+    "deleteConfirm": "Are you sure you want to delete \"{{name}}\"?"
+  },
+  "calendar": {
+    "emptyText": "No medications scheduled",
+    "emptySubtext": "The days your medications are scheduled for will appear here"
+  },
+  "home": {
+    "emptyText": "No medications for today!"
+  },
+  "medicationInfo": {
+    "paused": "PAUSED",
+    "noSchedule": "No schedule",
+    "daily": "Daily",
+    "xPerWeek": "{{count}}x per week",
+    "xPerMonth": "{{count}}x per month",
+    "everyXDays": "Every {{interval}} days"
+  }
+}
