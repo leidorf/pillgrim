@@ -6,8 +6,8 @@ import ScreenLayout from "../../components/ScreenLayout";
 import { Theme, ThemeMode } from "../../constants/theme";
 import { useSettingsStore } from "../../store/settingsStore";
 import { WEEKDAY_LABELS } from "../../constants/schedules";
-import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
 import { DropdownModal } from "../../components/DropdownModal";
+import { SettingRow } from "./components/SettingRow";
 import { FontScale } from "../../theme/typography";
 import { useAppTheme } from "../../theme/useAppTheme";
 
@@ -47,13 +47,10 @@ const AppearanceScreen = () => {
       <ScreenHeader title="Appearance" />
       <View style={styles.container}>
         {/* ------------------------------- Time Format ------------------------------ */}
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Time Format</Text>
-            <Text style={styles.settingDescription}>
-              How times are displayed across the app
-            </Text>
-          </View>
+        <SettingRow
+          label="Time Format"
+          description="How times are displayed across the app"
+        >
           <View style={styles.segmentedControl}>
             <Pressable
               style={[
@@ -88,73 +85,39 @@ const AppearanceScreen = () => {
               </Text>
             </Pressable>
           </View>
-        </View>
+        </SettingRow>
 
         {/* --------------------------------- Theme ---------------------------------- */}
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Theme</Text>
-            <Text style={styles.settingDescription}>
-              Choose between light, dark, or system default
-            </Text>
-          </View>
-          <Pressable
-            style={styles.dropdownTrigger}
-            onPress={() => setThemeDropdownOpen(true)}
-          >
-            <Text style={styles.dropdownTriggerText}>
-              {THEME_OPTIONS.find((o) => o.value === themeMode)?.label ||
-                "System"}
-            </Text>
-            <ArrowDownIcon
-              width={16}
-              height={16}
-              stroke={theme.textSecondary}
-            />
-          </Pressable>
-        </View>
+        <SettingRow
+          label="Theme"
+          description="Choose between light, dark, or system default"
+          dropdown={{
+            selectedLabel:
+              THEME_OPTIONS.find((o) => o.value === themeMode)?.label ||
+              "System",
+            onPress: () => setThemeDropdownOpen(true),
+          }}
+        />
 
         {/* ----------------------------- Week Starts On ----------------------------- */}
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Week starts on</Text>
-            <Text style={styles.settingDescription}>
-              First day of the week in calendars
-            </Text>
-          </View>
-          <Pressable
-            style={styles.dropdownTrigger}
-            onPress={() => setWeekDropdownOpen(true)}
-          >
-            <Text style={styles.dropdownTriggerText}>{selectedWeekLabel}</Text>
-            <ArrowDownIcon
-              width={16}
-              height={16}
-              stroke={theme.textSecondary}
-            />
-          </Pressable>
-        </View>
+        <SettingRow
+          label="Week starts on"
+          description="First day of the week in calendars"
+          dropdown={{
+            selectedLabel: selectedWeekLabel,
+            onPress: () => setWeekDropdownOpen(true),
+          }}
+        />
 
         {/* ------------------------------- Font Size ------------------------------- */}
-        <View style={styles.settingRow}>
-          <View style={styles.settingInfo}>
-            <Text style={styles.settingLabel}>Font Size</Text>
-            <Text style={styles.settingDescription}>
-              Adjust the text size of the application
-            </Text>
-          </View>
-          <Pressable
-            style={styles.dropdownTrigger}
-            onPress={() => setFontDropdownOpen(true)}
-          >
-            <Text style={styles.dropdownTriggerText}>{selectedFontLabel}</Text>
-            <ArrowDownIcon
-              width={16}
-              height={16}
-              stroke={theme.textSecondary}
-            />
-          </Pressable>
-        </View>
+        <SettingRow
+          label="Font Size"
+          description="Adjust the text size of the application"
+          dropdown={{
+            selectedLabel: selectedFontLabel,
+            onPress: () => setFontDropdownOpen(true),
+          }}
+        />
       </View>
 
       {/* --------------------------- Week Start Dropdown -------------------------- */}
@@ -193,21 +156,6 @@ const AppearanceScreen = () => {
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: { paddingHorizontal: 16 },
-    settingRow: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 16,
-      borderBottomWidth: 1,
-      borderBottomColor: theme.textSecondary + "15",
-    },
-    settingInfo: { flex: 1, marginRight: 16 },
-    settingLabel: { color: theme.textPrimary, fontSize: 15, fontWeight: "600" },
-    settingDescription: {
-      color: theme.textSecondary,
-      fontSize: 13,
-      marginTop: 2,
-    },
     segmentedControl: {
       flexDirection: "row",
       backgroundColor: theme.surface,
@@ -222,22 +170,6 @@ const createStyles = (theme: Theme) =>
       fontWeight: "600",
     },
     segmentTextActive: { color: theme.surfaceElevated },
-    dropdownTrigger: {
-      flexDirection: "row",
-      alignItems: "center",
-      gap: 8,
-      backgroundColor: theme.surface,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      borderRadius: 8,
-      minWidth: 120,
-      justifyContent: "space-between",
-    },
-    dropdownTriggerText: {
-      color: theme.textPrimary,
-      fontSize: 14,
-      fontWeight: "500",
-    },
   });
 
 export default AppearanceScreen;
