@@ -4,15 +4,12 @@ import {
   StyleSheet,
   TextInput,
   View,
-  Modal,
-  ScrollView,
 } from "react-native";
 import { Text } from "../../../../components/Text";
 
-
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
-import CheckIcon from "../../../../assets/icons/check.svg";
 import TrashIcon from "../../../../assets/icons/trash.svg";
+import { DropdownModal } from "../../../../components/DropdownModal";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -102,61 +99,14 @@ export const TimeDoseCard = ({
       )}
 
       {/* --------------------------- Unit Dropdown Modal -------------------------- */}
-      <Modal
+      <DropdownModal
         visible={unitDropdownOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setUnitDropdownOpen(false)}
-        statusBarTranslucent
-      >
-        <Pressable
-          style={styles.dropdownOverlay}
-          onPress={() => setUnitDropdownOpen(false)}
-        >
-          <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Select Unit</Text>
-            <View style={styles.separator} />
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.dropdownContent}
-            >
-              {availableUnits.map((unit) => {
-                const isActive = selectedUnit === unit.value;
-                return (
-                  <Pressable
-                    key={unit.value}
-                    style={[
-                      styles.dropdownItem,
-                      isActive && styles.dropdownItemActive,
-                    ]}
-                    onPress={() => {
-                      onUnitChange(unit.value);
-                      setUnitDropdownOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        isActive && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {unit.label}
-                    </Text>
-                    {isActive && (
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={theme.primary}
-                      />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+        title="Select Unit"
+        options={availableUnits}
+        selectedValue={selectedUnit}
+        onSelect={onUnitChange}
+        onClose={() => setUnitDropdownOpen(false)}
+      />
     </View>
   );
 };
@@ -222,58 +172,5 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.error,
     marginTop: 4,
     fontSize: 12,
-  },
-  dropdownOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  dropdownCard: {
-    backgroundColor: theme.surfaceElevated,
-    borderRadius: 20,
-    width: "100%",
-    maxWidth: 280,
-    maxHeight: 360,
-    paddingTop: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  dropdownTitle: {
-    fontWeight: "700",
-    color: theme.textPrimary,
-    paddingHorizontal: 4,
-    fontSize: 18,
-  },
-  dropdownContent: { gap: 2 },
-  dropdownItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  dropdownItemActive: {
-    backgroundColor: theme.primary + "10",
-  },
-  dropdownItemText: {
-    color: theme.textPrimary,
-    fontSize: 16,
-  },
-  dropdownItemTextActive: {
-    color: theme.primaryDark,
-    fontWeight: "600",
-  },
-  separator: {
-    height: 1,
-    backgroundColor: theme.textSecondary + "20",
-    marginVertical: 10,
   },
 });

@@ -1,8 +1,6 @@
 import { useCallback, useMemo, useRef, useState, useEffect } from "react";
 import {
-  Modal,
   Pressable,
-  ScrollView,
   StyleSheet,
   TextInput,
   View,
@@ -11,7 +9,7 @@ import { Text } from "../../../../components/Text";
 import { MONTHS } from "../../../../constants/schedules";
 import InlineContainer from "../../components/InlineContainer";
 import ArrowDownIcon from "../../../../assets/icons/arrow-down.svg";
-import CheckIcon from "../../../../assets/icons/check.svg";
+import { DropdownModal } from "../../../../components/DropdownModal";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
 
@@ -20,6 +18,11 @@ type Props = {
   onChange: (date: Date | null) => void;
   label: string;
 };
+
+const MONTH_OPTIONS = MONTHS.map((name, index) => ({
+  value: index + 1,
+  label: name,
+}));
 
 function getMaxDays(month: number, year: number): number {
   if (month === 2) {
@@ -212,58 +215,14 @@ const DateInputFields = ({ value, onChange, label }: Props) => {
         </View>
       </View>
 
-      <Modal
+      <DropdownModal
         visible={isMonthPickerOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setIsMonthPickerOpen(false)}
-        statusBarTranslucent
-      >
-        <Pressable
-          style={styles.dropdownOverlay}
-          onPress={() => setIsMonthPickerOpen(false)}
-        >
-          <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Select Month</Text>
-            <View style={styles.separator} />
-
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.dropdownContent}
-            >
-              {MONTHS.map((name, index) => {
-                const isActive = index === currentMonthIndex;
-                return (
-                  <Pressable
-                    key={index}
-                    style={[
-                      styles.dropdownItem,
-                      isActive && styles.dropdownItemActive,
-                    ]}
-                    onPress={() => handleMonthSelect(index + 1)}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        isActive && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {name}
-                    </Text>
-                    {isActive && (
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={theme.primary}
-                      />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+        title="Select Month"
+        options={MONTH_OPTIONS}
+        selectedValue={parseInt(month, 10)}
+        onSelect={handleMonthSelect}
+        onClose={() => setIsMonthPickerOpen(false)}
+      />
     </InlineContainer>
   );
 };
@@ -322,59 +281,6 @@ const createStyles = (theme: Theme) => StyleSheet.create({
     color: theme.textMuted,
     fontWeight: "500",
     fontSize: 14,
-  },
-  dropdownOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.4)",
-    justifyContent: "center",
-    alignItems: "center",
-    padding: 24,
-  },
-  dropdownCard: {
-    backgroundColor: theme.surfaceElevated,
-    borderRadius: 20,
-    width: "100%",
-    maxWidth: 280,
-    maxHeight: 360,
-    paddingTop: 20,
-    paddingHorizontal: 16,
-    paddingBottom: 16,
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    elevation: 8,
-  },
-  dropdownTitle: {
-    fontWeight: "700",
-    color: theme.textPrimary,
-    paddingHorizontal: 4,
-    fontSize: 18,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: theme.textSecondary + "20",
-    marginVertical: 10,
-  },
-  dropdownContent: { gap: 2 },
-  dropdownItem: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    paddingVertical: 14,
-    paddingHorizontal: 12,
-    borderRadius: 10,
-  },
-  dropdownItemActive: {
-    backgroundColor: theme.primary + "10",
-  },
-  dropdownItemText: {
-    color: theme.textPrimary,
-    fontSize: 16,
-  },
-  dropdownItemTextActive: {
-    color: theme.primaryDark,
-    fontWeight: "600",
   },
 });
 

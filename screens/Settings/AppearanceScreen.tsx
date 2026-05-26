@@ -1,13 +1,13 @@
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, View, ScrollView, Modal } from "react-native";
+import { Pressable, StyleSheet, View } from "react-native";
 import { Text } from "../../components/Text";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
 import { Theme, ThemeMode } from "../../constants/theme";
 import { useSettingsStore } from "../../store/settingsStore";
 import { WEEKDAY_LABELS } from "../../constants/schedules";
-import CheckIcon from "../../assets/icons/check.svg";
 import ArrowDownIcon from "../../assets/icons/arrow-down.svg";
+import { DropdownModal } from "../../components/DropdownModal";
 import { FontScale } from "../../theme/typography";
 import { useAppTheme } from "../../theme/useAppTheme";
 
@@ -158,166 +158,34 @@ const AppearanceScreen = () => {
       </View>
 
       {/* --------------------------- Week Start Dropdown -------------------------- */}
-      <Modal
+      <DropdownModal
         visible={weekDropdownOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setWeekDropdownOpen(false)}
-      >
-        <Pressable
-          style={styles.dropdownOverlay}
-          onPress={() => setWeekDropdownOpen(false)}
-        >
-          <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Week starts on</Text>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.dropdownContent}
-            >
-              {WEEKDAY_LABELS.map((day) => {
-                const isActive = weekStartsOn === day.value;
-                return (
-                  <Pressable
-                    key={day.value}
-                    style={[
-                      styles.dropdownItem,
-                      isActive && styles.dropdownItemActive,
-                    ]}
-                    onPress={() => {
-                      setWeekStartsOn(day.value);
-                      setWeekDropdownOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        isActive && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {day.label}
-                    </Text>
-                    {isActive && (
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={theme.primary}
-                      />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+        title="Week starts on"
+        options={WEEKDAY_LABELS}
+        selectedValue={weekStartsOn}
+        onSelect={(val) => setWeekStartsOn(val)}
+        onClose={() => setWeekDropdownOpen(false)}
+      />
 
       {/* --------------------------- Font Size Dropdown --------------------------- */}
-      <Modal
+      <DropdownModal
         visible={fontDropdownOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setFontDropdownOpen(false)}
-      >
-        <Pressable
-          style={styles.dropdownOverlay}
-          onPress={() => setFontDropdownOpen(false)}
-        >
-          <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Font Size</Text>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.dropdownContent}
-            >
-              {FONT_SCALE_OPTIONS.map((opt) => {
-                const isActive = fontScale === opt.value;
-                return (
-                  <Pressable
-                    key={opt.value}
-                    style={[
-                      styles.dropdownItem,
-                      isActive && styles.dropdownItemActive,
-                    ]}
-                    onPress={() => {
-                      setFontScale(opt.value);
-                      setFontDropdownOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        isActive && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {opt.label}
-                    </Text>
-                    {isActive && (
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={theme.primary}
-                      />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+        title="Font Size"
+        options={FONT_SCALE_OPTIONS}
+        selectedValue={fontScale}
+        onSelect={(val) => setFontScale(val)}
+        onClose={() => setFontDropdownOpen(false)}
+      />
 
       {/* ----------------------------- Theme Dropdown ------------------------------ */}
-      <Modal
+      <DropdownModal
         visible={themeDropdownOpen}
-        transparent
-        animationType="fade"
-        onRequestClose={() => setThemeDropdownOpen(false)}
-      >
-        <Pressable
-          style={styles.dropdownOverlay}
-          onPress={() => setThemeDropdownOpen(false)}
-        >
-          <View style={styles.dropdownCard}>
-            <Text style={styles.dropdownTitle}>Theme</Text>
-            <ScrollView
-              showsVerticalScrollIndicator={false}
-              contentContainerStyle={styles.dropdownContent}
-            >
-              {THEME_OPTIONS.map((opt) => {
-                const isActive = themeMode === opt.value;
-                return (
-                  <Pressable
-                    key={opt.value}
-                    style={[
-                      styles.dropdownItem,
-                      isActive && styles.dropdownItemActive,
-                    ]}
-                    onPress={() => {
-                      setThemeMode(opt.value);
-                      setThemeDropdownOpen(false);
-                    }}
-                  >
-                    <Text
-                      style={[
-                        styles.dropdownItemText,
-                        isActive && styles.dropdownItemTextActive,
-                      ]}
-                    >
-                      {opt.label}
-                    </Text>
-                    {isActive && (
-                      <CheckIcon
-                        width={16}
-                        height={16}
-                        stroke={theme.primary}
-                      />
-                    )}
-                  </Pressable>
-                );
-              })}
-            </ScrollView>
-          </View>
-        </Pressable>
-      </Modal>
+        title="Theme"
+        options={THEME_OPTIONS}
+        selectedValue={themeMode}
+        onSelect={(val) => setThemeMode(val)}
+        onClose={() => setThemeDropdownOpen(false)}
+      />
     </ScreenLayout>
   );
 };
@@ -370,51 +238,6 @@ const createStyles = (theme: Theme) =>
       fontSize: 14,
       fontWeight: "500",
     },
-    dropdownOverlay: {
-      flex: 1,
-      backgroundColor: "rgba(0, 0, 0, 0.4)",
-      justifyContent: "center",
-      alignItems: "center",
-      padding: 24,
-    },
-    dropdownCard: {
-      backgroundColor: theme.surfaceElevated,
-      borderRadius: 20,
-      width: "100%",
-      maxWidth: 280,
-      maxHeight: 400,
-      paddingTop: 20,
-      paddingHorizontal: 16,
-      paddingBottom: 16,
-      shadowColor: "#000",
-      shadowOffset: { width: 0, height: 4 },
-      shadowOpacity: 0.15,
-      shadowRadius: 12,
-      elevation: 8,
-    },
-    dropdownTitle: {
-      fontSize: 18,
-      fontWeight: "700",
-      color: theme.textPrimary,
-      marginBottom: 12,
-      paddingHorizontal: 4,
-    },
-    dropdownContent: { gap: 2 },
-    dropdownItem: {
-      flexDirection: "row",
-      justifyContent: "space-between",
-      alignItems: "center",
-      paddingVertical: 14,
-      paddingHorizontal: 12,
-      borderRadius: 10,
-    },
-    dropdownItemActive: { backgroundColor: theme.primary + "10" },
-    dropdownItemText: {
-      fontSize: 16,
-      color: theme.textPrimary,
-      fontWeight: "500",
-    },
-    dropdownItemTextActive: { color: theme.primaryDark, fontWeight: "600" },
   });
 
 export default AppearanceScreen;
