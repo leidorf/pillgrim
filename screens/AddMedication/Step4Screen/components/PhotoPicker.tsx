@@ -5,6 +5,7 @@ import { useTranslation } from "react-i18next";
 import { Text } from "../../../../components/Text";
 import * as ImagePicker from "expo-image-picker";
 import ImageIcon from "../../../../assets/icons/image.svg";
+import CloseIcon from "../../../../assets/icons/close.svg";
 import BaseModal from "../../../../components/BaseModal";
 import { useAppTheme } from "../../../../theme/useAppTheme";
 import { Theme } from "../../../../constants/theme";
@@ -76,7 +77,7 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
             style={styles.removeButton}
             onPress={() => setRemoveModalVisible(true)}
           >
-            <Text style={styles.removeText}>×</Text>
+            <CloseIcon width={14} height={14} stroke={theme.textPrimary} />
           </Pressable>
         </View>
       ) : (
@@ -112,7 +113,10 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
               pickFromLibrary();
             },
           },
-          { text: t("common.cancel"), onPress: () => setAddModalVisible(false) },
+          {
+            text: t("common.cancel"),
+            onPress: () => setAddModalVisible(false),
+          },
         ]}
       />
 
@@ -123,7 +127,10 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
         message={t("addMedication.confirmRemovePhoto")}
         onDismiss={() => setRemoveModalVisible(false)}
         buttons={[
-          { text: t("common.cancel"), onPress: () => setRemoveModalVisible(false) },
+          {
+            text: t("common.cancel"),
+            onPress: () => setRemoveModalVisible(false),
+          },
           {
             text: t("common.remove"),
             variant: "destructive",
@@ -138,37 +145,37 @@ export const PhotoPicker = ({ uri, onChange }: Props) => {
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  addButton: {
-    backgroundColor: theme.background,
-    borderRadius: 12,
-    height: 120,
-    justifyContent: "center",
-    alignItems: "center",
-    borderWidth: 2,
-    borderColor: theme.textSecondary + "30",
-    borderStyle: "dashed",
-    gap: 8,
-  },
-  addText: { color: theme.textSecondary, fontSize: 15, fontWeight: "500" },
-  photoContainer: {
-    borderRadius: 12,
-    overflow: "hidden",
-    position: "relative",
-    height: 160,
-    backgroundColor: theme.background,
-  },
-  photo: { width: "100%", height: "100%" },
-  removeButton: {
-    position: "absolute",
-    top: 8,
-    right: 8,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: "center",
-    alignItems: "center",
-  },
-  removeText: { color: theme.surfaceElevated, fontSize: 20, fontWeight: "600" },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    addButton: {
+      backgroundColor: theme.background,
+      borderRadius: 12,
+      height: 120,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: theme.textSecondary + "30",
+      borderStyle: "dashed",
+      gap: 8,
+    },
+    addText: { color: theme.textSecondary, fontSize: 15, fontWeight: "500" },
+    photoContainer: {
+      borderRadius: 12,
+      overflow: "hidden",
+      position: "relative",
+      height: 160,
+      backgroundColor: theme.background,
+    },
+    photo: { width: "100%", height: "100%" },
+    removeButton: {
+      position: "absolute",
+      top: 8,
+      right: 8,
+      backgroundColor: "rgba(0,0,0,0.6)",
+      width: 24,
+      height: 24,
+      borderRadius: 12,
+      justifyContent: "center",
+      alignItems: "center",
+    },
+  });

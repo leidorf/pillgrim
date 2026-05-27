@@ -28,7 +28,6 @@ export const getFormIcon = (formId?: string) => {
   return form?.Icon;
 };
 
-// If a dose string like "2 capsule" has a translatable unit, translate it
 export const translateDose = (
   dose: string,
   t: (key: string) => string,
