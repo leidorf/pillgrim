@@ -16,7 +16,7 @@ import { useTranslation } from "react-i18next";
 type Props = {
   selectedDate: Date;
   onSelectDate: (date: Date) => void;
-  onMonthChange?: (monthLabel: string) => void;
+  onMonthChange?: (monthLabel: string, year: number, month: number) => void;
 };
 
 type MonthGridProps = {
@@ -226,7 +226,7 @@ const MonthlyCalendar = ({
           month: "long",
           year: "numeric",
         });
-        onMonthChange(label);
+        onMonthChange(label, monthData.year, monthData.month);
       }
     }
   }).current;

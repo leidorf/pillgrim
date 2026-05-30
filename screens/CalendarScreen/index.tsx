@@ -14,9 +14,12 @@ import ScreenLayout from "../../components/ScreenLayout";
 import LogsHeader from "./components/LogsHeader";
 import SelectedDayHeader from "./components/SelectedDayHeader";
 import MedicationLogCard from "./components/MedicationLogCard";
+import ExportModal from "./components/ExportModal";
+import { exportCSV, exportPDF } from "../../utils/exportUtils";
 
 import {
   buildDailySchedule,
+  buildScheduleForDateRange,
   computeDayStats,
   WeekdayMap,
 } from "../../utils/medicationScheduleUtils";
@@ -36,14 +39,18 @@ const CalendarScreen = () => {
   const { t, i18n } = useTranslation();
   const [selectedDate, setSelectedDate] = useState(new Date());
   const locale = i18n.language?.split("-")[0] ?? "en";
+  const now = new Date();
   const [currentMonthLabel, setCurrentMonthLabel] = useState(
-    new Date().toLocaleDateString(locale, { month: "long", year: "numeric" }),
+    now.toLocaleDateString(locale, { month: "long", year: "numeric" }),
   );
+  const [currentYear, setCurrentYear] = useState(now.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(now.getMonth());
+  const [exportModalVisible, setExportModalVisible] = useState(false);
 
   const { logs } = useLogStore();
   const { medications } = useMedicationStore();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
-  const { formatTimeString } = useTimeFormat();
+  const { formatTimeString, timeFormat } = useTimeFormat();
 
   const weekdayMap = useMemo(
     () => buildWeekdayMap(weekStartsOn),
@@ -96,14 +103,21 @@ const CalendarScreen = () => {
   return (
     <ScreenLayout>
       {/* --------------------------------- Header --------------------------------- */}
-      <LogsHeader headerText={currentMonthLabel} />
+      <LogsHeader
+        headerText={currentMonthLabel}
+        onExportPress={() => setExportModalVisible(true)}
+      />
 
       {/* ---------------------------- Monthly Calendar ---------------------------- */}
       <View style={styles.calendarContainer}>
         <MonthlyCalendar
           selectedDate={selectedDate}
           onSelectDate={setSelectedDate}
-          onMonthChange={setCurrentMonthLabel}
+          onMonthChange={(label, year, month) => {
+            setCurrentMonthLabel(label);
+            setCurrentYear(year);
+            setCurrentMonth(month);
+          }}
         />
       </View>
 
@@ -128,6 +142,48 @@ const CalendarScreen = () => {
           )}
         </ScrollView>
       </View>
+      {/* ----------------------------- Export Modal ----------------------------- */}
+      <ExportModal
+        visible={exportModalVisible}
+        onClose={() => setExportModalVisible(false)}
+        onExportCSV={() => {
+          setExportModalVisible(false);
+          const monthStart = new Date(currentYear, currentMonth, 1);
+          const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+          const scheduleMap = buildScheduleForDateRange(
+            medications,
+            logs,
+            monthStart,
+            monthEnd,
+            weekdayMap,
+            formatTimeString,
+          );
+          exportCSV(scheduleMap, currentYear, currentMonth, timeFormat, t);
+        }}
+        onExportPDF={() => {
+          setExportModalVisible(false);
+          const monthStart = new Date(currentYear, currentMonth, 1);
+          const monthEnd = new Date(currentYear, currentMonth + 1, 0);
+          const scheduleMap = buildScheduleForDateRange(
+            medications,
+            logs,
+            monthStart,
+            monthEnd,
+            weekdayMap,
+            formatTimeString,
+          );
+          exportPDF(
+            scheduleMap,
+            medications,
+            currentYear,
+            currentMonth,
+            currentMonthLabel,
+            weekdayMap,
+            timeFormat,
+            t,
+          );
+        }}
+      />
     </ScreenLayout>
   );
 };

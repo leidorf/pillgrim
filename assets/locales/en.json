@@ -240,6 +240,25 @@
   "home": {
     "emptyText": "No medications for today!"
   },
+  "export": {
+    "title": "Select export file type",
+    "csv": "CSV",
+    "pdf": "PDF",
+    "cancel": "Cancel",
+    "date": "Date",
+    "medName": "Medication Name",
+    "scheduledTime": "Scheduled Time",
+    "dose": "Dose",
+    "status": "Status",
+    "takenAt": "Taken At",
+    "delayHour": "h",
+    "medication": "Medication",
+    "time": "Time",
+    "legendTaken": "Taken on time",
+    "legendTakenLate": "Taken late",
+    "legendMissed": "Missed",
+    "legendSkipped": "Skipped"
+  },
   "medicationInfo": {
     "paused": "PAUSED",
     "noSchedule": "No schedule",

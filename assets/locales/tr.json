@@ -240,6 +240,25 @@
   "home": {
     "emptyText": "Bugün için ilaç yok!"
   },
+  "export": {
+    "title": "Dışa aktarma türünü seçin",
+    "csv": "CSV",
+    "pdf": "PDF",
+    "cancel": "İptal",
+    "date": "Tarih",
+    "medName": "İlaç Adı",
+    "scheduledTime": "Planlanan Saat",
+    "dose": "Doz",
+    "status": "Durum",
+    "takenAt": "Alındığı Saat",
+    "delayHour": "s",
+    "medication": "İlaç",
+    "time": "Saat",
+    "legendTaken": "Zamanında alındı",
+    "legendTakenLate": "Geç alındı",
+    "legendMissed": "Kaçırıldı",
+    "legendSkipped": "Atlandı"
+  },
   "medicationInfo": {
     "paused": "DURAKLATILDI",
     "noSchedule": "Program yok",

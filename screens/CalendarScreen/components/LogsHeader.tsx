@@ -12,13 +12,10 @@ import { Theme } from "../../../constants/theme";
 
 type HeaderProps = {
   headerText: string;
+  onExportPress: () => void;
 };
 
-const handleExport = () => {
-  console.log("Export logs");
-};
-
-const LogsHeader = ({ headerText }: HeaderProps) => {
+const LogsHeader = ({ headerText, onExportPress }: HeaderProps) => {
   const navigation = useNavigation<NavProp>();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
@@ -26,7 +23,7 @@ const LogsHeader = ({ headerText }: HeaderProps) => {
   return (
     <View style={styles.topBar}>
       {/* ----------------------------- Download Button ---------------------------- */}
-      <Pressable style={styles.iconButton} onPress={handleExport}>
+      <Pressable style={styles.iconButton} onPress={onExportPress}>
         <FileDownloadIcon height={24} width={24} stroke={theme.textPrimary} />
       </Pressable>
 
