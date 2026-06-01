@@ -39,8 +39,10 @@ const BaseModal = ({
     >
       <Pressable style={styles.overlay} onPress={onDismiss}>
         <View style={styles.card} onStartShouldSetResponder={() => true}>
-          <Text style={styles.title}>{title}</Text>
-          {message ? <Text style={styles.message}>{message}</Text> : null}
+          <View style={styles.header}>
+            <Text style={styles.title}>{title}</Text>
+            {message ? <Text style={styles.message}>{message}</Text> : null}
+          </View>
           <View
             style={[
               styles.buttonContainer,
@@ -93,6 +95,9 @@ const createStyles = (theme: Theme) =>
       shadowRadius: 12,
       elevation: 8,
     },
+    header: {
+      marginBottom: 12,
+    },
     title: {
       fontSize: 18,
       fontWeight: "700",
@@ -103,7 +108,6 @@ const createStyles = (theme: Theme) =>
       fontSize: 14,
       color: theme.textSecondary,
       lineHeight: 20,
-      marginBottom: 12,
     },
     buttonContainer: {
       borderTopWidth: 1,

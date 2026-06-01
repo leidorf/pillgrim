@@ -8,10 +8,7 @@ import {
   isMedicationScheduledForDate,
 } from "./medicationScheduleUtils";
 
-/* -------------------------------------------------------------------------- */
-/*                               Shared Helpers                               */
-/* -------------------------------------------------------------------------- */
-
+/* --------------------------------- Helpers -------------------------------- */
 type TimeFmt = "12h" | "24h";
 
 const formatTimeExport = (time24: string, tf: TimeFmt): string => {
@@ -41,11 +38,7 @@ const formatDateExport = (d: Date, tf: TimeFmt): string => {
   return `${h}:${m}`;
 };
 
-/**
- * Round delay to nearest 0.5h (30 min). Returns delay in hours as a number.
- * Returns null if takenAt is missing or delay < 30min.
- */
-const calcDelayHours = (
+const calcDelayMinutes = (
   scheduledDate: string,
   scheduledTime: string,
   takenAt?: Date,
@@ -55,20 +48,30 @@ const calcDelayHours = (
   const actual = takenAt.getTime();
   const diffMin = (actual - sched) / 60_000;
   if (diffMin < 30) return null;
-  // Round to nearest 0.5h
-  const rounded = Math.round(diffMin / 30) * 30;
-  return rounded / 60;
+  return Math.round(diffMin / 30) * 30;
 };
 
-const formatDelay = (hours: number, hourUnit: string): string => {
-  if (hours === Math.floor(hours)) return `+${hours}${hourUnit}`;
-  return `+${hours}${hourUnit}`; // e.g. +0.5h or +1.5h
+const formatDelay = (delayMin: number, t: (key: string) => string): string => {
+  if (delayMin < 120) {
+    const h = delayMin / 60;
+    return `+${h}${t("export.delayHour")}`;
+  }
+  if (delayMin < 2880) {
+    return `+${Math.round(delayMin / 60)}${t("export.delayHour")}`;
+  }
+  if (delayMin < 20160) {
+    return `+${Math.round(delayMin / 1440)}${t("export.delayDay")}`;
+  }
+  if (delayMin < 86400) {
+    return `+${Math.round(delayMin / 10080)}${t("export.delayWeek")}`;
+  }
+  if (delayMin < 1051200) {
+    return `+${Math.round(delayMin / 43200)}${t("export.delayMonth")}`;
+  }
+  return `+${Math.round(delayMin / 525600)}${t("export.delayYear")}`;
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              CSV Export                                    */
-/* -------------------------------------------------------------------------- */
-
+/* ------------------------------- CSV Export ------------------------------- */
 export const exportCSV = async (
   scheduleMap: Map<string, DailyScheduleEntry[]>,
   year: number,
@@ -95,7 +98,6 @@ export const exportCSV = async (
 
   const rows: string[] = [];
 
-  // Iterate dates in order
   for (const dateStr of [...scheduleMap.keys()].sort()) {
     if (!dateStr.startsWith(monthPrefix)) continue;
     const entries = scheduleMap.get(dateStr)!;
@@ -121,9 +123,9 @@ export const exportCSV = async (
     }
   }
 
-  // UTF-8 BOM for Excel compatibility
   const bom = "﻿";
-  const csvContent = bom + [headers.map(escapeCSV).join(","), ...rows].join("\n");
+  const csvContent =
+    bom + [headers.map(escapeCSV).join(","), ...rows].join("\n");
 
   const monthStr = String(month + 1).padStart(2, "0");
   const fileName = `medication-log-${year}-${monthStr}.csv`;
@@ -141,20 +143,15 @@ export const exportCSV = async (
   }
 };
 
-/* -------------------------------------------------------------------------- */
-/*                              PDF Export                                    */
-/* -------------------------------------------------------------------------- */
-
-/** Build the grid data used by the PDF table */
+/* ------------------------------- PDF Export ------------------------------- */
 type PDFGridRow = {
   medication: Medication;
   timeDose: { time: string; dose: string };
-  /** day index → cell data, undefined if not scheduled that day */
   cells: Map<number, PDFCell | undefined>;
 };
 
 type PDFCell =
-  | { kind: "taken"; delayHours: number | null }
+  | { kind: "taken"; delayMinutes: number | null }
   | { kind: "skipped" }
   | { kind: "missed" };
 
@@ -167,7 +164,7 @@ const buildPDFGrid = (
 ): PDFGridRow[] => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Only medications that have timeDoses and are active
+  /* ----------- Only medications that have timeDoses and are active ---------- */
   const activeMeds = medications.filter(
     (m) => m.isActive && m.timeDoses?.length,
   );
@@ -187,25 +184,23 @@ const buildPDFGrid = (
         const dateStr = `${year}-${String(month + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
         const dayEntries = scheduleMap.get(dateStr) ?? [];
         const entry = dayEntries.find(
-          (e) =>
-            e.medication.id === med.id && e.scheduledTime === td.time,
+          (e) => e.medication.id === med.id && e.scheduledTime === td.time,
         );
 
         if (!entry) {
           cells.set(day, undefined);
         } else if (entry.status === "taken") {
-          const delay = calcDelayHours(
+          const delay = calcDelayMinutes(
             entry.scheduledDate,
             entry.scheduledTime,
             entry.log?.takenAt,
           );
-          cells.set(day, { kind: "taken", delayHours: delay });
+          cells.set(day, { kind: "taken", delayMinutes: delay });
         } else if (entry.status === "skipped") {
           cells.set(day, { kind: "skipped" });
         } else if (entry.status === "missed") {
           cells.set(day, { kind: "missed" });
         } else {
-          // pending — not shown
           cells.set(day, undefined);
         }
       }
@@ -221,12 +216,12 @@ const buildPDFGrid = (
   return grid;
 };
 
-// Maps medication id → rowspan (number of time doses)
 type MedSpanMap = Map<string, number>;
 
 const buildMedSpanMap = (grid: PDFGridRow[]): MedSpanMap => {
   const map = new Map<string, number>();
-  for (const row of grid) map.set(row.medication.id, (map.get(row.medication.id) ?? 0) + 1);
+  for (const row of grid)
+    map.set(row.medication.id, (map.get(row.medication.id) ?? 0) + 1);
   return map;
 };
 
@@ -244,11 +239,11 @@ const generatePDFHtml = (
   // Determine if we need compact mode (many columns → smaller font)
   const compact = daysInMonth >= 30;
 
-  const dayHeaders = Array.from({ length: daysInMonth }, (_, i) =>
-    `<th class="day-col">${i + 1}</th>`,
+  const dayHeaders = Array.from(
+    { length: daysInMonth },
+    (_, i) => `<th class="day-col">${i + 1}</th>`,
   ).join("");
 
-  // Build table rows
   let tableRows = "";
   let prevMedId = "";
 
@@ -267,15 +262,15 @@ const generatePDFHtml = (
     for (let day = 1; day <= daysInMonth; day++) {
       const cell = row.cells.get(day);
       if (cell === undefined) {
-        tableRows += '<td class="cell-empty"></td>';
+        tableRows += '<td class="cell-empty">&nbsp;</td>';
       } else if (cell.kind === "taken") {
-        if (cell.delayHours !== null) {
-          tableRows += `<td class="cell-taken cell-delay">${formatDelay(cell.delayHours, t("export.delayHour"))}</td>`;
+        if (cell.delayMinutes !== null) {
+          tableRows += `<td class="cell-taken cell-delay">${formatDelay(cell.delayMinutes, t)}</td>`;
         } else {
-          tableRows += '<td class="cell-taken"></td>';
+          tableRows += '<td class="cell-taken">&nbsp;</td>';
         }
       } else if (cell.kind === "skipped") {
-        tableRows += '<td class="cell-skipped"></td>';
+        tableRows += '<td class="cell-skipped">&nbsp;</td>';
       } else if (cell.kind === "missed") {
         tableRows += '<td class="cell-missed"></td>';
       }
@@ -317,6 +312,7 @@ const generatePDFHtml = (
             text-align: center;
             vertical-align: middle;
             word-break: break-word;
+            height: ${compact ? "20px" : "24px"};
           }
           th {
             font-weight: 600;
@@ -324,35 +320,42 @@ const generatePDFHtml = (
             font-size: ${compact ? "8px" : "9px"};
           }
           .med-name {
-            width: 24%;
+            width: 10%;
             text-align: left;
             font-weight: 600;
             font-size: ${compact ? "8.5px" : "10px"};
             padding: ${compact ? "3px 4px" : "4px 6px"};
             background: #fafafa;
-            border-right: 2px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
           }
           .time-col {
-            width: 12%;
-            color: #555;
+            width: 8%;
+            font-weight:600;
             font-size: ${compact ? "8px" : "9px"};
             background: #fafafa;
-            border-right: 2px solid #e0e0e0;
+            border-right: 1px solid #e0e0e0;
+            border-bottom: 1px solid #e0e0e0;
           }
           .day-col {
             font-size: ${compact ? "7.5px" : "8.5px"};
           }
           .cell-empty {
-            /* no fill */
+            background: "transparent";
+            border-radius: 4px;
           }
           .cell-taken {
-            background: #4caf50;
+            background: #2E7D32;
             border-radius: 4px;
             color: #fff;
             font-weight: 600;
             font-size: ${compact ? "7px" : "8px"};
           }
           .cell-delay {
+            background: #2E7D32;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: 600;
             font-size: ${compact ? "6.5px" : "7.5px"};
           }
           .cell-skipped {
@@ -360,7 +363,7 @@ const generatePDFHtml = (
             border-radius: 4px;
           }
           .cell-missed {
-            background: #f44336;
+            background: #C62828;
             border-radius: 4px;
             color: #fff;
             font-weight: 600;
@@ -393,9 +396,9 @@ const generatePDFHtml = (
             height: 14px;
             border-radius: 3px;
           }
-          .sw-green { background: #4caf50; }
-          .sw-green-delay { background: #4caf50; }
-          .sw-red { background: #f44336; }
+          .sw-green { background: #2E7D32; }
+          .sw-green-delay { background: #2E7D32; }
+          .sw-red { background: #C62828; }
           .sw-gray { background: #bdbdbd; }
         </style>
       </head>
@@ -428,15 +431,17 @@ export const exportPDF = async (
   timeFormat: TimeFmt,
   t: (key: string) => string,
 ) => {
-  const grid = buildPDFGrid(
-    scheduleMap,
-    medications,
+  const grid = buildPDFGrid(scheduleMap, medications, year, month, weekdayMap);
+  const medSpanMap = buildMedSpanMap(grid);
+  const html = generatePDFHtml(
+    grid,
+    medSpanMap,
     year,
     month,
-    weekdayMap,
+    monthLabel,
+    timeFormat,
+    t,
   );
-  const medSpanMap = buildMedSpanMap(grid);
-  const html = generatePDFHtml(grid, medSpanMap, year, month, monthLabel, timeFormat, t);
 
   const { uri } = await Print.printToFileAsync({ html });
 

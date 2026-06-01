@@ -231,7 +231,7 @@
     "medications": "ilaç",
     "emptyText": "İlaç bulunamadı",
     "emptySubtext": "İlk ilacınızı eklemek için +'ya dokunun",
-    "deleteConfirm": "\"{{name}}\" silmek istediğinize emin misiniz?"
+    "deleteConfirm": "\"{{name}}\" ilacını silmek istediğinize emin misiniz?"
   },
   "calendar": {
     "emptyText": "Planlanmış ilaç yok",
@@ -252,6 +252,10 @@
     "status": "Durum",
     "takenAt": "Alındığı Saat",
     "delayHour": "s",
+    "delayDay": "g",
+    "delayWeek": "h",
+    "delayMonth": "ay",
+    "delayYear": "y",
     "medication": "İlaç",
     "time": "Saat",
     "legendTaken": "Zamanında alındı",
