@@ -263,6 +263,14 @@
     "legendMissed": "Missed",
     "legendSkipped": "Skipped"
   },
+  "notifications": {
+    "defaultTitle": "Medication Reminder",
+    "defaultBody": "Time to take your medication",
+    "lowStockTitle": "Low Medication Stock",
+    "lowStockTitleWithName": "Low {{name}} Stock",
+    "lowStockBody_one": "Only {{count}} dose remaining. Time to refill.",
+    "lowStockBody_other": "Only {{count}} doses remaining. Time to refill."
+  },
   "medicationInfo": {
     "paused": "PAUSED",
     "noSchedule": "No schedule",

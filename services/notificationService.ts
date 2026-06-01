@@ -3,6 +3,9 @@ import * as Device from "expo-device";
 import { Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
+import i18n from "../utils/i18n";
+
+const CHANNEL_ID = "medication-reminders";
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -38,15 +41,39 @@ export async function requestNotificationPermission(): Promise<boolean> {
   }
 
   if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync("medication-reminders", {
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
       name: "Medication Reminders",
       importance: Notifications.AndroidImportance.HIGH,
       vibrationPattern: [0, 250, 250, 250],
       lightColor: Colors.primary,
       sound: "default",
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      audioAttributes: {
+        usage: Notifications.AndroidAudioUsage.NOTIFICATION,
+        contentType: Notifications.AndroidAudioContentType.SONIFICATION,
+      },
+      bypassDnd: false,
     });
   }
   return true;
+}
+
+/* -------------------------- Notification Content -------------------------- */
+function buildContent(params: {
+  title: string;
+  body: string;
+  data: Record<string, unknown>;
+}): Notifications.NotificationContentInput {
+  return {
+    title: params.title,
+    body: params.body,
+    data: params.data,
+    sound: "default",
+    priority: Notifications.AndroidNotificationPriority.HIGH,
+    vibrate: [0, 250, 250, 250],
+    autoDismiss: true,
+    color: Colors.primary,
+  };
 }
 
 function parseTime(time: string): { hours: number; minutes: number } {
@@ -60,9 +87,9 @@ function toExpoWeekday(jsDay: number): number {
 
 function buildTitle(medication: Medication): string {
   if (medication.notificationSettings?.hideName) {
-    return "Medication Reminder";
+    return i18n.t("notifications.defaultTitle");
   }
-  return `${medication.name}`;
+  return medication.name;
 }
 
 function buildBody(medication: Medication, dose: string, time: string): string {
@@ -75,17 +102,17 @@ function buildBody(medication: Medication, dose: string, time: string): string {
 
   return parts.length > 0
     ? parts.join(" · ")
-    : `Time to take your medication (${time})`;
+    : i18n.t("notifications.defaultBody") + ` (${time})`;
 }
 
 function noteLabel(note: string): string {
-  const map: Record<string, string> = {
-    before_meal: "Before meal",
-    with_meal: "With meal",
-    after_meal: "After meal",
-    empty_stomach: "On empty stomach",
+  const keyMap: Record<string, string> = {
+    before_meal: "instructions.beforeMeal",
+    with_meal: "instructions.withMeal",
+    after_meal: "instructions.afterMeal",
+    empty_stomach: "instructions.emptyStomach",
   };
-  return map[note] ?? note;
+  return keyMap[note] ? i18n.t(keyMap[note]) : note;
 }
 
 /* ------------------------- Schedule Notifications ------------------------- */
@@ -124,9 +151,19 @@ export async function scheduleMedicationNotifications(
         break;
 
       case "weekly":
-      case "biweekly":
         notificationIds = await scheduleWeeklyDose({
           days: schedule.days ?? [],
+          hours,
+          minutes,
+          title,
+          body,
+          data,
+        });
+        break;
+
+      case "biweekly":
+        notificationIds = await scheduleBiweeklyDose({
+          startDate: schedule.startDate,
           hours,
           minutes,
           title,
@@ -149,7 +186,19 @@ export async function scheduleMedicationNotifications(
         }
         break;
 
-      case "monthly":
+      case "monthly": {
+        const startDay = new Date(schedule.startDate).getDate();
+        notificationIds = await scheduleMonthlyDose({
+          days: [startDay],
+          hours,
+          minutes,
+          title,
+          body,
+          data,
+        });
+        break;
+      }
+
       case "specificmonth":
         notificationIds = await scheduleMonthlyDose({
           days: schedule.days ?? [],
@@ -180,7 +229,11 @@ async function scheduleDailyDose(params: {
   data: Record<string, unknown>;
 }): Promise<string[]> {
   const id = await Notifications.scheduleNotificationAsync({
-    content: { title: params.title, body: params.body, data: params.data },
+    content: buildContent({
+      title: params.title,
+      body: params.body,
+      data: params.data,
+    }),
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: params.hours,
@@ -203,12 +256,57 @@ async function scheduleWeeklyDose(params: {
 
   for (const day of params.days) {
     const id = await Notifications.scheduleNotificationAsync({
-      content: { title: params.title, body: params.body, data: params.data },
+      content: buildContent({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      }),
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday: toExpoWeekday(day),
         hour: params.hours,
         minute: params.minutes,
+      },
+    });
+    ids.push(id);
+  }
+
+  return ids;
+}
+
+/* --------------------------- Schedule Biweekly --------------------------- */
+async function scheduleBiweeklyDose(params: {
+  startDate: string;
+  hours: number;
+  minutes: number;
+  title: string;
+  body: string;
+  data: Record<string, unknown>;
+}): Promise<string[]> {
+  const ids: string[] = [];
+  const now = new Date();
+
+  let next = new Date(params.startDate);
+  next.setHours(params.hours, params.minutes, 0, 0);
+
+  while (next <= now) {
+    next.setDate(next.getDate() + 14);
+  }
+  const maxOccurrences = 26;
+
+  for (let i = 0; i < maxOccurrences; i++) {
+    const trigger = new Date(next);
+    trigger.setDate(trigger.getDate() + i * 14);
+
+    const id = await Notifications.scheduleNotificationAsync({
+      content: buildContent({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      }),
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DATE,
+        date: trigger,
       },
     });
     ids.push(id);
@@ -244,7 +342,11 @@ async function scheduleIntervalDose(params: {
     trigger.setDate(trigger.getDate() + i * params.intervalDays);
 
     const id = await Notifications.scheduleNotificationAsync({
-      content: { title: params.title, body: params.body, data: params.data },
+      content: buildContent({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      }),
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: trigger,
@@ -283,7 +385,11 @@ async function scheduleMonthlyDose(params: {
       if (date <= now) continue;
 
       const id = await Notifications.scheduleNotificationAsync({
-        content: { title: params.title, body: params.body, data: params.data },
+        content: buildContent({
+          title: params.title,
+          body: params.body,
+          data: params.data,
+        }),
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date,
@@ -341,17 +447,19 @@ export async function scheduleLowStockNotification(
     return null;
 
   const title = medication.notificationSettings.hideName
-    ? "Low Medication Stock"
-    : `Low ${medication.name} Stock`;
+    ? i18n.t("notifications.lowStockTitle")
+    : i18n.t("notifications.lowStockTitleWithName", { name: medication.name });
 
-  const body = `Only ${medication.stock} dose${medication.stock === 1 ? "" : "s"} remaining. Time to refill.`;
+  const body = i18n.t("notifications.lowStockBody", {
+    count: medication.stock ?? 0,
+  });
 
   const id = await Notifications.scheduleNotificationAsync({
-    content: {
+    content: buildContent({
       title,
       body,
       data: { medicationId: medication.id, type: "low_stock" },
-    },
+    }),
     trigger: null,
   });
 
@@ -374,7 +482,7 @@ export async function snoozeMedicationNotification(
   const triggerDate = new Date(Date.now() + minutes * 60000);
 
   const id = await Notifications.scheduleNotificationAsync({
-    content: {
+    content: buildContent({
       title,
       body,
       data: {
@@ -383,7 +491,7 @@ export async function snoozeMedicationNotification(
         snoozed: true,
         snoozeMinutes: minutes,
       },
-    },
+    }),
     trigger: {
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: triggerDate,

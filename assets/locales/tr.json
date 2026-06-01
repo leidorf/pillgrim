@@ -263,6 +263,13 @@
     "legendMissed": "Kaçırıldı",
     "legendSkipped": "Atlandı"
   },
+  "notifications": {
+    "defaultTitle": "İlaç Hatırlatıcı",
+    "defaultBody": "İlacınızı alma zamanı",
+    "lowStockTitle": "Düşük İlaç Stoku",
+    "lowStockTitleWithName": "Düşük {{name}} Stoku",
+    "lowStockBody_other": "Sadece {{count}} doz kaldı. Yenileme zamanı."
+  },
   "medicationInfo": {
     "paused": "DURAKLATILDI",
     "noSchedule": "Program yok",

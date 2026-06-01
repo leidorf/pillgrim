@@ -343,7 +343,7 @@ const createStyles = (theme: Theme) => StyleSheet.create({
   emptyText: { fontSize: 18, fontWeight: "500" },
   emptySubtext: {
     fontSize: 14,
-    color: theme.textSecondary,
+    color: theme.textPrimary,
     textTransform: "capitalize",
   },
 });

@@ -1,5 +1,5 @@
-import { useEffect } from "react";
-import { StatusBar } from "react-native";
+import { useEffect, useRef } from "react";
+import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { SafeAreaProvider } from "react-native-safe-area-context";
@@ -22,6 +22,8 @@ import SettingsScreen from "./screens/Settings";
 import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
 import { useSettingsStore } from "./store/settingsStore";
+import { useMedicationStore } from "./store/medicationStore";
+import { rescheduleAllNotifications } from "./services/notificationService";
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
@@ -122,6 +124,39 @@ export default function App() {
     const resolved = language === "system" ? getSystemLanguage() : language;
     i18n.changeLanguage(resolved);
   }, []);
+
+  const medications = useMedicationStore((s) => s.medications);
+  const _updateMedicationNotificationIds = useMedicationStore(
+    (s) => s._updateMedicationNotificationIds,
+  );
+  const hasRescheduled = useRef(false);
+
+  useEffect(() => {
+    const doReschedule = async () => {
+      if (medications.length === 0) return;
+      try {
+        await rescheduleAllNotifications(
+          medications,
+          (id) => medications.find((m) => m.id === id)?.notificationIds ?? [],
+          (id, ids) => _updateMedicationNotificationIds(id, ids),
+        );
+      } catch (error) {
+        console.error("Failed to reschedule notifications:", error);
+      }
+    };
+
+    if (!hasRescheduled.current && medications.length > 0) {
+      hasRescheduled.current = true;
+      doReschedule();
+    }
+
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
+        doReschedule();
+      }
+    });
+    return () => subscription.remove();
+  }, [medications]);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
