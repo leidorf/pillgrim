@@ -1,6 +1,6 @@
 import { View, StyleSheet, ScrollView } from "react-native";
 import { Text } from "../../components/Text";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 
 import { useLogStore } from "../../store/logsStore";
@@ -46,6 +46,13 @@ const CalendarScreen = () => {
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
   const [exportModalVisible, setExportModalVisible] = useState(false);
+
+  useEffect(() => {
+    const firstOfMonth = new Date(currentYear, currentMonth, 1);
+    setCurrentMonthLabel(
+      firstOfMonth.toLocaleDateString(locale, { month: "long", year: "numeric" }),
+    );
+  }, [locale]);
 
   const { logs } = useLogStore();
   const { medications } = useMedicationStore();

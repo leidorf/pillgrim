@@ -222,7 +222,8 @@ const MonthlyCalendar = ({
       if (onMonthChange && months[index]) {
         const monthData = months[index];
         const firstDay = new Date(monthData.year, monthData.month, 1);
-        const label = firstDay.toLocaleDateString(locale, {
+        const currentLocale = i18n.language?.split("-")[0] ?? "en";
+        const label = firstDay.toLocaleDateString(currentLocale, {
           month: "long",
           year: "numeric",
         });
