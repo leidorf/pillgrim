@@ -217,6 +217,20 @@ const HomeScreen = () => {
   }, [isSheetOpen, navigation]);
 
   useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      navigation.setOptions({
+        tabBarStyle: {
+          backgroundColor: "rgba(0, 0, 0, 0)",
+          borderTopWidth: 0,
+          boxShadow: "none",
+          elevation: 0,
+        },
+      });
+    });
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
     if (!isSheetOpen) return;
 
     const onBackPress = () => {

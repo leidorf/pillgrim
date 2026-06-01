@@ -112,6 +112,7 @@ const MedsScreen = () => {
 
   const handleEditFromSheet = useCallback(() => {
     if (selectedMed?.id) {
+      setIsSheetOpen(false);
       handleEdit(selectedMed.id);
     }
   }, [selectedMed, handleEdit]);
@@ -125,19 +126,26 @@ const MedsScreen = () => {
   const tabNavigation =
     useNavigation<BottomTabNavigationProp<MainScreenParamList>>();
 
+  const visibleTabBarStyle = {
+    backgroundColor: "rgba(0, 0, 0, 0)",
+    borderTopWidth: 0,
+    boxShadow: "none",
+    elevation: 0,
+  } as const;
+
   // Hide tab bar when sheet is open
   useEffect(() => {
     tabNavigation.setOptions({
-      tabBarStyle: isSheetOpen
-        ? { display: "none" }
-        : {
-            backgroundColor: "rgba(0, 0, 0, 0)",
-            borderTopWidth: 0,
-            boxShadow: "none",
-            elevation: 0,
-          },
+      tabBarStyle: isSheetOpen ? { display: "none" } : visibleTabBarStyle,
     });
   }, [isSheetOpen, tabNavigation]);
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      tabNavigation.setOptions({ tabBarStyle: visibleTabBarStyle });
+    });
+    return unsubscribe;
+  }, [navigation, tabNavigation]);
 
   useEffect(() => {
     if (!isSheetOpen) return;
