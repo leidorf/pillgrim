@@ -8,6 +8,7 @@ import {
   scheduleMedicationNotifications,
   cancelMedicationNotifications,
   rescheduleMedicationNotifications,
+  scheduleLowStockNotification,
 } from "../services/notificationService";
 
 type DraftMedication = Partial<Medication>;
@@ -143,24 +144,48 @@ export const useMedicationStore = create<MedicationStore>()(
           ),
         }));
 
-        //TODO: lowstock notification
-        if (updates.stock !== undefined && updates.stock <= 5) {
+        if (
+          updates.stock !== undefined &&
+          updates.stock <= 5 &&
+          updatedMed.notificationSettings?.lowStockAlert
+        ) {
+          scheduleLowStockNotification(updatedMed).catch((err) =>
+            console.error("Low stock notification failed:", err),
+          );
         }
       },
 
       /* -------------------- Update Stock on Medication Takes -------------------- */
       updateStock: (id: string, delta: number) => {
+        const currentMed = get().medications.find((m) => m.id === id);
+        const newStock =
+          currentMed?.stock !== undefined
+            ? Math.max(0, currentMed.stock + delta)
+            : undefined;
+
         set((state) => ({
           medications: state.medications.map((m) =>
             m.id === id && m.stock !== undefined
               ? {
                   ...m,
-                  stock: Math.max(0, m.stock + delta),
+                  stock: newStock!,
                   updatedAt: new Date().toISOString(),
                 }
               : m,
           ),
         }));
+
+        if (
+          newStock !== undefined &&
+          newStock <= 5 &&
+          delta < 0 &&
+          currentMed?.notificationSettings?.lowStockAlert
+        ) {
+          const updatedMed = { ...currentMed, stock: newStock };
+          scheduleLowStockNotification(updatedMed).catch((err) =>
+            console.error("Low stock notification failed:", err),
+          );
+        }
       },
 
       _updateMedicationNotificationIds: (

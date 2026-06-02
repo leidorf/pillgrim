@@ -33,7 +33,7 @@
         {
           "enableBackgroundRemoteNotifications": true,
           "icon": "./assets/notification-icon.png",
-          "color": "#689F38",
+          "color": "#AED581",
           "sounds": []
         }
       ],

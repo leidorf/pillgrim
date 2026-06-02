@@ -285,11 +285,14 @@ const HomeScreen = () => {
             />
             <Text style={styles.emptyText}>{t("home.emptyText")}</Text>
             <Text style={styles.emptySubtext}>
-              {selectedDate.toLocaleDateString(i18n.language?.split("-")[0] ?? "en", {
-                weekday: "long",
-                day: "numeric",
-                month: "long",
-              })}
+              {selectedDate.toLocaleDateString(
+                i18n.language?.split("-")[0] ?? "en",
+                {
+                  weekday: "long",
+                  day: "numeric",
+                  month: "long",
+                },
+              )}
             </Text>
           </View>
         }
@@ -325,27 +328,28 @@ const HomeScreen = () => {
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  medList: {
-    paddingHorizontal: 32,
-    paddingTop: 16,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    backgroundColor: theme.surface,
-  },
-  listContent: { paddingBottom: 72 },
-  emptyContainer: {
-    justifyContent: "center",
-    alignItems: "center",
-    paddingTop: 32,
-    gap: 8,
-  },
-  emptyText: { fontSize: 18, fontWeight: "500" },
-  emptySubtext: {
-    fontSize: 14,
-    color: theme.textPrimary,
-    textTransform: "capitalize",
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    medList: {
+      paddingHorizontal: 32,
+      paddingTop: 16,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      backgroundColor: theme.surface,
+    },
+    listContent: { paddingBottom: 72 },
+    emptyContainer: {
+      justifyContent: "center",
+      alignItems: "center",
+      paddingTop: 32,
+      gap: 8,
+    },
+    emptyText: { fontSize: 18, color: theme.textSecondary, fontWeight: "500" },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textTransform: "capitalize",
+    },
+  });
 
 export default HomeScreen;
