@@ -23,7 +23,9 @@
     "alarm": "Alarm & Sound",
     "language": "Language",
     "privacy": "Privacy Policy",
-    "about": "About"
+    "about": "About",
+    "hideNotificationNames": "Hide medication names",
+    "hideNotificationNamesDesc": "Show \"Medication Reminder\" instead of medication names in all notifications"
   },
   "language": {
     "title": "Language",

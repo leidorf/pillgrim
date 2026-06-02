@@ -23,8 +23,11 @@
     "notifications": "Bildirimler",
     "alarm": "Alarm & Ses",
     "privacy": "Gizlilik Politikası",
-    "about": "Hakkında"
+    "about": "Hakkında",
+    "hideNotificationNames": "İlaç adlarını gizle",
+    "hideNotificationNamesDesc": "Bildirimlerde ilaç adı yerine \"İlaç Hatırlatıcı\" göster"
   },
+
   "language": {
     "title": "Dil",
     "systemDefault": "Sistem Varsayılanı",

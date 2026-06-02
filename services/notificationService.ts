@@ -4,8 +4,12 @@ import { Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
 import i18n from "../utils/i18n";
+import { useSettingsStore } from "../store/settingsStore";
 
 const CHANNEL_ID = "medication-reminders";
+
+const getGlobalHideNames = (): boolean =>
+  useSettingsStore.getState().hideNotificationNames;
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -86,6 +90,11 @@ function toExpoWeekday(jsDay: number): number {
 }
 
 function buildTitle(medication: Medication): string {
+  // Global setting overrides per-medication — hides ALL names
+  if (getGlobalHideNames()) {
+    return i18n.t("notifications.defaultTitle");
+  }
+  // Per-medication "hide name" setting
   if (medication.notificationSettings?.hideName) {
     return i18n.t("notifications.defaultTitle");
   }
