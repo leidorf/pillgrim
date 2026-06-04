@@ -91,7 +91,7 @@ const Step3Screen = () => {
         };
       });
     }
-    return [{ id: "1", time: createTimeAt(8), amount: "" }];
+    return [{ id: "1", time: new Date(), amount: "" }];
   });
 
   const [activeTimePickerId, setActiveTimePickerId] = useState<string | null>(

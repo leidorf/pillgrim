@@ -25,7 +25,19 @@
     "privacy": "Privacy Policy",
     "about": "About",
     "hideNotificationNames": "Hide medication names",
-    "hideNotificationNamesDesc": "Show \"Medication Reminder\" instead of medication names in all notifications"
+    "hideNotificationNamesDesc": "Show \"Medication Reminder\" instead of medication names in all notifications",
+    "fullscreenNotification": "Fullscreen reminders",
+    "fullscreenNotificationDesc": "Show a fullscreen alarm overlay when a reminder fires while the app is open",
+    "vibration": "Vibration",
+    "vibrationDesc": "Vibrate when a medication reminder fires",
+    "vibrationPattern": "Vibration pattern",
+    "vibrationPatternDesc": "Choose how the notification vibrates"
+  },
+  "vibration": {
+    "short": "Short",
+    "normal": "Normal",
+    "long": "Long",
+    "alarm": "Alarm"
   },
   "language": {
     "title": "Language",
@@ -271,7 +283,9 @@
     "lowStockTitle": "Low Medication Stock",
     "lowStockTitleWithName": "Low {{name}} Stock",
     "lowStockBody_one": "Only {{count}} dose remaining. Time to refill.",
-    "lowStockBody_other": "Only {{count}} doses remaining. Time to refill."
+    "lowStockBody_other": "Only {{count}} doses remaining. Time to refill.",
+    "actionTaken": "Taken",
+    "actionSkip": "Skip"
   },
   "medicationInfo": {
     "paused": "PAUSED",

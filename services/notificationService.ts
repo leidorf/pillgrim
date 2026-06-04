@@ -7,9 +7,30 @@ import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
 
 const CHANNEL_ID = "medication-reminders";
+const CHANNEL_ID_FULLSCREEN = "medication-reminders-fullscreen";
 
 const getGlobalHideNames = (): boolean =>
   useSettingsStore.getState().hideNotificationNames;
+const getFullscreen = (): boolean =>
+  useSettingsStore.getState().fullscreenNotification;
+const activeChannelId = (): string =>
+  getFullscreen() ? CHANNEL_ID_FULLSCREEN : CHANNEL_ID;
+
+const CATEGORY_ID = "medication-actions";
+
+/* --------------------------- Vibration patterns --------------------------- */
+const VIBRATION_PATTERNS: Record<string, number[]> = {
+  short: [0, 150, 100, 150],
+  normal: [0, 250, 250, 250],
+  long: [0, 500, 200, 500, 200, 500],
+  alarm: [0, 500, 200, 500],
+};
+
+function getVibratePattern(): number[] | undefined {
+  const { vibrationEnabled, vibrationPattern } = useSettingsStore.getState();
+  if (!vibrationEnabled) return undefined;
+  return VIBRATION_PATTERNS[vibrationPattern] ?? VIBRATION_PATTERNS.normal;
+}
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -20,6 +41,23 @@ Notifications.setNotificationHandler({
     shouldShowList: true,
   }),
 });
+
+/* ---------------------- Register category with actions --------------------- */
+export async function setupNotificationCategories(): Promise<void> {
+  if (!Device.isDevice) return;
+  await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
+    {
+      identifier: "taken",
+      buttonTitle: i18n.t("notifications.actionTaken"),
+      options: { opensAppToForeground: true },
+    },
+    {
+      identifier: "skip",
+      buttonTitle: i18n.t("notifications.actionSkip"),
+      options: { opensAppToForeground: true },
+    },
+  ]);
+}
 
 /* ------------------------------- Permission ------------------------------- */
 export async function requestNotificationPermission(): Promise<boolean> {
@@ -58,7 +96,24 @@ export async function requestNotificationPermission(): Promise<boolean> {
       },
       bypassDnd: false,
     });
+
+    await Notifications.setNotificationChannelAsync(CHANNEL_ID_FULLSCREEN, {
+      name: "Medication Reminders (Fullscreen)",
+      importance: Notifications.AndroidImportance.MAX,
+      vibrationPattern: [0, 250, 250, 250],
+      lightColor: Colors.primary,
+      sound: "default",
+      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+      audioAttributes: {
+        usage: Notifications.AndroidAudioUsage.NOTIFICATION,
+        contentType: Notifications.AndroidAudioContentType.SONIFICATION,
+      },
+      bypassDnd: false,
+    });
   }
+
+  await setupNotificationCategories();
+
   return true;
 }
 
@@ -74,9 +129,10 @@ function buildContent(params: {
     data: params.data,
     sound: "default",
     priority: Notifications.AndroidNotificationPriority.HIGH,
-    vibrate: [0, 250, 250, 250],
+    vibrate: getVibratePattern(),
     autoDismiss: true,
     color: Colors.primary,
+    categoryIdentifier: CATEGORY_ID,
   };
 }
 
@@ -90,11 +146,9 @@ function toExpoWeekday(jsDay: number): number {
 }
 
 function buildTitle(medication: Medication): string {
-  // Global setting overrides per-medication — hides ALL names
   if (getGlobalHideNames()) {
     return i18n.t("notifications.defaultTitle");
   }
-  // Per-medication "hide name" setting
   if (medication.notificationSettings?.hideName) {
     return i18n.t("notifications.defaultTitle");
   }
@@ -244,6 +298,7 @@ async function scheduleDailyDose(params: {
       data: params.data,
     }),
     trigger: {
+      channelId: activeChannelId(),
       type: Notifications.SchedulableTriggerInputTypes.DAILY,
       hour: params.hours,
       minute: params.minutes,
@@ -271,6 +326,7 @@ async function scheduleWeeklyDose(params: {
         data: params.data,
       }),
       trigger: {
+        channelId: activeChannelId(),
         type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
         weekday: toExpoWeekday(day),
         hour: params.hours,
@@ -314,6 +370,7 @@ async function scheduleBiweeklyDose(params: {
         data: params.data,
       }),
       trigger: {
+        channelId: activeChannelId(),
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: trigger,
       },
@@ -357,6 +414,7 @@ async function scheduleIntervalDose(params: {
         data: params.data,
       }),
       trigger: {
+        channelId: activeChannelId(),
         type: Notifications.SchedulableTriggerInputTypes.DATE,
         date: trigger,
       },
@@ -400,6 +458,7 @@ async function scheduleMonthlyDose(params: {
           data: params.data,
         }),
         trigger: {
+          channelId: activeChannelId(),
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date,
         },
@@ -502,6 +561,7 @@ export async function snoozeMedicationNotification(
       },
     }),
     trigger: {
+      channelId: activeChannelId(),
       type: Notifications.SchedulableTriggerInputTypes.DATE,
       date: triggerDate,
     },

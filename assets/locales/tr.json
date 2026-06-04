@@ -25,7 +25,19 @@
     "privacy": "Gizlilik Politikası",
     "about": "Hakkında",
     "hideNotificationNames": "İlaç adlarını gizle",
-    "hideNotificationNamesDesc": "Bildirimlerde ilaç adı yerine \"İlaç Hatırlatıcı\" göster"
+    "hideNotificationNamesDesc": "Bildirimlerde ilaç adı yerine \"İlaç Hatırlatıcı\" göster",
+    "fullscreenNotification": "Tam ekran hatırlatıcılar",
+    "fullscreenNotificationDesc": "Uygulama açıkken hatırlatıcı geldiğinde tam ekran alarm göster",
+    "vibration": "Titreşim",
+    "vibrationDesc": "İlaç hatırlatıcısı geldiğinde titreşim yap",
+    "vibrationPattern": "Titreşim deseni",
+    "vibrationPatternDesc": "Bildirimin nasıl titreyeceğini seç"
+  },
+  "vibration": {
+    "short": "Kısa",
+    "normal": "Normal",
+    "long": "Uzun",
+    "alarm": "Alarm"
   },
 
   "language": {
@@ -271,7 +283,9 @@
     "defaultBody": "İlacınızı alma zamanı",
     "lowStockTitle": "Düşük İlaç Stoku",
     "lowStockTitleWithName": "Düşük {{name}} Stoku",
-    "lowStockBody_other": "Sadece {{count}} doz kaldı. Yenileme zamanı."
+    "lowStockBody_other": "Sadece {{count}} doz kaldı. Yenileme zamanı.",
+    "actionTaken": "Alındı",
+    "actionSkip": "Atla"
   },
   "medicationInfo": {
     "paused": "DURAKLATILDI",

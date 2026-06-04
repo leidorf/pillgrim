@@ -18,12 +18,18 @@ type SettingsStore = {
   themeMode: ThemeMode;
   language: LanguageSetting;
   hideNotificationNames: boolean;
+  fullscreenNotification: boolean;
+  vibrationEnabled: boolean;
+  vibrationPattern: "short" | "normal" | "long" | "alarm";
   setTimeFormat: (format: TimeFormat) => void;
   setWeekStartsOn: (start: WeekStart) => void;
   setFontScale: (scale: FontScale) => void;
   setThemeMode: (mode: ThemeMode) => void;
   setLanguage: (language: LanguageSetting) => void;
   setHideNotificationNames: (hide: boolean) => void;
+  setFullscreenNotification: (enabled: boolean) => void;
+  setVibrationEnabled: (enabled: boolean) => void;
+  setVibrationPattern: (pattern: "short" | "normal" | "long" | "alarm") => void;
 };
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -35,11 +41,20 @@ export const useSettingsStore = create<SettingsStore>()(
       themeMode: "system",
       language: "system",
       hideNotificationNames: false,
+      fullscreenNotification: false,
       setTimeFormat: (format) => set({ timeFormat: format }),
       setWeekStartsOn: (start) => set({ weekStartsOn: start }),
       setFontScale: (scale) => set({ fontScale: scale }),
       setThemeMode: (mode) => set({ themeMode: mode }),
       setHideNotificationNames: (hide) => set({ hideNotificationNames: hide }),
+      setFullscreenNotification: (enabled) =>
+        set({ fullscreenNotification: enabled }),
+      vibrationEnabled: true,
+      vibrationPattern: "normal",
+      setVibrationEnabled: (enabled: boolean) =>
+        set({ vibrationEnabled: enabled }),
+      setVibrationPattern: (pattern: "short" | "normal" | "long" | "alarm") =>
+        set({ vibrationPattern: pattern }),
       setLanguage: (lang) => {
         const resolved = lang === "system" ? getSystemLanguage() : lang;
         i18n.changeLanguage(resolved);

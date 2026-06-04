@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -22,8 +22,66 @@ import SettingsScreen from "./screens/Settings";
 import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
 import { useSettingsStore } from "./store/settingsStore";
+import * as Notifications from "expo-notifications";
 import { useMedicationStore } from "./store/medicationStore";
+import { useLogStore } from "./store/logsStore";
 import { rescheduleAllNotifications } from "./services/notificationService";
+import { getLocalDateString } from "./utils/dateUtils";
+import FullscreenAlarm, { AlarmData } from "./components/FullscreenAlarm";
+
+/* ---------------------- Notification Action Handlers ---------------------- */
+function createOrUpdateLog(
+  medicationId: string,
+  scheduledDate: string,
+  scheduledTime: string,
+  updates: { takenAt?: Date; skipped?: boolean; doseAmount?: number },
+) {
+  const { logs, addLog, updateLog } = useLogStore.getState();
+  const existing = logs.find(
+    (l) =>
+      l.medicationId === medicationId &&
+      l.scheduledDate === scheduledDate &&
+      l.scheduledTime === scheduledTime,
+  );
+  if (existing) {
+    updateLog(existing.id, updates);
+  } else {
+    addLog({ medicationId, scheduledDate, scheduledTime, ...updates });
+  }
+}
+
+function handleNotificationTaken(
+  medicationId: string,
+  scheduledTime: string,
+  dateStr: string,
+) {
+  const med = useMedicationStore
+    .getState()
+    .medications.find((m) => m.id === medicationId);
+  const doseStr = med?.timeDoses?.find((td) => td.time === scheduledTime)?.dose;
+  const doseAmount = doseStr ? parseInt(doseStr, 10) || undefined : undefined;
+
+  createOrUpdateLog(medicationId, dateStr, scheduledTime, {
+    takenAt: new Date(),
+    skipped: false,
+    doseAmount,
+  });
+
+  // Decrement stock
+  if (doseAmount && doseAmount > 0) {
+    useMedicationStore.getState().updateStock(medicationId, -doseAmount);
+  }
+}
+
+function handleNotificationSkip(
+  medicationId: string,
+  scheduledTime: string,
+  dateStr: string,
+) {
+  createOrUpdateLog(medicationId, dateStr, scheduledTime, {
+    skipped: true,
+  });
+}
 
 import PillIcon from "./assets/icons/pill.svg";
 import HouseIcon from "./assets/icons/house.svg";
@@ -130,10 +188,39 @@ export default function App() {
     (s) => s._updateMedicationNotificationIds,
   );
   const hasRescheduled = useRef(false);
+  const isRescheduling = useRef(false);
+  const pendingReschedule = useRef(false);
+
+  const [alarmData, setAlarmData] = useState<AlarmData | null>(null);
+
+  const lastResponse = Notifications.useLastNotificationResponse();
+  useEffect(() => {
+    if (!lastResponse) return;
+    const { actionIdentifier, notification } = lastResponse;
+    const data = notification.request.content.data as
+      | { medicationId?: string; scheduledTime?: string }
+      | undefined;
+    if (!data?.medicationId || !data?.scheduledTime) return;
+
+    const dateStr = getLocalDateString(new Date());
+    if (actionIdentifier === "taken") {
+      handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
+    } else if (actionIdentifier === "skip") {
+      handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
+    }
+    Notifications.clearLastNotificationResponseAsync();
+  }, [lastResponse]);
 
   useEffect(() => {
     const doReschedule = async () => {
+      if (isRescheduling.current) {
+        pendingReschedule.current = true;
+        return;
+      }
       if (medications.length === 0) return;
+
+      isRescheduling.current = true;
+      pendingReschedule.current = false;
       try {
         await rescheduleAllNotifications(
           medications,
@@ -142,12 +229,20 @@ export default function App() {
         );
       } catch (error) {
         console.error("Failed to reschedule notifications:", error);
+      } finally {
+        isRescheduling.current = false;
+        if (pendingReschedule.current) {
+          pendingReschedule.current = false;
+          doReschedule();
+        }
       }
     };
 
-    if (!hasRescheduled.current && medications.length > 0) {
+    if (!hasRescheduled.current) {
       hasRescheduled.current = true;
-      doReschedule();
+      if (medications.length > 0) {
+        doReschedule();
+      }
     }
 
     const subscription = AppState.addEventListener("change", (state) => {
@@ -157,6 +252,62 @@ export default function App() {
     });
     return () => subscription.remove();
   }, [medications]);
+
+  // Handle notification action button taps (Taken / Skip)
+  useEffect(() => {
+    const subscription = Notifications.addNotificationResponseReceivedListener(
+      (response) => {
+        const { actionIdentifier, notification } = response;
+        const data = notification.request.content.data as
+          | { medicationId?: string; scheduledTime?: string }
+          | undefined;
+
+        if (!data?.medicationId || !data?.scheduledTime) return;
+
+        const dateStr = getLocalDateString(new Date());
+
+        if (actionIdentifier === "taken") {
+          handleNotificationTaken(
+            data.medicationId,
+            data.scheduledTime,
+            dateStr,
+          );
+        } else if (actionIdentifier === "skip") {
+          handleNotificationSkip(
+            data.medicationId,
+            data.scheduledTime,
+            dateStr,
+          );
+        }
+      },
+    );
+
+    return () => subscription.remove();
+  }, []);
+
+  useEffect(() => {
+    const subscription = Notifications.addNotificationReceivedListener(
+      (notification) => {
+        const fullscreen = useSettingsStore.getState().fullscreenNotification;
+        if (!fullscreen) return;
+
+        const { title, body, data } = notification.request.content;
+        const payload = data as
+          | { medicationId?: string; scheduledTime?: string }
+          | undefined;
+
+        if (!payload?.medicationId || !payload?.scheduledTime) return;
+
+        setAlarmData({
+          medicationId: payload.medicationId,
+          scheduledTime: payload.scheduledTime,
+          title: title ?? "",
+          body: body ?? "",
+        });
+      },
+    );
+    return () => subscription.remove();
+  }, []);
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
@@ -189,6 +340,13 @@ export default function App() {
               />
             </RootStack.Navigator>
           </NavigationContainer>
+
+          {alarmData && (
+            <FullscreenAlarm
+              data={alarmData}
+              onDismiss={() => setAlarmData(null)}
+            />
+          )}
         </BottomSheetModalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
