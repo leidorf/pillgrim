@@ -221,6 +221,7 @@
     "intentionallySkip": "Intentionally skip",
     "markPending": "Mark as pending again",
     "snooze": "Snooze reminder",
+    "snoozeShort": "Snooze",
     "remindLater": "Remind me later",
     "remindAgain": "Remind me again in..."
   },

@@ -222,6 +222,7 @@
     "intentionallySkip": "Bilinçli olarak atla",
     "markPending": "Tekrar beklemede işaretle",
     "snooze": "Hatırlatıcıyı ertele",
+    "snoozeShort": "Ertele",
     "remindLater": "Daha sonra hatırlat",
     "remindAgain": "Tekrar ne zaman hatırlatılsın?"
   },
@@ -281,8 +282,8 @@
   "notifications": {
     "defaultTitle": "İlaç Hatırlatıcı",
     "defaultBody": "İlacınızı alma zamanı",
-    "lowStockTitle": "Düşük İlaç Stoku",
-    "lowStockTitleWithName": "Düşük {{name}} Stoku",
+    "lowStockTitle": "İlacınız Tükeniyor",
+    "lowStockTitleWithName": "{{name}} Tükeniyor",
     "lowStockBody_other": "Sadece {{count}} doz kaldı. Yenileme zamanı.",
     "actionTaken": "Alındı",
     "actionSkip": "Atla"

@@ -22,10 +22,10 @@ import SettingsScreen from "./screens/Settings";
 import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
 import { useSettingsStore } from "./store/settingsStore";
-import * as Notifications from "expo-notifications";
+import notifee, { EventType } from "@notifee/react-native";
 import { useMedicationStore } from "./store/medicationStore";
 import { useLogStore } from "./store/logsStore";
-import { rescheduleAllNotifications } from "./services/notificationService";
+import { rescheduleAllNotifications, onForegroundNotificationEvent } from "./services/notificationService";
 import { getLocalDateString } from "./utils/dateUtils";
 import FullscreenAlarm, { AlarmData } from "./components/FullscreenAlarm";
 
@@ -193,23 +193,22 @@ export default function App() {
 
   const [alarmData, setAlarmData] = useState<AlarmData | null>(null);
 
-  const lastResponse = Notifications.useLastNotificationResponse();
   useEffect(() => {
-    if (!lastResponse) return;
-    const { actionIdentifier, notification } = lastResponse;
-    const data = notification.request.content.data as
-      | { medicationId?: string; scheduledTime?: string }
-      | undefined;
-    if (!data?.medicationId || !data?.scheduledTime) return;
+    notifee.getInitialNotification().then((initial: any) => {
+      if (!initial) return;
+      const data = initial.notification.data as
+        | { medicationId?: string; scheduledTime?: string }
+        | undefined;
+      if (!data?.medicationId || !data?.scheduledTime) return;
 
-    const dateStr = getLocalDateString(new Date());
-    if (actionIdentifier === "taken") {
-      handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
-    } else if (actionIdentifier === "skip") {
-      handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
-    }
-    Notifications.clearLastNotificationResponseAsync();
-  }, [lastResponse]);
+      const dateStr = getLocalDateString(new Date());
+      if (initial.pressAction?.id === "taken") {
+        handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
+      } else if (initial.pressAction?.id === "skip") {
+        handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
+      }
+    });
+  }, []);
 
   useEffect(() => {
     const doReschedule = async () => {
@@ -253,60 +252,36 @@ export default function App() {
     return () => subscription.remove();
   }, [medications]);
 
-  // Handle notification action button taps (Taken / Skip)
   useEffect(() => {
-    const subscription = Notifications.addNotificationResponseReceivedListener(
-      (response) => {
-        const { actionIdentifier, notification } = response;
-        const data = notification.request.content.data as
-          | { medicationId?: string; scheduledTime?: string }
-          | undefined;
+    const unsub = onForegroundNotificationEvent((type, detail) => {
+      const data = detail.notification?.data as
+        | { medicationId?: string; scheduledTime?: string }
+        | undefined;
 
-        if (!data?.medicationId || !data?.scheduledTime) return;
+      if (!data?.medicationId || !data?.scheduledTime) return;
 
+      if (type === EventType.ACTION_PRESS && detail.pressAction?.id) {
         const dateStr = getLocalDateString(new Date());
-
-        if (actionIdentifier === "taken") {
-          handleNotificationTaken(
-            data.medicationId,
-            data.scheduledTime,
-            dateStr,
-          );
-        } else if (actionIdentifier === "skip") {
-          handleNotificationSkip(
-            data.medicationId,
-            data.scheduledTime,
-            dateStr,
-          );
+        if (detail.pressAction.id === "taken") {
+          handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
+        } else if (detail.pressAction.id === "skip") {
+          handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
         }
-      },
-    );
+      }
 
-    return () => subscription.remove();
-  }, []);
-
-  useEffect(() => {
-    const subscription = Notifications.addNotificationReceivedListener(
-      (notification) => {
+      if (type === EventType.DELIVERED) {
         const fullscreen = useSettingsStore.getState().fullscreenNotification;
-        if (!fullscreen) return;
-
-        const { title, body, data } = notification.request.content;
-        const payload = data as
-          | { medicationId?: string; scheduledTime?: string }
-          | undefined;
-
-        if (!payload?.medicationId || !payload?.scheduledTime) return;
-
-        setAlarmData({
-          medicationId: payload.medicationId,
-          scheduledTime: payload.scheduledTime,
-          title: title ?? "",
-          body: body ?? "",
-        });
-      },
-    );
-    return () => subscription.remove();
+        if (fullscreen) {
+          setAlarmData({
+            medicationId: data.medicationId as string,
+            scheduledTime: data.scheduledTime as string,
+            title: detail.notification?.title ?? "",
+            body: detail.notification?.body ?? "",
+          });
+        }
+      }
+    });
+    return unsub;
   }, []);
 
   return (

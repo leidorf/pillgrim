@@ -1,5 +1,15 @@
-import * as Notifications from "expo-notifications";
-import * as Device from "expo-device";
+import notifee, {
+  AndroidImportance,
+  AndroidCategory,
+  AndroidVisibility,
+  TriggerType,
+  RepeatFrequency,
+  EventType,
+  TimestampTrigger,
+  AndroidAction,
+  AuthorizationStatus,
+  AndroidAlarmType
+} from "@notifee/react-native";
 import { Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
@@ -7,165 +17,30 @@ import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
 
 const CHANNEL_ID = "medication-reminders";
-const CHANNEL_ID_FULLSCREEN = "medication-reminders-fullscreen";
 
-const getGlobalHideNames = (): boolean =>
-  useSettingsStore.getState().hideNotificationNames;
-const getFullscreen = (): boolean =>
-  useSettingsStore.getState().fullscreenNotification;
-const activeChannelId = (): string =>
-  getFullscreen() ? CHANNEL_ID_FULLSCREEN : CHANNEL_ID;
-
-const CATEGORY_ID = "medication-actions";
-
-/* --------------------------- Vibration patterns --------------------------- */
-const VIBRATION_PATTERNS: Record<string, number[]> = {
-  short: [0, 150, 100, 150],
-  normal: [0, 250, 250, 250],
-  long: [0, 500, 200, 500, 200, 500],
-  alarm: [0, 500, 200, 500],
-};
-
-function getVibratePattern(): number[] | undefined {
+const getVibration = (): number[] | undefined => {
   const { vibrationEnabled, vibrationPattern } = useSettingsStore.getState();
   if (!vibrationEnabled) return undefined;
-  return VIBRATION_PATTERNS[vibrationPattern] ?? VIBRATION_PATTERNS.normal;
-}
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
-
-/* ---------------------- Register category with actions --------------------- */
-export async function setupNotificationCategories(): Promise<void> {
-  if (!Device.isDevice) return;
-  await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
-    {
-      identifier: "taken",
-      buttonTitle: i18n.t("notifications.actionTaken"),
-      options: { opensAppToForeground: true },
-    },
-    {
-      identifier: "skip",
-      buttonTitle: i18n.t("notifications.actionSkip"),
-      options: { opensAppToForeground: true },
-    },
-  ]);
-}
-
-/* ------------------------------- Permission ------------------------------- */
-export async function requestNotificationPermission(): Promise<boolean> {
-  if (!Device.isDevice) {
-    console.warn("Notifications require physical device");
-    return false;
-  }
-
-  if (Platform.OS === "android" && Platform.Version >= 33) {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== "granted") {
-      const { status: newStatus } =
-        await Notifications.requestPermissionsAsync();
-      if (newStatus !== "granted") return false;
-    }
-  } else {
-    const { status } = await Notifications.getPermissionsAsync();
-    if (status !== "granted") {
-      const { status: newStatus } =
-        await Notifications.requestPermissionsAsync();
-      if (newStatus !== "granted") return false;
-    }
-  }
-
-  if (Platform.OS === "android") {
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
-      name: "Medication Reminders",
-      importance: Notifications.AndroidImportance.HIGH,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: Colors.primary,
-      sound: "default",
-      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-      audioAttributes: {
-        usage: Notifications.AndroidAudioUsage.NOTIFICATION,
-        contentType: Notifications.AndroidAudioContentType.SONIFICATION,
-      },
-      bypassDnd: false,
-    });
-
-    await Notifications.setNotificationChannelAsync(CHANNEL_ID_FULLSCREEN, {
-      name: "Medication Reminders (Fullscreen)",
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      lightColor: Colors.primary,
-      sound: "default",
-      lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
-      audioAttributes: {
-        usage: Notifications.AndroidAudioUsage.NOTIFICATION,
-        contentType: Notifications.AndroidAudioContentType.SONIFICATION,
-      },
-      bypassDnd: false,
-    });
-  }
-
-  await setupNotificationCategories();
-
-  return true;
-}
-
-/* -------------------------- Notification Content -------------------------- */
-function buildContent(params: {
-  title: string;
-  body: string;
-  data: Record<string, unknown>;
-}): Notifications.NotificationContentInput {
-  return {
-    title: params.title,
-    body: params.body,
-    data: params.data,
-    sound: "default",
-    priority: Notifications.AndroidNotificationPriority.HIGH,
-    vibrate: getVibratePattern(),
-    autoDismiss: true,
-    color: Colors.primary,
-    categoryIdentifier: CATEGORY_ID,
+  const patterns: Record<string, number[]> = {
+    short: [10, 150, 100, 150],
+    normal: [10, 250, 250, 250],
+    long: [10, 500, 200, 500, 200, 500],
+    alarm: [10, 500, 200, 500],
   };
-}
+  return patterns[vibrationPattern] ?? patterns.normal;
+};
 
-function parseTime(time: string): { hours: number; minutes: number } {
-  const [h, m] = time.split(":").map(Number);
-  return { hours: h, minutes: m };
-}
+const getFullscreen = (): boolean =>
+  useSettingsStore.getState().fullscreenNotification;
+const getGlobalHideNames = (): boolean =>
+  useSettingsStore.getState().hideNotificationNames;
 
-function toExpoWeekday(jsDay: number): number {
-  return jsDay + 1;
-}
-
+/* ----------------------------- Text builders ----------------------------- */
 function buildTitle(medication: Medication): string {
-  if (getGlobalHideNames()) {
-    return i18n.t("notifications.defaultTitle");
-  }
-  if (medication.notificationSettings?.hideName) {
+  if (getGlobalHideNames() || medication.notificationSettings?.hideName) {
     return i18n.t("notifications.defaultTitle");
   }
   return medication.name;
-}
-
-function buildBody(medication: Medication, dose: string, time: string): string {
-  const parts: string[] = [];
-
-  dose && parts.push(dose);
-  if (medication.note && medication.note !== "any") {
-    parts.push(noteLabel(medication.note));
-  }
-
-  return parts.length > 0
-    ? parts.join(" · ")
-    : i18n.t("notifications.defaultBody") + ` (${time})`;
 }
 
 function noteLabel(note: string): string {
@@ -178,15 +53,130 @@ function noteLabel(note: string): string {
   return keyMap[note] ? i18n.t(keyMap[note]) : note;
 }
 
-/* ------------------------- Schedule Notifications ------------------------- */
+function buildBody(medication: Medication, dose: string, time: string): string {
+  const parts: string[] = [];
+  if (dose) parts.push(dose);
+  if (medication.note && medication.note !== "any") {
+    parts.push(noteLabel(medication.note));
+  }
+  return parts.length > 0
+    ? parts.join(" · ")
+    : i18n.t("notifications.defaultBody") + " (" + time + ")";
+}
+
+function parseTime(time: string): { hours: number; minutes: number } {
+  const [h, m] = time.split(":").map(Number);
+  return { hours: h, minutes: m };
+}
+
+/* --------------------------- Action definitions --------------------------- */
+const ACTION_TAKEN = "taken";
+const ACTION_SKIP = "skip";
+
+function makeActions(): AndroidAction[] {
+  return [
+    {
+      title: i18n.t("notifications.actionTaken"),
+      pressAction: { id: ACTION_TAKEN },
+    },
+    {
+      title: i18n.t("notifications.actionSkip"),
+      pressAction: { id: ACTION_SKIP },
+    },
+  ];
+}
+
+/* ---------------- Shared notification body for all triggers --------------- */
+function buildNotificationPayload(params: {
+  title: string;
+  body: string;
+  data: Record<string, string | number | object>;
+  withActions?: boolean;
+}) {
+  const fullscreen = getFullscreen();
+  const vibration = getVibration();
+  const showActions = params.withActions !== false;
+
+  const android: any = {
+    channelId: CHANNEL_ID,
+    category: showActions ? AndroidCategory.ALARM : AndroidCategory.REMINDER,
+    color: Colors.primary,
+    ...(showActions ? { actions: makeActions() } : {}),
+    pressAction: { id: "default" },
+  };
+
+  if (vibration) {
+    android.vibrationPattern = vibration;
+  }
+
+  if (fullscreen) {
+    android.fullScreenAction = { id: "default", launchActivity: "com.anonymous.medicationreminder.MainActivity" };
+    android.importance = AndroidImportance.HIGH;
+    android.lightUpScreen = true;
+    android.ongoing = true;
+    android.showTimestamp = true;
+    android.showChronometer = false;
+    console.log("[Notifee] Fullscreen mode ON — fullScreenAction added to payload");
+  }
+
+  return {
+    title: params.title,
+    body: params.body,
+    data: params.data,
+    android,
+    ios: {
+      sound: "default",
+      ...(fullscreen ? { criticalAlert: { volume: 1.0 } as any } : {}),
+      categoryId: "medication-actions",
+    },
+  };
+}
+
+/* ----------------------- Channel & permission setup ----------------------- */
+
+export async function requestNotificationPermission(): Promise<boolean> {
+  const settings = await notifee.requestPermission();
+  console.log("[Notifee] Permission status:", JSON.stringify(settings));
+
+  if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+    console.warn("[Notifee] Notifications denied by user");
+    return false;
+  }
+
+  if (Platform.OS === "android") {
+    try {
+      await notifee.createChannel({
+        id: CHANNEL_ID,
+        name: "Medication Reminders",
+        importance: AndroidImportance.HIGH,
+        vibration: true,
+        visibility: AndroidVisibility.PUBLIC,
+        bypassDnd: true,
+        category: AndroidCategory.ALARM,
+      });
+      console.log("[Notifee] Channel created:", CHANNEL_ID);
+    } catch (err) {
+      console.error("[Notifee] Channel creation failed:", err);
+    }
+  }
+
+  return true;
+}
+
+/* --------------------------- Schedule functions --------------------------- */
 export async function scheduleMedicationNotifications(
   medication: Medication,
 ): Promise<string[]> {
   if (!medication.notificationSettings?.enabled) return [];
   if (!medication.schedule || !medication.timeDoses?.length) return [];
 
+  console.log("[Notifee] Scheduling for:", medication.name, medication.schedule.type, medication.timeDoses?.map((td) => td.time));
+
   const hasPermission = await requestNotificationPermission();
-  if (!hasPermission) return [];
+  if (!hasPermission) {
+    console.warn("[Notifee] Permission denied — no notifications scheduled");
+    return [];
+  }
 
   const ids: string[] = [];
   const { schedule, timeDoses } = medication;
@@ -195,7 +185,7 @@ export async function scheduleMedicationNotifications(
     const { hours, minutes } = parseTime(time);
     const title = buildTitle(medication);
     const body = buildBody(medication, dose, time);
-    const data: Record<string, unknown> = {
+    const data: Record<string, string | number | object> = {
       medicationId: medication.id,
       scheduledTime: time,
     };
@@ -212,7 +202,6 @@ export async function scheduleMedicationNotifications(
           data,
         });
         break;
-
       case "weekly":
         notificationIds = await scheduleWeeklyDose({
           days: schedule.days ?? [],
@@ -223,7 +212,6 @@ export async function scheduleMedicationNotifications(
           data,
         });
         break;
-
       case "biweekly":
         notificationIds = await scheduleBiweeklyDose({
           startDate: schedule.startDate,
@@ -234,7 +222,6 @@ export async function scheduleMedicationNotifications(
           data,
         });
         break;
-
       case "interval":
         if (schedule.interval) {
           notificationIds = await scheduleIntervalDose({
@@ -248,7 +235,6 @@ export async function scheduleMedicationNotifications(
           });
         }
         break;
-
       case "monthly": {
         const startDay = new Date(schedule.startDate).getDate();
         notificationIds = await scheduleMonthlyDose({
@@ -261,7 +247,6 @@ export async function scheduleMedicationNotifications(
         });
         break;
       }
-
       case "specificmonth":
         notificationIds = await scheduleMonthlyDose({
           days: schedule.days ?? [],
@@ -272,7 +257,6 @@ export async function scheduleMedicationNotifications(
           data,
         });
         break;
-
       case "prn":
         break;
     }
@@ -283,105 +267,125 @@ export async function scheduleMedicationNotifications(
   return ids;
 }
 
-/* ----------------------------- Schedule Daily ----------------------------- */
+/* -------------------------------- Daily --------------------------------- */
 async function scheduleDailyDose(params: {
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | object>;
 }): Promise<string[]> {
-  const id = await Notifications.scheduleNotificationAsync({
-    content: buildContent({
+  const now = new Date();
+  const next = new Date(
+    now.getFullYear(),
+    now.getMonth(),
+    now.getDate(),
+    params.hours,
+    params.minutes,
+    0,
+    0,
+  );
+  if (next <= now) next.setDate(next.getDate() + 1);
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: next.getTime(),
+      repeatFrequency: RepeatFrequency.DAILY,
+      alarmManager: {
+        allowWhileIdle: true,
+      },
+    };
+
+  const id = await notifee.createTriggerNotification(
+    buildNotificationPayload({
       title: params.title,
       body: params.body,
       data: params.data,
     }),
-    trigger: {
-      channelId: activeChannelId(),
-      type: Notifications.SchedulableTriggerInputTypes.DAILY,
-      hour: params.hours,
-      minute: params.minutes,
-    },
-  });
+    trigger,
+  );
+  console.log("[Notifee] Daily trigger created:", id, "next:", new Date(trigger.timestamp).toLocaleString());
   return [id];
 }
 
-/* ----------------------------- Schedule Weekly ---------------------------- */
+/* ------------------------------- Weekly --------------------------------- */
 async function scheduleWeeklyDose(params: {
   days: number[];
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | object>;
 }): Promise<string[]> {
   const ids: string[] = [];
+  const now = new Date();
 
   for (const day of params.days) {
-    const id = await Notifications.scheduleNotificationAsync({
-      content: buildContent({
+    const next = new Date(now);
+    const daysUntil = (day + 7 - now.getDay()) % 7;
+    next.setDate(next.getDate() + daysUntil);
+    next.setHours(params.hours, params.minutes, 0, 0);
+    if (next <= now) next.setDate(next.getDate() + 7);
+
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: next.getTime(),
+      repeatFrequency: RepeatFrequency.WEEKLY,
+      alarmManager: { allowWhileIdle: true },
+    };
+
+    const id = await notifee.createTriggerNotification(
+      buildNotificationPayload({
         title: params.title,
         body: params.body,
         data: params.data,
       }),
-      trigger: {
-        channelId: activeChannelId(),
-        type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-        weekday: toExpoWeekday(day),
-        hour: params.hours,
-        minute: params.minutes,
-      },
-    });
+      trigger,
+    );
     ids.push(id);
   }
-
   return ids;
 }
 
-/* --------------------------- Schedule Biweekly --------------------------- */
+/* ------------------------------ Biweekly -------------------------------- */
 async function scheduleBiweeklyDose(params: {
   startDate: string;
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | object>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
-
   let next = new Date(params.startDate);
   next.setHours(params.hours, params.minutes, 0, 0);
+  while (next <= now) next.setDate(next.getDate() + 14);
 
-  while (next <= now) {
-    next.setDate(next.getDate() + 14);
-  }
-  const maxOccurrences = 26;
+  for (let i = 0; i < 26; i++) {
+    const triggerDate = new Date(next);
+    triggerDate.setDate(triggerDate.getDate() + i * 14);
 
-  for (let i = 0; i < maxOccurrences; i++) {
-    const trigger = new Date(next);
-    trigger.setDate(trigger.getDate() + i * 14);
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: triggerDate.getTime(),
+      alarmManager: { allowWhileIdle: true },
+    };
 
-    const id = await Notifications.scheduleNotificationAsync({
-      content: buildContent({
+    const id = await notifee.createTriggerNotification(
+      buildNotificationPayload({
         title: params.title,
         body: params.body,
         data: params.data,
       }),
-      trigger: {
-        channelId: activeChannelId(),
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: trigger,
-      },
-    });
+      trigger,
+    );
     ids.push(id);
   }
-
   return ids;
 }
 
-/* ---------------------------- Schedule Interval --------------------------- */
+/* ------------------------------ Interval -------------------------------- */
 async function scheduleIntervalDose(params: {
   intervalDays: number;
   startDate: string;
@@ -389,50 +393,47 @@ async function scheduleIntervalDose(params: {
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | object>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
-
   let next = new Date(params.startDate);
   next.setHours(params.hours, params.minutes, 0, 0);
-
-  while (next <= now) {
-    next.setDate(next.getDate() + params.intervalDays);
-  }
+  while (next <= now) next.setDate(next.getDate() + params.intervalDays);
 
   const maxOccurrences = Math.min(64, Math.floor(365 / params.intervalDays));
 
   for (let i = 0; i < maxOccurrences; i++) {
-    const trigger = new Date(next);
-    trigger.setDate(trigger.getDate() + i * params.intervalDays);
+    const triggerDate = new Date(next);
+    triggerDate.setDate(triggerDate.getDate() + i * params.intervalDays);
 
-    const id = await Notifications.scheduleNotificationAsync({
-      content: buildContent({
+    const trigger: TimestampTrigger = {
+      type: TriggerType.TIMESTAMP,
+      timestamp: triggerDate.getTime(),
+      alarmManager: { allowWhileIdle: true },
+    };
+
+    const id = await notifee.createTriggerNotification(
+      buildNotificationPayload({
         title: params.title,
         body: params.body,
         data: params.data,
       }),
-      trigger: {
-        channelId: activeChannelId(),
-        type: Notifications.SchedulableTriggerInputTypes.DATE,
-        date: trigger,
-      },
-    });
+      trigger,
+    );
     ids.push(id);
   }
-
   return ids;
 }
 
-/* ---------------------------- Schedule Monthly ---------------------------- */
+/* ------------------------------ Monthly -------------------------------- */
 async function scheduleMonthlyDose(params: {
   days: number[];
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, unknown>;
+  data: Record<string, string | number | object>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -448,40 +449,40 @@ async function scheduleMonthlyDose(params: {
         0,
         0,
       );
-
       if (date <= now) continue;
 
-      const id = await Notifications.scheduleNotificationAsync({
-        content: buildContent({
+      const trigger: TimestampTrigger = {
+        type: TriggerType.TIMESTAMP,
+        timestamp: date.getTime(),
+        alarmManager: { allowWhileIdle: true },
+      };
+
+      const id = await notifee.createTriggerNotification(
+        buildNotificationPayload({
           title: params.title,
           body: params.body,
           data: params.data,
         }),
-        trigger: {
-          channelId: activeChannelId(),
-          type: Notifications.SchedulableTriggerInputTypes.DATE,
-          date,
-        },
-      });
+        trigger,
+      );
       ids.push(id);
     }
   }
-
   return ids;
 }
 
-/* --------------------------------- Cancel --------------------------------- */
+/* --------------------------- Cancel / Reschedule -------------------------- */
+
 export async function cancelMedicationNotifications(
   notificationIds: string[],
 ): Promise<void> {
   await Promise.all(
     notificationIds.map((id) =>
-      Notifications.cancelScheduledNotificationAsync(id).catch(() => {}),
+      notifee.cancelTriggerNotification(id).catch(() => {}),
     ),
   );
 }
 
-/* ------------------------------- Reschedule ------------------------------- */
 export async function rescheduleMedicationNotifications(
   medication: Medication,
   previousIds: string[],
@@ -490,7 +491,6 @@ export async function rescheduleMedicationNotifications(
   return scheduleMedicationNotifications(medication);
 }
 
-/* ----------------------------- Reschedule All ----------------------------- */
 export async function rescheduleAllNotifications(
   medications: Medication[],
   getStoredIds: (medicationId: string) => string[],
@@ -498,14 +498,14 @@ export async function rescheduleAllNotifications(
 ): Promise<void> {
   for (const med of medications) {
     if (!med.isActive) continue;
-
     const previousIds = getStoredIds(med.id);
     const newIds = await rescheduleMedicationNotifications(med, previousIds);
     saveIds(med.id, newIds);
   }
 }
 
-/* ----------------------------- Low Stock Alert ---------------------------- */
+/* -------------------------------- Low stock ------------------------------- */
+
 export async function scheduleLowStockNotification(
   medication: Medication,
   threshold = 5,
@@ -521,20 +521,16 @@ export async function scheduleLowStockNotification(
   const body = i18n.t("notifications.lowStockBody", {
     count: medication.stock ?? 0,
   });
+  const data = { medicationId: medication.id, type: "low_stock" };
 
-  const id = await Notifications.scheduleNotificationAsync({
-    content: buildContent({
-      title,
-      body,
-      data: { medicationId: medication.id, type: "low_stock" },
-    }),
-    trigger: null,
-  });
-
+  const id = await notifee.displayNotification(
+    buildNotificationPayload({ title, body, data, withActions: false }),
+  );
   return id;
 }
 
-/* ------------------------------- Snooze ----------------------------------- */
+/* --------------------------------- Snooze --------------------------------- */
+
 export async function snoozeMedicationNotification(
   medication: Medication,
   time: string,
@@ -546,26 +542,107 @@ export async function snoozeMedicationNotification(
 
   const title = buildTitle(medication);
   const body = buildBody(medication, dose || "", time);
-
   const triggerDate = new Date(Date.now() + minutes * 60000);
+  const data = {
+    medicationId: medication.id,
+    scheduledTime: time,
+    snoozed: 1,
+    snoozeMinutes: minutes,
+  };
 
-  const id = await Notifications.scheduleNotificationAsync({
-    content: buildContent({
-      title,
-      body,
-      data: {
-        medicationId: medication.id,
-        scheduledTime: time,
-        snoozed: true,
-        snoozeMinutes: minutes,
-      },
-    }),
-    trigger: {
-      channelId: activeChannelId(),
-      type: Notifications.SchedulableTriggerInputTypes.DATE,
-      date: triggerDate,
-    },
-  });
+  const trigger: TimestampTrigger = {
+    type: TriggerType.TIMESTAMP,
+    timestamp: triggerDate.getTime(),
+    alarmManager: { allowWhileIdle: true },
+  };
 
+  const id = await notifee.createTriggerNotification(
+    buildNotificationPayload({ title, body, data }),
+    trigger,
+  );
   return { id, title, body };
 }
+
+/* --------------------------- Foreground handler --------------------------- */
+
+export function onForegroundNotificationEvent(
+  callback: (type: EventType, detail: any) => void,
+): () => void {
+  return notifee.onForegroundEvent((event: any) => {
+    callback(event.type, event.detail);
+  });
+}
+
+/* --------------------------- Background handler --------------------------- */
+notifee.onBackgroundEvent(async ({ type, detail }: any) => {
+  if (type !== EventType.ACTION_PRESS || !detail.pressAction?.id) return;
+
+  const data = detail.notification?.data as
+    | Record<string, string | number | object>
+    | undefined;
+  if (!data?.medicationId || !data?.scheduledTime) return;
+
+  const { useLogStore } = await import("../store/logsStore");
+  const { useMedicationStore } = await import("../store/medicationStore");
+  const { getLocalDateString } = await import("../utils/dateUtils");
+
+  const date = getLocalDateString(new Date());
+  const actionId = detail.pressAction.id;
+
+  if (actionId === ACTION_TAKEN) {
+    const med = useMedicationStore
+      .getState()
+      .medications.find((m) => m.id === data.medicationId);
+    const doseStr = med?.timeDoses?.find(
+      (td) => td.time === data.scheduledTime,
+    )?.dose;
+    const doseAmount = doseStr ? parseInt(doseStr, 10) || undefined : undefined;
+
+    const { logs, addLog, updateLog } = useLogStore.getState();
+    const existing = logs.find(
+      (l) =>
+        l.medicationId === data.medicationId &&
+        l.scheduledDate === date &&
+        l.scheduledTime === data.scheduledTime,
+    );
+    if (existing) {
+      updateLog(existing.id, {
+        takenAt: new Date(),
+        skipped: false,
+        doseAmount,
+      });
+    } else {
+      addLog({
+        medicationId: data.medicationId as string,
+        scheduledDate: date,
+        scheduledTime: data.scheduledTime as string,
+        takenAt: new Date(),
+        skipped: false,
+        doseAmount,
+      });
+    }
+    if (doseAmount && doseAmount > 0) {
+      useMedicationStore
+        .getState()
+        .updateStock(data.medicationId as string, -doseAmount);
+    }
+  } else if (actionId === ACTION_SKIP) {
+    const { logs, addLog, updateLog } = useLogStore.getState();
+    const existing = logs.find(
+      (l) =>
+        l.medicationId === data.medicationId &&
+        l.scheduledDate === date &&
+        l.scheduledTime === data.scheduledTime,
+    );
+    if (existing) {
+      updateLog(existing.id, { skipped: true });
+    } else {
+      addLog({
+        medicationId: data.medicationId as string,
+        scheduledDate: date,
+        scheduledTime: data.scheduledTime as string,
+        skipped: true,
+      });
+    }
+  }
+});

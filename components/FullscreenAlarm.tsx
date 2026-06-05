@@ -57,7 +57,7 @@ const FullscreenAlarm = ({ data, onDismiss }: Props) => {
   const snooze = snoozeOpen ? SNOOZE_OPTIONS : [];
 
   const startVibration = useCallback(() => {
-    Vibration.vibrate([0, 500, 200, 500, 200, 500], true);
+    Vibration.vibrate([10, 500, 200, 500, 200, 500], true);
   }, []);
 
   const stopVibration = useCallback(() => {
@@ -209,7 +209,7 @@ const FullscreenAlarm = ({ data, onDismiss }: Props) => {
               disabled={actionTaken}
             >
               <Text style={styles.btnSnoozeText}>
-                {t("medicationAction.snooze")}
+                {t("medicationAction.snoozeShort")}
               </Text>
               <ChevronDown
                 width={14}
