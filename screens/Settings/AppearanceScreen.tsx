@@ -1,6 +1,5 @@
 import { useMemo, useState } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
-import { Text } from "../../components/Text";
+import { StyleSheet, Switch, View } from "react-native";
 import { useTranslation } from "react-i18next";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
@@ -66,49 +65,40 @@ const AppearanceScreen = () => {
       "fontScale.normal",
   );
 
+  // Live time preview for the switch description
+  const timePreview = useMemo(() => {
+    const now = new Date();
+    const h24 = String(now.getHours()).padStart(2, "0");
+    const m = String(now.getMinutes()).padStart(2, "0");
+    if (timeFormat === "24h") return h24 + ":" + m;
+    const h12 = now.getHours() % 12 || 12;
+    const ampm = now.getHours() < 12 ? "AM" : "PM";
+    return h12 + ":" + m + " " + ampm;
+  }, [timeFormat]);
+
+  const switchTrackColor = {
+    false: theme.textSecondary + "40",
+    true: theme.primary,
+  };
+
   return (
     <ScreenLayout>
       <ScreenHeader title={t("appearance.title")} />
       <View style={styles.container}>
-        {/* ------------------------------- Time Format ------------------------------ */}
+        {/* ---------------------------- 24 Hour Format ---------------------------- */}
         <SettingRow
           label={t("appearance.timeFormat")}
-          description={t("appearance.timeFormatDesc")}
+          description={timePreview}
         >
-          <View style={styles.segmentedControl}>
-            <Pressable
-              style={[
-                styles.segment,
-                timeFormat === "12h" && styles.segmentActive,
-              ]}
-              onPress={() => setTimeFormat("12h")}
-            >
-              <Text
-                style={[
-                  styles.segmentText,
-                  timeFormat === "12h" && styles.segmentTextActive,
-                ]}
-              >
-                {t("appearance.12h")}
-              </Text>
-            </Pressable>
-            <Pressable
-              style={[
-                styles.segment,
-                timeFormat === "24h" && styles.segmentActive,
-              ]}
-              onPress={() => setTimeFormat("24h")}
-            >
-              <Text
-                style={[
-                  styles.segmentText,
-                  timeFormat === "24h" && styles.segmentTextActive,
-                ]}
-              >
-                {t("appearance.24h")}
-              </Text>
-            </Pressable>
-          </View>
+          <Switch
+            value={timeFormat === "24h"}
+            onValueChange={(v: boolean) => setTimeFormat(v ? "24h" : "12h")}
+            trackColor={{
+              false: switchTrackColor.false,
+              true: switchTrackColor.true,
+            }}
+            thumbColor={timeFormat === "24h" ? "#fff" : "#f4f3f4"}
+          />
         </SettingRow>
 
         {/* --------------------------------- Theme ---------------------------------- */}
@@ -180,21 +170,7 @@ const AppearanceScreen = () => {
 
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
-    container: { paddingHorizontal: 16 },
-    segmentedControl: {
-      flexDirection: "row",
-      backgroundColor: theme.surface,
-      borderRadius: 8,
-      padding: 2,
-    },
-    segment: { paddingHorizontal: 14, paddingVertical: 6, borderRadius: 6 },
-    segmentActive: { backgroundColor: theme.primaryDark },
-    segmentText: {
-      color: theme.textSecondary,
-      fontSize: 14,
-      fontWeight: "600",
-    },
-    segmentTextActive: { color: theme.surfaceElevated },
+    container: { paddingHorizontal: 24 },
   });
 
 export default AppearanceScreen;

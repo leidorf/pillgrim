@@ -50,7 +50,11 @@ const NotificationsScreen = () => {
 
         <SettingRow
           label={t("settings.hideNotificationNames")}
-          description={t("settings.hideNotificationNamesDesc")}
+          description={
+            hideNotificationNames
+              ? t("settings.hideNotificationNamesDescHidden")
+              : t("settings.hideNotificationNamesDesc")
+          }
         >
           <Switch
             value={hideNotificationNames}

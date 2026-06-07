@@ -25,7 +25,8 @@
     "privacy": "Privacy Policy",
     "about": "About",
     "hideNotificationNames": "Hide medication names",
-    "hideNotificationNamesDesc": "Show \"Medication Reminder\" instead of medication names in all notifications",
+    "hideNotificationNamesDesc": "Show medication name",
+    "hideNotificationNamesDescHidden": "Show \"Medication Reminder\" instead of medication name",
     "fullscreenNotification": "Fullscreen reminders",
     "fullscreenNotificationDesc": "Show a fullscreen alarm overlay when a reminder fires while the app is open",
     "vibration": "Vibration",
@@ -56,7 +57,7 @@
   },
   "appearance": {
     "title": "Appearance",
-    "timeFormat": "Time Format",
+    "timeFormat": "24 Hour Time Format",
     "timeFormatDesc": "How times are displayed across the app",
     "theme": "Theme",
     "themeDesc": "Choose between light, dark, or system default",

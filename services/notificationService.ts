@@ -8,7 +8,6 @@ import notifee, {
   TimestampTrigger,
   AndroidAction,
   AuthorizationStatus,
-  AndroidAlarmType
 } from "@notifee/react-native";
 import { Platform } from "react-native";
 import { Medication } from "../types/medication";
@@ -110,13 +109,18 @@ function buildNotificationPayload(params: {
   }
 
   if (fullscreen) {
-    android.fullScreenAction = { id: "default", launchActivity: "com.anonymous.medicationreminder.MainActivity" };
+    android.fullScreenAction = {
+      id: "default",
+      launchActivity: "com.anonymous.medicationreminder.MainActivity",
+    };
     android.importance = AndroidImportance.HIGH;
     android.lightUpScreen = true;
     android.ongoing = true;
     android.showTimestamp = true;
     android.showChronometer = false;
-    console.log("[Notifee] Fullscreen mode ON — fullScreenAction added to payload");
+    console.log(
+      "[Notifee] Fullscreen mode ON — fullScreenAction added to payload",
+    );
   }
 
   return {
@@ -152,7 +156,6 @@ export async function requestNotificationPermission(): Promise<boolean> {
         vibration: true,
         visibility: AndroidVisibility.PUBLIC,
         bypassDnd: true,
-        category: AndroidCategory.ALARM,
       });
       console.log("[Notifee] Channel created:", CHANNEL_ID);
     } catch (err) {
@@ -170,7 +173,12 @@ export async function scheduleMedicationNotifications(
   if (!medication.notificationSettings?.enabled) return [];
   if (!medication.schedule || !medication.timeDoses?.length) return [];
 
-  console.log("[Notifee] Scheduling for:", medication.name, medication.schedule.type, medication.timeDoses?.map((td) => td.time));
+  console.log(
+    "[Notifee] Scheduling for:",
+    medication.name,
+    medication.schedule.type,
+    medication.timeDoses?.map((td) => td.time),
+  );
 
   const hasPermission = await requestNotificationPermission();
   if (!hasPermission) {
@@ -287,14 +295,14 @@ async function scheduleDailyDose(params: {
   );
   if (next <= now) next.setDate(next.getDate() + 1);
 
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: next.getTime(),
-      repeatFrequency: RepeatFrequency.DAILY,
-      alarmManager: {
-        allowWhileIdle: true,
-      },
-    };
+  const trigger: TimestampTrigger = {
+    type: TriggerType.TIMESTAMP,
+    timestamp: next.getTime(),
+    repeatFrequency: RepeatFrequency.DAILY,
+    alarmManager: {
+      allowWhileIdle: true,
+    },
+  };
 
   const id = await notifee.createTriggerNotification(
     buildNotificationPayload({
@@ -304,7 +312,12 @@ async function scheduleDailyDose(params: {
     }),
     trigger,
   );
-  console.log("[Notifee] Daily trigger created:", id, "next:", new Date(trigger.timestamp).toLocaleString());
+  console.log(
+    "[Notifee] Daily trigger created:",
+    id,
+    "next:",
+    new Date(trigger.timestamp).toLocaleString(),
+  );
   return [id];
 }
 

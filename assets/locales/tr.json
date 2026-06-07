@@ -25,7 +25,8 @@
     "privacy": "Gizlilik Politikası",
     "about": "Hakkında",
     "hideNotificationNames": "İlaç adlarını gizle",
-    "hideNotificationNamesDesc": "Bildirimlerde ilaç adı yerine \"İlaç Hatırlatıcı\" göster",
+    "hideNotificationNamesDesc": "İlaç adını göster",
+    "hideNotificationNamesDescHidden": "İlaç adı yerine \"İlaç Hatırlatıcı\" göster",
     "fullscreenNotification": "Tam ekran hatırlatıcılar",
     "fullscreenNotificationDesc": "Uygulama açıkken hatırlatıcı geldiğinde tam ekran alarm göster",
     "vibration": "Titreşim",
@@ -57,7 +58,7 @@
   },
   "appearance": {
     "title": "Görünüm",
-    "timeFormat": "Zaman Formatı",
+    "timeFormat": "24 Saatlik Zaman Formatı",
     "timeFormatDesc": "Uygulama genelinde saatler nasıl görüntülenir",
     "theme": "Tema",
     "themeDesc": "Açık, koyu veya sistem varsayılanı arasında seçim yapın",
