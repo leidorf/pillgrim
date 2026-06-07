@@ -36,6 +36,14 @@ export function isMedicationScheduledForDate(
   const dayOfMonth = date.getDate();
   const weekday = weekdayMap[date.getDay()];
 
+  if (startDate) {
+    const startDay = new Date(startDate);
+    startDay.setHours(0, 0, 0, 0);
+    const checkDay = new Date(date);
+    checkDay.setHours(0, 0, 0, 0);
+    if (checkDay < startDay) return false;
+  }
+
   switch (type) {
     case "daily":
       return true;
