@@ -16,13 +16,6 @@ const NotificationsScreen = () => {
   const setHideNotificationNames = useSettingsStore(
     (s) => s.setHideNotificationNames,
   );
-  const fullscreenNotification = useSettingsStore(
-    (s) => s.fullscreenNotification,
-  );
-  const setFullscreenNotification = useSettingsStore(
-    (s) => s.setFullscreenNotification,
-  );
-
   const switchColors = {
     trackColor: { false: theme.textSecondary + "40", true: theme.primary },
     thumbColor: "#fff" as string,
@@ -32,22 +25,6 @@ const NotificationsScreen = () => {
     <ScreenLayout>
       <ScreenHeader title={t("settings.notifications")} />
       <View style={styles.container}>
-        <SettingRow
-          label={t("settings.fullscreenNotification")}
-          description={t("settings.fullscreenNotificationDesc")}
-        >
-          <Switch
-            value={fullscreenNotification}
-            onValueChange={setFullscreenNotification}
-            {...switchColors}
-            thumbColor={
-              fullscreenNotification
-                ? switchColors.thumbColor
-                : "#f4f3f4"
-            }
-          />
-        </SettingRow>
-
         <SettingRow
           label={t("settings.hideNotificationNames")}
           description={

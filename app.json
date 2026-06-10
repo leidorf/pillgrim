@@ -36,14 +36,17 @@
               "android.permission.POST_NOTIFICATIONS",
               "android.permission.SCHEDULE_EXACT_ALARM",
               "android.permission.USE_EXACT_ALARM",
-              "android.permission.USE_FULL_SCREEN_INTENT",
               "android.permission.RECEIVE_BOOT_COMPLETED",
               "android.permission.WAKE_LOCK"
-            ],
-            "extraMavenRepos": [
-              "../../node_modules/@notifee/react-native/android/libs"
             ]
           }
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#AED581"
         }
       ],
       "expo-font",

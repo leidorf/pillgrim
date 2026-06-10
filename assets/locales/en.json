@@ -27,8 +27,6 @@
     "hideNotificationNames": "Hide medication names",
     "hideNotificationNamesDesc": "Show medication name",
     "hideNotificationNamesDescHidden": "Show \"Medication Reminder\" instead of medication name",
-    "fullscreenNotification": "Fullscreen reminders",
-    "fullscreenNotificationDesc": "Show a fullscreen alarm overlay when a reminder fires while the app is open",
     "vibration": "Vibration",
     "vibrationDesc": "Vibrate when a medication reminder fires",
     "vibrationPattern": "Vibration pattern",

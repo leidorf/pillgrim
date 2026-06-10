@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -14,6 +14,14 @@ import {
   SettingsParamList,
 } from "./types/navigation";
 
+import HouseIcon from "./assets/icons/house.svg";
+import PillIcon from "./assets/icons/pill.svg";
+import CalendarIcon from "./assets/icons/calendar.svg";
+import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
+import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
+import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
+import CalendarScreen from "./screens/CalendarScreen";
+
 import HomeScreen from "./screens/HomeScreen";
 import MedsScreen from "./screens/MedsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen/Step1Screen";
@@ -22,83 +30,20 @@ import SettingsScreen from "./screens/Settings";
 import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
 import { useSettingsStore } from "./store/settingsStore";
-import notifee, { EventType } from "@notifee/react-native";
 import { useMedicationStore } from "./store/medicationStore";
-import { useLogStore } from "./store/logsStore";
-import { rescheduleAllNotifications, onForegroundNotificationEvent } from "./services/notificationService";
-import { getLocalDateString } from "./utils/dateUtils";
-import FullscreenAlarm, { AlarmData } from "./components/FullscreenAlarm";
+import {
+  rescheduleAllNotifications,
+  onForegroundNotificationEvent,
+  getInitialNotificationResponse,
+  clearInitialNotificationResponse,
+  setupNotificationHandler,
+  processNotificationAction,
+} from "./services/notificationService";
 
-/* ---------------------- Notification Action Handlers ---------------------- */
-function createOrUpdateLog(
-  medicationId: string,
-  scheduledDate: string,
-  scheduledTime: string,
-  updates: { takenAt?: Date; skipped?: boolean; doseAmount?: number },
-) {
-  const { logs, addLog, updateLog } = useLogStore.getState();
-  const existing = logs.find(
-    (l) =>
-      l.medicationId === medicationId &&
-      l.scheduledDate === scheduledDate &&
-      l.scheduledTime === scheduledTime,
-  );
-  if (existing) {
-    updateLog(existing.id, updates);
-  } else {
-    addLog({ medicationId, scheduledDate, scheduledTime, ...updates });
-  }
-}
-
-function handleNotificationTaken(
-  medicationId: string,
-  scheduledTime: string,
-  dateStr: string,
-) {
-  const med = useMedicationStore
-    .getState()
-    .medications.find((m) => m.id === medicationId);
-  const doseStr = med?.timeDoses?.find((td) => td.time === scheduledTime)?.dose;
-  const doseAmount = doseStr ? parseInt(doseStr, 10) || undefined : undefined;
-
-  createOrUpdateLog(medicationId, dateStr, scheduledTime, {
-    takenAt: new Date(),
-    skipped: false,
-    doseAmount,
-  });
-
-  // Decrement stock
-  if (doseAmount && doseAmount > 0) {
-    useMedicationStore.getState().updateStock(medicationId, -doseAmount);
-  }
-}
-
-function handleNotificationSkip(
-  medicationId: string,
-  scheduledTime: string,
-  dateStr: string,
-) {
-  createOrUpdateLog(medicationId, dateStr, scheduledTime, {
-    skipped: true,
-  });
-}
-
-import PillIcon from "./assets/icons/pill.svg";
-import HouseIcon from "./assets/icons/house.svg";
-import CalendarIcon from "./assets/icons/calendar.svg";
-import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
-import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
-import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
-import NotificationsScreen from "./screens/Settings/NotificationsScreen";
-import AppearanceScreen from "./screens/Settings/AppearanceScreen";
-import LanguageScreen from "./screens/Settings/LanguageScreen";
-import AlarmScreen from "./screens/Settings/AlarmScreen";
-import CalendarScreen from "./screens/CalendarScreen";
-
-const RootStack = createNativeStackNavigator<RootStackParamList>();
+/* ---------------------- Navigators ---------------------- */
 const Tab = createBottomTabNavigator<MainScreenParamList>();
+const RootStack = createNativeStackNavigator<RootStackParamList>();
 const AddMedStack = createNativeStackNavigator<AddMedicationParamList>();
-const SettingsStack = createNativeStackNavigator<SettingsParamList>();
 
 const MainTabs = () => {
   const theme = useAppTheme();
@@ -158,7 +103,14 @@ const AddMedicationNavigator = () => {
   );
 };
 
-const SettingsNavigator = () => {
+const SettingsStack = createNativeStackNavigator<SettingsParamList>();
+
+import NotificationsScreen from "./screens/Settings/NotificationsScreen";
+import AlarmScreen from "./screens/Settings/AlarmScreen";
+import AppearanceScreen from "./screens/Settings/AppearanceScreen";
+import LanguageScreen from "./screens/Settings/LanguageScreen";
+
+function SettingsNavigator() {
   return (
     <SettingsStack.Navigator screenOptions={{ headerShown: false }}>
       <SettingsStack.Screen name="SettingsMain" component={SettingsScreen} />
@@ -171,7 +123,7 @@ const SettingsNavigator = () => {
       <SettingsStack.Screen name="Language" component={LanguageScreen} />
     </SettingsStack.Navigator>
   );
-};
+}
 
 export default function App() {
   const theme = useAppTheme();
@@ -191,23 +143,24 @@ export default function App() {
   const isRescheduling = useRef(false);
   const pendingReschedule = useRef(false);
 
-  const [alarmData, setAlarmData] = useState<AlarmData | null>(null);
-
+  // Setup foreground notification handler (only once)
   useEffect(() => {
-    notifee.getInitialNotification().then((initial: any) => {
-      if (!initial) return;
-      const data = initial.notification.data as
-        | { medicationId?: string; scheduledTime?: string }
-        | undefined;
-      if (!data?.medicationId || !data?.scheduledTime) return;
+    setupNotificationHandler();
+  }, []);
 
-      const dateStr = getLocalDateString(new Date());
-      if (initial.pressAction?.id === "taken") {
-        handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
-      } else if (initial.pressAction?.id === "skip") {
-        handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
-      }
-    });
+  // Handle cold-start notification interaction (iOS fallback when bg task isn't used)
+  useEffect(() => {
+    const response = getInitialNotificationResponse();
+    if (!response) return;
+    const data = response.notification.request.content.data as
+      | { medicationId?: string; scheduledTime?: string }
+      | undefined;
+    if (!data?.medicationId || !data?.scheduledTime) return;
+    const actionId = response.actionIdentifier;
+    if (actionId === "taken" || actionId === "skip") {
+      processNotificationAction(actionId, data.medicationId, data.scheduledTime);
+    }
+    clearInitialNotificationResponse();
   }, []);
 
   useEffect(() => {
@@ -253,32 +206,14 @@ export default function App() {
   }, [medications]);
 
   useEffect(() => {
-    const unsub = onForegroundNotificationEvent((type, detail) => {
-      const data = detail.notification?.data as
+    const unsub = onForegroundNotificationEvent((actionId, response) => {
+      const data = response.notification.request.content.data as
         | { medicationId?: string; scheduledTime?: string }
         | undefined;
-
       if (!data?.medicationId || !data?.scheduledTime) return;
 
-      if (type === EventType.ACTION_PRESS && detail.pressAction?.id) {
-        const dateStr = getLocalDateString(new Date());
-        if (detail.pressAction.id === "taken") {
-          handleNotificationTaken(data.medicationId, data.scheduledTime, dateStr);
-        } else if (detail.pressAction.id === "skip") {
-          handleNotificationSkip(data.medicationId, data.scheduledTime, dateStr);
-        }
-      }
-
-      if (type === EventType.DELIVERED) {
-        const fullscreen = useSettingsStore.getState().fullscreenNotification;
-        if (fullscreen) {
-          setAlarmData({
-            medicationId: data.medicationId as string,
-            scheduledTime: data.scheduledTime as string,
-            title: detail.notification?.title ?? "",
-            body: detail.notification?.body ?? "",
-          });
-        }
+      if (actionId === "taken" || actionId === "skip") {
+        processNotificationAction(actionId, data.medicationId, data.scheduledTime);
       }
     });
     return unsub;
@@ -315,13 +250,6 @@ export default function App() {
               />
             </RootStack.Navigator>
           </NavigationContainer>
-
-          {alarmData && (
-            <FullscreenAlarm
-              data={alarmData}
-              onDismiss={() => setAlarmData(null)}
-            />
-          )}
         </BottomSheetModalProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

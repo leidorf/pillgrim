@@ -1,14 +1,4 @@
-import notifee, {
-  AndroidImportance,
-  AndroidCategory,
-  AndroidVisibility,
-  TriggerType,
-  RepeatFrequency,
-  EventType,
-  TimestampTrigger,
-  AndroidAction,
-  AuthorizationStatus,
-} from "@notifee/react-native";
+import * as Notifications from "expo-notifications";
 import { Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
@@ -16,7 +6,9 @@ import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
 
 const CHANNEL_ID = "medication-reminders";
+const CATEGORY_ID = "medication-actions";
 
+/* ---------------------- Settings helpers (safe outside React) ---------------------- */
 const getVibration = (): number[] | undefined => {
   const { vibrationEnabled, vibrationPattern } = useSettingsStore.getState();
   if (!vibrationEnabled) return undefined;
@@ -29,8 +21,6 @@ const getVibration = (): number[] | undefined => {
   return patterns[vibrationPattern] ?? patterns.normal;
 };
 
-const getFullscreen = (): boolean =>
-  useSettingsStore.getState().fullscreenNotification;
 const getGlobalHideNames = (): boolean =>
   useSettingsStore.getState().hideNotificationNames;
 
@@ -68,105 +58,109 @@ function parseTime(time: string): { hours: number; minutes: number } {
   return { hours: h, minutes: m };
 }
 
-/* --------------------------- Action definitions --------------------------- */
+/* --------------------------- Action identifiers --------------------------- */
 const ACTION_TAKEN = "taken";
 const ACTION_SKIP = "skip";
 
-function makeActions(): AndroidAction[] {
-  return [
-    {
-      title: i18n.t("notifications.actionTaken"),
-      pressAction: { id: ACTION_TAKEN },
-    },
-    {
-      title: i18n.t("notifications.actionSkip"),
-      pressAction: { id: ACTION_SKIP },
-    },
-  ];
-}
-
-/* ---------------- Shared notification body for all triggers --------------- */
-function buildNotificationPayload(params: {
+/* ------------------- Shared notification content builder ------------------ */
+function buildNotificationContent(params: {
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
   withActions?: boolean;
 }) {
-  const fullscreen = getFullscreen();
   const vibration = getVibration();
   const showActions = params.withActions !== false;
-
-  const android: any = {
-    channelId: CHANNEL_ID,
-    category: showActions ? AndroidCategory.ALARM : AndroidCategory.REMINDER,
-    color: Colors.primary,
-    ...(showActions ? { actions: makeActions() } : {}),
-    pressAction: { id: "default" },
-  };
-
-  if (vibration) {
-    android.vibrationPattern = vibration;
-  }
-
-  if (fullscreen) {
-    android.fullScreenAction = {
-      id: "default",
-      launchActivity: "com.anonymous.medicationreminder.MainActivity",
-    };
-    android.importance = AndroidImportance.HIGH;
-    android.lightUpScreen = true;
-    android.ongoing = true;
-    android.showTimestamp = true;
-    android.showChronometer = false;
-    console.log(
-      "[Notifee] Fullscreen mode ON — fullScreenAction added to payload",
-    );
-  }
 
   return {
     title: params.title,
     body: params.body,
     data: params.data,
-    android,
-    ios: {
-      sound: "default",
-      ...(fullscreen ? { criticalAlert: { volume: 1.0 } as any } : {}),
-      categoryId: "medication-actions",
-    },
+    sound: "default" as const,
+    color: Colors.primary,
+    ...(vibration ? { vibrate: vibration } : {}),
+    priority: Notifications.AndroidNotificationPriority.HIGH,
+    categoryIdentifier: showActions ? CATEGORY_ID : undefined,
+    autoDismiss: true,
   };
 }
 
-/* ----------------------- Channel & permission setup ----------------------- */
+/* --------------- Channel, category & handler setup ---------------- */
+export async function ensureChannel(): Promise<void> {
+  if (Platform.OS !== "android") return;
 
+  const vibration = getVibration();
+  await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+    name: "Medication Reminders",
+    importance: Notifications.AndroidImportance.HIGH,
+    vibrationPattern: vibration ?? null,
+    sound: "default",
+    bypassDnd: true,
+    lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
+    enableVibrate: vibration !== undefined,
+  });
+}
+
+let categoryEnsured = false;
+
+export async function ensureCategory(): Promise<void> {
+  if (categoryEnsured) return;
+  await Notifications.setNotificationCategoryAsync(CATEGORY_ID, [
+    {
+      identifier: ACTION_TAKEN,
+      buttonTitle: i18n.t("notifications.actionTaken"),
+      options: { opensAppToForeground: true },
+    },
+    {
+      identifier: ACTION_SKIP,
+      buttonTitle: i18n.t("notifications.actionSkip"),
+      options: { opensAppToForeground: true },
+    },
+  ]);
+  categoryEnsured = true;
+}
+
+/**
+ * Configure the foreground notification handler.
+ * Must be called once at app startup.
+ */
+export function setupNotificationHandler(): void {
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowBanner: true,
+      shouldShowList: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+    }),
+  });
+}
+
+/* ------------------------- Permission request ---------------------------- */
 export async function requestNotificationPermission(): Promise<boolean> {
-  const settings = await notifee.requestPermission();
-  console.log("[Notifee] Permission status:", JSON.stringify(settings));
-
-  if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
-    console.warn("[Notifee] Notifications denied by user");
-    return false;
+  try {
+    const perm: any = await Notifications.requestPermissionsAsync();
+    console.log("[Notifications] Permission status:", perm.granted);
+    if (!perm.granted) {
+      console.warn("[Notifications] Permissions denied by user");
+      return false;
+    }
+  } catch (err) {
+    console.error("[Notifications] Permission request failed:", err);
   }
 
   if (Platform.OS === "android") {
     try {
-      await notifee.createChannel({
-        id: CHANNEL_ID,
-        name: "Medication Reminders",
-        importance: AndroidImportance.HIGH,
-        vibration: true,
-        visibility: AndroidVisibility.PUBLIC,
-        bypassDnd: true,
-      });
-      console.log("[Notifee] Channel created:", CHANNEL_ID);
+      await ensureChannel();
+      console.log("[Notifications] Channel ensured:", CHANNEL_ID);
     } catch (err) {
-      console.error("[Notifee] Channel creation failed:", err);
+      console.error("[Notifications] Channel creation failed:", err);
     }
   }
 
   return true;
 }
 
-/* --------------------------- Schedule functions --------------------------- */
+/* -------------------------- Schedule functions --------------------------- */
 export async function scheduleMedicationNotifications(
   medication: Medication,
 ): Promise<string[]> {
@@ -174,7 +168,7 @@ export async function scheduleMedicationNotifications(
   if (!medication.schedule || !medication.timeDoses?.length) return [];
 
   console.log(
-    "[Notifee] Scheduling for:",
+    "[Notifications] Scheduling for:",
     medication.name,
     medication.schedule.type,
     medication.timeDoses?.map((td) => td.time),
@@ -182,9 +176,11 @@ export async function scheduleMedicationNotifications(
 
   const hasPermission = await requestNotificationPermission();
   if (!hasPermission) {
-    console.warn("[Notifee] Permission denied — no notifications scheduled");
+    console.warn("[Notifications] Permission denied - no notifications scheduled");
     return [];
   }
+
+  await ensureCategory();
 
   const ids: string[] = [];
   const { schedule, timeDoses } = medication;
@@ -193,7 +189,7 @@ export async function scheduleMedicationNotifications(
     const { hours, minutes } = parseTime(time);
     const title = buildTitle(medication);
     const body = buildBody(medication, dose, time);
-    const data: Record<string, string | number | object> = {
+    const data: Record<string, unknown> = {
       medicationId: medication.id,
       scheduledTime: time,
     };
@@ -275,99 +271,85 @@ export async function scheduleMedicationNotifications(
   return ids;
 }
 
-/* -------------------------------- Daily --------------------------------- */
+/* ------------------------------- Daily --------------------------------- */
 async function scheduleDailyDose(params: {
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
 }): Promise<string[]> {
-  const now = new Date();
-  const next = new Date(
-    now.getFullYear(),
-    now.getMonth(),
-    now.getDate(),
-    params.hours,
-    params.minutes,
-    0,
-    0,
-  );
-  if (next <= now) next.setDate(next.getDate() + 1);
-
-  const trigger: TimestampTrigger = {
-    type: TriggerType.TIMESTAMP,
-    timestamp: next.getTime(),
-    repeatFrequency: RepeatFrequency.DAILY,
-    alarmManager: {
-      allowWhileIdle: true,
-    },
-  };
-
-  const id = await notifee.createTriggerNotification(
-    buildNotificationPayload({
-      title: params.title,
-      body: params.body,
-      data: params.data,
-    }),
-    trigger,
-  );
-  console.log(
-    "[Notifee] Daily trigger created:",
-    id,
-    "next:",
-    new Date(trigger.timestamp).toLocaleString(),
-  );
-  return [id];
+  try {
+    const id = await Notifications.scheduleNotificationAsync({
+      content: buildNotificationContent({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      }),
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.DAILY,
+        channelId: CHANNEL_ID,
+        hour: params.hours,
+        minute: params.minutes,
+      },
+    });
+    console.log("[Notifications] Daily trigger:", id);
+    return [id];
+  } catch (err: any) {
+    console.error("[Notifications] Daily trigger FAILED:", err?.message ?? err);
+    return [];
+  }
 }
 
-/* ------------------------------- Weekly --------------------------------- */
+/* ------------------------------ Weekly --------------------------------- */
+function toExpoWeekday(jsDay: number): number {
+  // JS getDay(): 0=Sun, 1=Mon, ..., 6=Sat
+  // Expo weekday:  1=Sun, 2=Mon, ..., 7=Sat
+  return jsDay + 1;
+}
+
 async function scheduleWeeklyDose(params: {
   days: number[];
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
 }): Promise<string[]> {
   const ids: string[] = [];
-  const now = new Date();
-
   for (const day of params.days) {
-    const next = new Date(now);
-    const daysUntil = (day + 7 - now.getDay()) % 7;
-    next.setDate(next.getDate() + daysUntil);
-    next.setHours(params.hours, params.minutes, 0, 0);
-    if (next <= now) next.setDate(next.getDate() + 7);
-
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: next.getTime(),
-      repeatFrequency: RepeatFrequency.WEEKLY,
-      alarmManager: { allowWhileIdle: true },
-    };
-
-    const id = await notifee.createTriggerNotification(
-      buildNotificationPayload({
-        title: params.title,
-        body: params.body,
-        data: params.data,
-      }),
-      trigger,
-    );
-    ids.push(id);
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: buildNotificationContent({
+          title: params.title,
+          body: params.body,
+          data: params.data,
+        }),
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
+          channelId: CHANNEL_ID,
+          weekday: toExpoWeekday(day),
+          hour: params.hours,
+          minute: params.minutes,
+        },
+      });
+      console.log("[Notifications] Weekly trigger:", id, "weekday:", toExpoWeekday(day));
+      ids.push(id);
+    } catch (err: any) {
+      console.error("[Notifications] Weekly trigger FAILED:", err?.message ?? err);
+    }
   }
   return ids;
 }
 
-/* ------------------------------ Biweekly -------------------------------- */
+/* ----------------------------- Biweekly ------------------------------- */
 async function scheduleBiweeklyDose(params: {
   startDate: string;
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -378,27 +360,28 @@ async function scheduleBiweeklyDose(params: {
   for (let i = 0; i < 26; i++) {
     const triggerDate = new Date(next);
     triggerDate.setDate(triggerDate.getDate() + i * 14);
-
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: triggerDate.getTime(),
-      alarmManager: { allowWhileIdle: true },
-    };
-
-    const id = await notifee.createTriggerNotification(
-      buildNotificationPayload({
-        title: params.title,
-        body: params.body,
-        data: params.data,
-      }),
-      trigger,
-    );
-    ids.push(id);
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: buildNotificationContent({
+          title: params.title,
+          body: params.body,
+          data: params.data,
+        }),
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: triggerDate,
+          channelId: CHANNEL_ID,
+        },
+      });
+      ids.push(id);
+    } catch (err: any) {
+      console.error("[Notifications] Biweekly trigger FAILED:", err?.message ?? err);
+    }
   }
   return ids;
 }
 
-/* ------------------------------ Interval -------------------------------- */
+/* ----------------------------- Interval ------------------------------- */
 async function scheduleIntervalDose(params: {
   intervalDays: number;
   startDate: string;
@@ -406,7 +389,7 @@ async function scheduleIntervalDose(params: {
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -415,42 +398,41 @@ async function scheduleIntervalDose(params: {
   while (next <= now) next.setDate(next.getDate() + params.intervalDays);
 
   const maxOccurrences = Math.min(64, Math.floor(365 / params.intervalDays));
-
   for (let i = 0; i < maxOccurrences; i++) {
     const triggerDate = new Date(next);
     triggerDate.setDate(triggerDate.getDate() + i * params.intervalDays);
-
-    const trigger: TimestampTrigger = {
-      type: TriggerType.TIMESTAMP,
-      timestamp: triggerDate.getTime(),
-      alarmManager: { allowWhileIdle: true },
-    };
-
-    const id = await notifee.createTriggerNotification(
-      buildNotificationPayload({
-        title: params.title,
-        body: params.body,
-        data: params.data,
-      }),
-      trigger,
-    );
-    ids.push(id);
+    try {
+      const id = await Notifications.scheduleNotificationAsync({
+        content: buildNotificationContent({
+          title: params.title,
+          body: params.body,
+          data: params.data,
+        }),
+        trigger: {
+          type: Notifications.SchedulableTriggerInputTypes.DATE,
+          date: triggerDate,
+          channelId: CHANNEL_ID,
+        },
+      });
+      ids.push(id);
+    } catch (err: any) {
+      console.error("[Notifications] Interval trigger FAILED:", err?.message ?? err);
+    }
   }
   return ids;
 }
 
-/* ------------------------------ Monthly -------------------------------- */
+/* ----------------------------- Monthly ------------------------------- */
 async function scheduleMonthlyDose(params: {
   days: number[];
   hours: number;
   minutes: number;
   title: string;
   body: string;
-  data: Record<string, string | number | object>;
+  data: Record<string, unknown>;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
-
   for (let monthOffset = 0; monthOffset < 12; monthOffset++) {
     for (const day of params.days) {
       const date = new Date(
@@ -463,35 +445,35 @@ async function scheduleMonthlyDose(params: {
         0,
       );
       if (date <= now) continue;
-
-      const trigger: TimestampTrigger = {
-        type: TriggerType.TIMESTAMP,
-        timestamp: date.getTime(),
-        alarmManager: { allowWhileIdle: true },
-      };
-
-      const id = await notifee.createTriggerNotification(
-        buildNotificationPayload({
-          title: params.title,
-          body: params.body,
-          data: params.data,
-        }),
-        trigger,
-      );
-      ids.push(id);
+      try {
+        const id = await Notifications.scheduleNotificationAsync({
+          content: buildNotificationContent({
+            title: params.title,
+            body: params.body,
+            data: params.data,
+          }),
+          trigger: {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date,
+            channelId: CHANNEL_ID,
+          },
+        });
+        ids.push(id);
+      } catch (err: any) {
+        console.error("[Notifications] Monthly trigger FAILED:", err?.message ?? err);
+      }
     }
   }
   return ids;
 }
 
-/* --------------------------- Cancel / Reschedule -------------------------- */
-
+/* -------------------------- Cancel / Reschedule ------------------------- */
 export async function cancelMedicationNotifications(
   notificationIds: string[],
 ): Promise<void> {
   await Promise.all(
     notificationIds.map((id) =>
-      notifee.cancelTriggerNotification(id).catch(() => {}),
+      Notifications.cancelScheduledNotificationAsync(id).catch(() => {}),
     ),
   );
 }
@@ -517,8 +499,7 @@ export async function rescheduleAllNotifications(
   }
 }
 
-/* -------------------------------- Low stock ------------------------------- */
-
+/* ------------------------------- Low stock ------------------------------ */
 export async function scheduleLowStockNotification(
   medication: Medication,
   threshold = 5,
@@ -530,20 +511,24 @@ export async function scheduleLowStockNotification(
   const title = medication.notificationSettings.hideName
     ? i18n.t("notifications.lowStockTitle")
     : i18n.t("notifications.lowStockTitleWithName", { name: medication.name });
-
   const body = i18n.t("notifications.lowStockBody", {
     count: medication.stock ?? 0,
   });
   const data = { medicationId: medication.id, type: "low_stock" };
 
-  const id = await notifee.displayNotification(
-    buildNotificationPayload({ title, body, data, withActions: false }),
-  );
+  const id = await Notifications.scheduleNotificationAsync({
+    content: buildNotificationContent({
+      title,
+      body,
+      data,
+      withActions: false,
+    }),
+    trigger: null, // immediate
+  });
   return id;
 }
 
-/* --------------------------------- Snooze --------------------------------- */
-
+/* -------------------------------- Snooze -------------------------------- */
 export async function snoozeMedicationNotification(
   medication: Medication,
   time: string,
@@ -556,67 +541,75 @@ export async function snoozeMedicationNotification(
   const title = buildTitle(medication);
   const body = buildBody(medication, dose || "", time);
   const triggerDate = new Date(Date.now() + minutes * 60000);
-  const data = {
+  const data: Record<string, unknown> = {
     medicationId: medication.id,
     scheduledTime: time,
     snoozed: 1,
     snoozeMinutes: minutes,
   };
 
-  const trigger: TimestampTrigger = {
-    type: TriggerType.TIMESTAMP,
-    timestamp: triggerDate.getTime(),
-    alarmManager: { allowWhileIdle: true },
-  };
-
-  const id = await notifee.createTriggerNotification(
-    buildNotificationPayload({ title, body, data }),
-    trigger,
-  );
+  const id = await Notifications.scheduleNotificationAsync({
+    content: buildNotificationContent({ title, body, data }),
+    trigger: {
+      type: Notifications.SchedulableTriggerInputTypes.DATE,
+      date: triggerDate,
+      channelId: CHANNEL_ID,
+    },
+  });
   return { id, title, body };
 }
 
-/* --------------------------- Foreground handler --------------------------- */
-
+/* -------------------------- Foreground listener ------------------------- */
 export function onForegroundNotificationEvent(
-  callback: (type: EventType, detail: any) => void,
+  callback: (actionIdentifier: string, response: Notifications.NotificationResponse) => void,
 ): () => void {
-  return notifee.onForegroundEvent((event: any) => {
-    callback(event.type, event.detail);
-  });
+  const subscription = Notifications.addNotificationResponseReceivedListener(
+    (response) => {
+      const actionId = response.actionIdentifier;
+      if (
+        actionId === Notifications.DEFAULT_ACTION_IDENTIFIER ||
+        actionId === ACTION_TAKEN ||
+        actionId === ACTION_SKIP
+      ) {
+        callback(actionId, response);
+      }
+    },
+  );
+  return () => subscription.remove();
 }
 
-/* --------------------------- Background handler --------------------------- */
-notifee.onBackgroundEvent(async ({ type, detail }: any) => {
-  if (type !== EventType.ACTION_PRESS || !detail.pressAction?.id) return;
-
-  const data = detail.notification?.data as
-    | Record<string, string | number | object>
-    | undefined;
-  if (!data?.medicationId || !data?.scheduledTime) return;
-
+/* ----------------------- Shared action processor ------------------------ */
+/**
+ * Processes a notification action (Taken / Skip) by creating or updating the log
+ * and updating medication stock. Works in both foreground and headless background contexts.
+ */
+export async function processNotificationAction(
+  actionId: string,
+  medicationId: string,
+  scheduledTime: string,
+): Promise<void> {
+  // Dynamic imports to work in headless background context
   const { useLogStore } = await import("../store/logsStore");
   const { useMedicationStore } = await import("../store/medicationStore");
   const { getLocalDateString } = await import("../utils/dateUtils");
 
   const date = getLocalDateString(new Date());
-  const actionId = detail.pressAction.id;
 
   if (actionId === ACTION_TAKEN) {
     const med = useMedicationStore
       .getState()
-      .medications.find((m) => m.id === data.medicationId);
+      .medications.find((m) => m.id === medicationId);
     const doseStr = med?.timeDoses?.find(
-      (td) => td.time === data.scheduledTime,
+      (td) => td.time === scheduledTime,
     )?.dose;
     const doseAmount = doseStr ? parseInt(doseStr, 10) || undefined : undefined;
 
     const { logs, addLog, updateLog } = useLogStore.getState();
     const existing = logs.find(
       (l) =>
-        l.medicationId === data.medicationId &&
+        l.medicationId === medicationId &&
         l.scheduledDate === date &&
-        l.scheduledTime === data.scheduledTime,
+        l.scheduledTime === scheduledTime,
     );
     if (existing) {
       updateLog(existing.id, {
@@ -626,36 +619,50 @@ notifee.onBackgroundEvent(async ({ type, detail }: any) => {
       });
     } else {
       addLog({
-        medicationId: data.medicationId as string,
+        medicationId,
         scheduledDate: date,
-        scheduledTime: data.scheduledTime as string,
+        scheduledTime,
         takenAt: new Date(),
         skipped: false,
         doseAmount,
       });
     }
     if (doseAmount && doseAmount > 0) {
-      useMedicationStore
-        .getState()
-        .updateStock(data.medicationId as string, -doseAmount);
+      useMedicationStore.getState().updateStock(medicationId, -doseAmount);
     }
   } else if (actionId === ACTION_SKIP) {
     const { logs, addLog, updateLog } = useLogStore.getState();
     const existing = logs.find(
       (l) =>
-        l.medicationId === data.medicationId &&
+        l.medicationId === medicationId &&
         l.scheduledDate === date &&
-        l.scheduledTime === data.scheduledTime,
+        l.scheduledTime === scheduledTime,
     );
     if (existing) {
       updateLog(existing.id, { skipped: true });
     } else {
       addLog({
-        medicationId: data.medicationId as string,
+        medicationId,
         scheduledDate: date,
-        scheduledTime: data.scheduledTime as string,
+        scheduledTime,
         skipped: true,
       });
     }
   }
-});
+}
+
+/* ----------------------- Background handler (cold-start helper) --------- */
+/**
+ * Returns the last notification response if the app was launched via a notification action.
+ * Call this once at app startup to handle cold-start interactions.
+ */
+export function getInitialNotificationResponse(): Notifications.NotificationResponse | null {
+  return Notifications.getLastNotificationResponse();
+}
+
+/**
+ * Clear the last response so it's not processed again on next launch.
+ */
+export function clearInitialNotificationResponse(): void {
+  Notifications.clearLastNotificationResponse();
+}
