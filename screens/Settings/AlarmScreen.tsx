@@ -8,6 +8,10 @@ import { DropdownModal } from "../../components/DropdownModal";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
+import {
+  SOUND_OPTIONS,
+  NotificationSound,
+} from "../../utils/notificationSounds";
 
 type VibrationPattern = "short" | "normal" | "long" | "alarm";
 
@@ -27,16 +31,30 @@ const AlarmScreen = () => {
   const setVibrationEnabled = useSettingsStore((s) => s.setVibrationEnabled);
   const vibrationPattern = useSettingsStore((s) => s.vibrationPattern);
   const setVibrationPattern = useSettingsStore((s) => s.setVibrationPattern);
-  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const notificationSound = useSettingsStore((s) => s.notificationSound);
+  const setNotificationSound = useSettingsStore((s) => s.setNotificationSound);
+
+  const [patternDropdownOpen, setPatternDropdownOpen] = useState(false);
+  const [soundDropdownOpen, setSoundDropdownOpen] = useState(false);
 
   const patternOptions = useMemo(
     () => PATTERN_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) })),
     [t],
   );
 
+  const soundOptions = useMemo(
+    () => SOUND_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) })),
+    [t],
+  );
+
   const selectedPatternLabel = t(
     PATTERN_OPTIONS.find((o) => o.value === vibrationPattern)?.labelKey ??
       "vibration.normal",
+  );
+
+  const selectedSoundLabel = t(
+    SOUND_OPTIONS.find((o) => o.value === notificationSound)?.labelKey ??
+      "sound.default",
   );
 
   const switchColors = {
@@ -69,18 +87,37 @@ const AlarmScreen = () => {
           description={t("settings.vibrationPatternDesc")}
           dropdown={{
             selectedLabel: selectedPatternLabel,
-            onPress: () => vibrationEnabled && setDropdownOpen(true),
+            onPress: () => vibrationEnabled && setPatternDropdownOpen(true),
+          }}
+        />
+
+        {/* ------------------------- Notification Sound ------------------------- */}
+        <SettingRow
+          label={t("settings.notificationSound")}
+          description={t("settings.notificationSoundDesc")}
+          dropdown={{
+            selectedLabel: selectedSoundLabel,
+            onPress: () => setSoundDropdownOpen(true),
           }}
         />
       </View>
 
       <DropdownModal
-        visible={dropdownOpen}
+        visible={patternDropdownOpen}
         title={t("settings.vibrationPattern")}
         options={patternOptions}
         selectedValue={vibrationPattern}
         onSelect={(val) => setVibrationPattern(val as VibrationPattern)}
-        onClose={() => setDropdownOpen(false)}
+        onClose={() => setPatternDropdownOpen(false)}
+      />
+
+      <DropdownModal
+        visible={soundDropdownOpen}
+        title={t("settings.notificationSound")}
+        options={soundOptions}
+        selectedValue={notificationSound}
+        onSelect={(val) => setNotificationSound(val as NotificationSound)}
+        onClose={() => setSoundDropdownOpen(false)}
       />
     </ScreenLayout>
   );

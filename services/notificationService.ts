@@ -4,6 +4,7 @@ import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
 import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
+import { resolveNotificationSound } from "../utils/notificationSounds";
 
 const CHANNEL_ID = "medication-reminders";
 const CATEGORY_ID = "medication-actions";
@@ -71,12 +72,14 @@ function buildNotificationContent(params: {
 }) {
   const vibration = getVibration();
   const showActions = params.withActions !== false;
+  const soundPref = useSettingsStore.getState().notificationSound;
+  const sound = resolveNotificationSound(soundPref);
 
   return {
     title: params.title,
     body: params.body,
     data: params.data,
-    sound: "default" as const,
+    ...(sound !== undefined ? { sound } : {}),
     color: Colors.primary,
     ...(vibration ? { vibrate: vibration } : {}),
     priority: Notifications.AndroidNotificationPriority.HIGH,
@@ -120,10 +123,6 @@ export async function ensureCategory(): Promise<void> {
   categoryEnsured = true;
 }
 
-/**
- * Configure the foreground notification handler.
- * Must be called once at app startup.
- */
 export function setupNotificationHandler(): void {
   Notifications.setNotificationHandler({
     handleNotification: async () => ({
@@ -302,12 +301,6 @@ async function scheduleDailyDose(params: {
 }
 
 /* ------------------------------ Weekly --------------------------------- */
-function toExpoWeekday(jsDay: number): number {
-  // JS getDay(): 0=Sun, 1=Mon, ..., 6=Sat
-  // Expo weekday:  1=Sun, 2=Mon, ..., 7=Sat
-  return jsDay + 1;
-}
-
 async function scheduleWeeklyDose(params: {
   days: number[];
   hours: number;
@@ -328,12 +321,12 @@ async function scheduleWeeklyDose(params: {
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
           channelId: CHANNEL_ID,
-          weekday: toExpoWeekday(day),
+          weekday: day+1,
           hour: params.hours,
           minute: params.minutes,
         },
       });
-      console.log("[Notifications] Weekly trigger:", id, "weekday:", toExpoWeekday(day));
+      console.log("[Notifications] Weekly trigger:", id, "weekday:", day+1);
       ids.push(id);
     } catch (err: any) {
       console.error("[Notifications] Weekly trigger FAILED:", err?.message ?? err);

@@ -30,13 +30,24 @@
     "vibration": "Titreşim",
     "vibrationDesc": "İlaç hatırlatıcısı geldiğinde titreşim yap",
     "vibrationPattern": "Titreşim deseni",
-    "vibrationPatternDesc": "Bildirimin nasıl titreyeceğini seç"
+    "vibrationPatternDesc": "Bildirimin nasıl titreyeceğini seç",
+    "notificationSound": "Bildirim sesi",
+    "notificationSoundDesc": "İlaç hatırlatıcıları için ses seçin"
   },
   "vibration": {
     "short": "Kısa",
     "normal": "Normal",
     "long": "Uzun",
     "alarm": "Alarm"
+  },
+  "sound": {
+    "silent": "Sessiz",
+    "default": "Sistem varsayılanı",
+    "apoc": "Apoc",
+    "dozer": "Dozer",
+    "mouse": "Mouse",
+    "switch": "Switch",
+    "tank": "Tank"
   },
 
   "language": {

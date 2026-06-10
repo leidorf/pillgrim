@@ -4,6 +4,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { FontScale } from "../theme/typography";
 import { ThemeMode } from "../constants/theme";
 import i18n, { getSystemLanguage, LanguageCode } from "../utils/i18n";
+import { NotificationSound } from "../utils/notificationSounds";
 
 type WeekStart = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
@@ -20,6 +21,7 @@ type SettingsStore = {
   hideNotificationNames: boolean;
   vibrationEnabled: boolean;
   vibrationPattern: "short" | "normal" | "long" | "alarm";
+  notificationSound: NotificationSound;
   setTimeFormat: (format: TimeFormat) => void;
   setWeekStartsOn: (start: WeekStart) => void;
   setFontScale: (scale: FontScale) => void;
@@ -28,6 +30,7 @@ type SettingsStore = {
   setHideNotificationNames: (hide: boolean) => void;
   setVibrationEnabled: (enabled: boolean) => void;
   setVibrationPattern: (pattern: "short" | "normal" | "long" | "alarm") => void;
+  setNotificationSound: (sound: NotificationSound) => void;
 };
 
 export const useSettingsStore = create<SettingsStore>()(
@@ -50,6 +53,9 @@ export const useSettingsStore = create<SettingsStore>()(
         set({ vibrationEnabled: enabled }),
       setVibrationPattern: (pattern: "short" | "normal" | "long" | "alarm") =>
         set({ vibrationPattern: pattern }),
+      notificationSound: "default",
+      setNotificationSound: (sound: NotificationSound) =>
+        set({ notificationSound: sound }),
       setLanguage: (lang) => {
         const resolved = lang === "system" ? getSystemLanguage() : lang;
         i18n.changeLanguage(resolved);

@@ -30,13 +30,24 @@
     "vibration": "Vibration",
     "vibrationDesc": "Vibrate when a medication reminder fires",
     "vibrationPattern": "Vibration pattern",
-    "vibrationPatternDesc": "Choose how the notification vibrates"
+    "vibrationPatternDesc": "Choose how the notification vibrates",
+    "notificationSound": "Notification sound",
+    "notificationSoundDesc": "Choose the sound for medication reminders"
   },
   "vibration": {
     "short": "Short",
     "normal": "Normal",
     "long": "Long",
     "alarm": "Alarm"
+  },
+  "sound": {
+    "silent": "Silent",
+    "default": "System default",
+    "apoc": "Apoc",
+    "dozer": "Dozer",
+    "mouse": "Mouse",
+    "switch": "Switch",
+    "tank": "Tank"
   },
   "language": {
     "title": "Language",

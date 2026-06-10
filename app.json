@@ -46,7 +46,14 @@
         "expo-notifications",
         {
           "icon": "./assets/notification-icon.png",
-          "color": "#AED581"
+          "color": "#AED581",
+          "sounds": [
+            "./assets/sounds/apoc_sound.mp3",
+            "./assets/sounds/dozer_sound.mp3",
+            "./assets/sounds/mouse_sound.mp3",
+            "./assets/sounds/switch_sound.mp3",
+            "./assets/sounds/tank_sound.mp3"
+          ]
         }
       ],
       "expo-font",
