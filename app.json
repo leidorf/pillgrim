@@ -27,6 +27,7 @@
       "package": "com.anonymous.medicationreminder"
     },
     "plugins": [
+      "./plugins/withFullscreenActivity",
       [
         "expo-build-properties",
         {

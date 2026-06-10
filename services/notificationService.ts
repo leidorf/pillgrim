@@ -7,6 +7,8 @@ import notifee, {
   EventType,
   TimestampTrigger,
   AndroidAction,
+  AndroidLaunchActivityFlag,
+  AlarmType,
   AuthorizationStatus,
 } from "@notifee/react-native";
 import { Platform } from "react-native";
@@ -109,17 +111,15 @@ function buildNotificationPayload(params: {
   }
 
   if (fullscreen) {
-    android.fullScreenAction = {
-      id: "default",
-      launchActivity: "com.anonymous.medicationreminder.MainActivity",
-    };
+    // Triggers can't carry fullScreenAction (PendingIntent lost on serialization).
+    // Instead: asForegroundService launches a headless JS task when the trigger
+    // fires. That task calls displayNotification — which DOES support fullScreenAction.
+    android.asForegroundService = true;
     android.importance = AndroidImportance.HIGH;
     android.lightUpScreen = true;
     android.ongoing = true;
-    android.showTimestamp = true;
-    android.showChronometer = false;
     console.log(
-      "[Notifee] Fullscreen mode ON — fullScreenAction added to payload",
+      "[Notifee] Fullscreen ON — using foreground service path for takeover",
     );
   }
 
@@ -139,12 +139,21 @@ function buildNotificationPayload(params: {
 /* ----------------------- Channel & permission setup ----------------------- */
 
 export async function requestNotificationPermission(): Promise<boolean> {
-  const settings = await notifee.requestPermission();
-  console.log("[Notifee] Permission status:", JSON.stringify(settings));
+  try {
+    const settings = await notifee.requestPermission();
+    console.log("[Notifee] Permission status:", JSON.stringify(settings));
 
-  if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
-    console.warn("[Notifee] Notifications denied by user");
-    return false;
+    // On emulators / some devices requestPermission may return unexpected
+    // values. Only bail if explicitly DENIED (0). AUTHORIZED, PROVISIONAL,
+    // and NOT_DETERMINED are all treated as "can try to schedule".
+    if (settings.authorizationStatus === AuthorizationStatus.DENIED) {
+      console.warn("[Notifee] Notifications explicitly denied by user");
+      return false;
+    }
+  } catch (err) {
+    console.error("[Notifee] Permission request failed:", err);
+    // On some devices permission API fails but notifications still work —
+    // fall through and try to create the channel anyway.
   }
 
   if (Platform.OS === "android") {
@@ -161,6 +170,62 @@ export async function requestNotificationPermission(): Promise<boolean> {
     } catch (err) {
       console.error("[Notifee] Channel creation failed:", err);
     }
+
+    // Foreground service: when a trigger with asForegroundService fires,
+    // this callback runs (even from background/killed state). It cancels
+    // the standard wake-up notification and fires a real fullscreen one
+    // via displayNotification, which properly supports fullScreenAction.
+    notifee.registerForegroundService((notification: any) => {
+      return new Promise<void>(async (resolve) => {
+        try {
+          const data = notification?.data as Record<string, any> | undefined;
+          if (!data?.medicationId || !data?.scheduledTime) {
+            resolve();
+            return;
+          }
+          if (data.scheduledTime === "__test__") {
+            resolve();
+            return;
+          }
+
+          // Cancel the foreground-service notification (stops the service)
+          if (notification?.id) {
+            await notifee.cancelNotification(notification.id);
+          }
+
+          // Fire a new notification WITH fullScreenAction via displayNotification
+          await notifee.displayNotification({
+            title: notification?.title ?? "Medication Reminder",
+            body: notification?.body ?? "",
+            data: {
+              medicationId: data.medicationId,
+              scheduledTime: data.scheduledTime,
+            },
+            android: {
+              channelId: CHANNEL_ID,
+              category: AndroidCategory.ALARM,
+              color: Colors.primary,
+              actions: makeActions(),
+              pressAction: { id: "default" },
+              fullScreenAction: { id: "default" },
+              importance: AndroidImportance.HIGH,
+              lightUpScreen: true,
+              ongoing: true,
+            },
+            ios: {
+              sound: "default",
+              criticalAlert: { volume: 1.0 } as any,
+              categoryId: "medication-actions",
+            },
+          });
+          console.log("[Notifee] Fullscreen foreground service notification displayed");
+        } catch (err: any) {
+          console.error("[Notifee] Foreground service handler error:", err?.message);
+        } finally {
+          resolve();
+        }
+      });
+    });
   }
 
   return true;
@@ -179,12 +244,6 @@ export async function scheduleMedicationNotifications(
     medication.schedule.type,
     medication.timeDoses?.map((td) => td.time),
   );
-
-  const hasPermission = await requestNotificationPermission();
-  if (!hasPermission) {
-    console.warn("[Notifee] Permission denied — no notifications scheduled");
-    return [];
-  }
 
   const ids: string[] = [];
   const { schedule, timeDoses } = medication;
@@ -299,26 +358,29 @@ async function scheduleDailyDose(params: {
     type: TriggerType.TIMESTAMP,
     timestamp: next.getTime(),
     repeatFrequency: RepeatFrequency.DAILY,
-    alarmManager: {
-      allowWhileIdle: true,
-    },
+    alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
   };
 
-  const id = await notifee.createTriggerNotification(
-    buildNotificationPayload({
-      title: params.title,
-      body: params.body,
-      data: params.data,
-    }),
-    trigger,
-  );
-  console.log(
-    "[Notifee] Daily trigger created:",
-    id,
-    "next:",
-    new Date(trigger.timestamp).toLocaleString(),
-  );
-  return [id];
+  try {
+    const id = await notifee.createTriggerNotification(
+      buildNotificationPayload({
+        title: params.title,
+        body: params.body,
+        data: params.data,
+      }),
+      trigger,
+    );
+    console.log(
+      "[Notifee] Daily trigger created:",
+      id,
+      "next:",
+      new Date(trigger.timestamp).toLocaleString(),
+    );
+    return [id];
+  } catch (err: any) {
+    console.error("[Notifee] Daily trigger FAILED:", err?.message ?? err);
+    return [];
+  }
 }
 
 /* ------------------------------- Weekly --------------------------------- */
@@ -344,7 +406,7 @@ async function scheduleWeeklyDose(params: {
       type: TriggerType.TIMESTAMP,
       timestamp: next.getTime(),
       repeatFrequency: RepeatFrequency.WEEKLY,
-      alarmManager: { allowWhileIdle: true },
+      alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
     };
 
     const id = await notifee.createTriggerNotification(
@@ -382,7 +444,7 @@ async function scheduleBiweeklyDose(params: {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: triggerDate.getTime(),
-      alarmManager: { allowWhileIdle: true },
+      alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
     };
 
     const id = await notifee.createTriggerNotification(
@@ -423,7 +485,7 @@ async function scheduleIntervalDose(params: {
     const trigger: TimestampTrigger = {
       type: TriggerType.TIMESTAMP,
       timestamp: triggerDate.getTime(),
-      alarmManager: { allowWhileIdle: true },
+      alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
     };
 
     const id = await notifee.createTriggerNotification(
@@ -467,7 +529,7 @@ async function scheduleMonthlyDose(params: {
       const trigger: TimestampTrigger = {
         type: TriggerType.TIMESTAMP,
         timestamp: date.getTime(),
-        alarmManager: { allowWhileIdle: true },
+        alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
       };
 
       const id = await notifee.createTriggerNotification(
@@ -566,7 +628,7 @@ export async function snoozeMedicationNotification(
   const trigger: TimestampTrigger = {
     type: TriggerType.TIMESTAMP,
     timestamp: triggerDate.getTime(),
-    alarmManager: { allowWhileIdle: true },
+    alarmManager: { type: AlarmType.SET_EXACT, allowWhileIdle: true },
   };
 
   const id = await notifee.createTriggerNotification(
