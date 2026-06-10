@@ -8,6 +8,8 @@ import { resolveNotificationSound } from "../utils/notificationSounds";
 
 const CHANNEL_ID = "medication-reminders";
 const CATEGORY_ID = "medication-actions";
+const ACTION_TAKEN = "taken";
+const ACTION_SKIP = "skip";
 
 /* ---------------------- Settings helpers (safe outside React) ---------------------- */
 const getVibration = (): number[] | undefined => {
@@ -59,10 +61,6 @@ function parseTime(time: string): { hours: number; minutes: number } {
   return { hours: h, minutes: m };
 }
 
-/* --------------------------- Action identifiers --------------------------- */
-const ACTION_TAKEN = "taken";
-const ACTION_SKIP = "skip";
-
 /* ------------------- Shared notification content builder ------------------ */
 function buildNotificationContent(params: {
   title: string;
@@ -74,6 +72,12 @@ function buildNotificationContent(params: {
   const showActions = params.withActions !== false;
   const soundPref = useSettingsStore.getState().notificationSound;
   const sound = resolveNotificationSound(soundPref);
+  console.log("[Notifications] buildNotificationContent sound:", {
+    soundPref,
+    resolved: sound,
+    platform: Platform.OS,
+    title: params.title,
+  });
 
   return {
     title: params.title,
@@ -88,20 +92,36 @@ function buildNotificationContent(params: {
   };
 }
 
-/* --------------- Channel, category & handler setup ---------------- */
-export async function ensureChannel(): Promise<void> {
-  if (Platform.OS !== "android") return;
+function getSoundChannelId(): string {
+  if (Platform.OS !== "android") return CHANNEL_ID;
+  const { notificationSound } = useSettingsStore.getState();
+  const sound = resolveNotificationSound(notificationSound);
+  if (!sound || sound === "default") return CHANNEL_ID;
+  return `${CHANNEL_ID}-${notificationSound}`;
+}
 
+/* --------------- Channel, category & handler setup ---------------- */
+export async function ensureChannel(): Promise<string> {
+  if (Platform.OS !== "android") return CHANNEL_ID;
+
+  const channelId = getSoundChannelId();
+  const { notificationSound } = useSettingsStore.getState();
+  const resolvedSound = resolveNotificationSound(notificationSound);
+  const sound: string =
+    typeof resolvedSound === "string" ? resolvedSound : "default";
   const vibration = getVibration();
-  await Notifications.setNotificationChannelAsync(CHANNEL_ID, {
+
+  await Notifications.setNotificationChannelAsync(channelId, {
     name: "Medication Reminders",
     importance: Notifications.AndroidImportance.HIGH,
     vibrationPattern: vibration ?? null,
-    sound: "default",
+    sound,
     bypassDnd: true,
     lockscreenVisibility: Notifications.AndroidNotificationVisibility.PUBLIC,
     enableVibrate: vibration !== undefined,
   });
+
+  return channelId;
 }
 
 let categoryEnsured = false;
@@ -165,22 +185,21 @@ export async function scheduleMedicationNotifications(
 ): Promise<string[]> {
   if (!medication.notificationSettings?.enabled) return [];
   if (!medication.schedule || !medication.timeDoses?.length) return [];
-
-  console.log(
-    "[Notifications] Scheduling for:",
-    medication.name,
-    medication.schedule.type,
-    medication.timeDoses?.map((td) => td.time),
-  );
+  if (medication.notificationIds?.length) {
+    await cancelMedicationNotifications(medication.notificationIds);
+  }
 
   const hasPermission = await requestNotificationPermission();
   if (!hasPermission) {
-    console.warn("[Notifications] Permission denied - no notifications scheduled");
+    console.warn(
+      "[Notifications] Permission denied - no notifications scheduled",
+    );
     return [];
   }
 
   await ensureCategory();
 
+  const channelId = await ensureChannel();
   const ids: string[] = [];
   const { schedule, timeDoses } = medication;
 
@@ -203,6 +222,7 @@ export async function scheduleMedicationNotifications(
           title,
           body,
           data,
+          channelId,
         });
         break;
       case "weekly":
@@ -213,6 +233,7 @@ export async function scheduleMedicationNotifications(
           title,
           body,
           data,
+          channelId,
         });
         break;
       case "biweekly":
@@ -223,6 +244,7 @@ export async function scheduleMedicationNotifications(
           title,
           body,
           data,
+          channelId,
         });
         break;
       case "interval":
@@ -235,6 +257,7 @@ export async function scheduleMedicationNotifications(
             title,
             body,
             data,
+            channelId,
           });
         }
         break;
@@ -247,6 +270,7 @@ export async function scheduleMedicationNotifications(
           title,
           body,
           data,
+          channelId,
         });
         break;
       }
@@ -258,6 +282,7 @@ export async function scheduleMedicationNotifications(
           title,
           body,
           data,
+          channelId,
         });
         break;
       case "prn":
@@ -277,6 +302,7 @@ async function scheduleDailyDose(params: {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  channelId: string;
 }): Promise<string[]> {
   try {
     const id = await Notifications.scheduleNotificationAsync({
@@ -287,7 +313,7 @@ async function scheduleDailyDose(params: {
       }),
       trigger: {
         type: Notifications.SchedulableTriggerInputTypes.DAILY,
-        channelId: CHANNEL_ID,
+        channelId: params.channelId,
         hour: params.hours,
         minute: params.minutes,
       },
@@ -308,6 +334,7 @@ async function scheduleWeeklyDose(params: {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  channelId: string;
 }): Promise<string[]> {
   const ids: string[] = [];
   for (const day of params.days) {
@@ -320,16 +347,19 @@ async function scheduleWeeklyDose(params: {
         }),
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.WEEKLY,
-          channelId: CHANNEL_ID,
-          weekday: day+1,
+          channelId: params.channelId,
+          weekday: day + 1,
           hour: params.hours,
           minute: params.minutes,
         },
       });
-      console.log("[Notifications] Weekly trigger:", id, "weekday:", day+1);
+      console.log("[Notifications] Weekly trigger:", id, "weekday:", day + 1);
       ids.push(id);
     } catch (err: any) {
-      console.error("[Notifications] Weekly trigger FAILED:", err?.message ?? err);
+      console.error(
+        "[Notifications] Weekly trigger FAILED:",
+        err?.message ?? err,
+      );
     }
   }
   return ids;
@@ -343,6 +373,7 @@ async function scheduleBiweeklyDose(params: {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  channelId: string;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -363,12 +394,15 @@ async function scheduleBiweeklyDose(params: {
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date: triggerDate,
-          channelId: CHANNEL_ID,
+          channelId: params.channelId,
         },
       });
       ids.push(id);
     } catch (err: any) {
-      console.error("[Notifications] Biweekly trigger FAILED:", err?.message ?? err);
+      console.error(
+        "[Notifications] Biweekly trigger FAILED:",
+        err?.message ?? err,
+      );
     }
   }
   return ids;
@@ -383,6 +417,7 @@ async function scheduleIntervalDose(params: {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  channelId: string;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -404,12 +439,15 @@ async function scheduleIntervalDose(params: {
         trigger: {
           type: Notifications.SchedulableTriggerInputTypes.DATE,
           date: triggerDate,
-          channelId: CHANNEL_ID,
+          channelId: params.channelId,
         },
       });
       ids.push(id);
     } catch (err: any) {
-      console.error("[Notifications] Interval trigger FAILED:", err?.message ?? err);
+      console.error(
+        "[Notifications] Interval trigger FAILED:",
+        err?.message ?? err,
+      );
     }
   }
   return ids;
@@ -423,6 +461,7 @@ async function scheduleMonthlyDose(params: {
   title: string;
   body: string;
   data: Record<string, unknown>;
+  channelId: string;
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
@@ -448,12 +487,15 @@ async function scheduleMonthlyDose(params: {
           trigger: {
             type: Notifications.SchedulableTriggerInputTypes.DATE,
             date,
-            channelId: CHANNEL_ID,
+            channelId: params.channelId,
           },
         });
         ids.push(id);
       } catch (err: any) {
-        console.error("[Notifications] Monthly trigger FAILED:", err?.message ?? err);
+        console.error(
+          "[Notifications] Monthly trigger FAILED:",
+          err?.message ?? err,
+        );
       }
     }
   }
@@ -508,6 +550,7 @@ export async function scheduleLowStockNotification(
     count: medication.stock ?? 0,
   });
   const data = { medicationId: medication.id, type: "low_stock" };
+  const channelId = await ensureChannel();
 
   const id = await Notifications.scheduleNotificationAsync({
     content: buildNotificationContent({
@@ -516,7 +559,14 @@ export async function scheduleLowStockNotification(
       data,
       withActions: false,
     }),
-    trigger: null, // immediate
+    trigger:
+      Platform.OS === "android"
+        ? {
+            type: Notifications.SchedulableTriggerInputTypes.DATE,
+            date: new Date(Date.now() + 1000),
+            channelId,
+          }
+        : null,
   });
   return id;
 }
@@ -554,7 +604,10 @@ export async function snoozeMedicationNotification(
 
 /* -------------------------- Foreground listener ------------------------- */
 export function onForegroundNotificationEvent(
-  callback: (actionIdentifier: string, response: Notifications.NotificationResponse) => void,
+  callback: (
+    actionIdentifier: string,
+    response: Notifications.NotificationResponse,
+  ) => void,
 ): () => void {
   const subscription = Notifications.addNotificationResponseReceivedListener(
     (response) => {
@@ -572,21 +625,22 @@ export function onForegroundNotificationEvent(
 }
 
 /* ----------------------- Shared action processor ------------------------ */
-/**
- * Processes a notification action (Taken / Skip) by creating or updating the log
- * and updating medication stock. Works in both foreground and headless background contexts.
- */
 export async function processNotificationAction(
   actionId: string,
   medicationId: string,
   scheduledTime: string,
 ): Promise<void> {
-  // Dynamic imports to work in headless background context
   const { useLogStore } = await import("../store/logsStore");
   const { useMedicationStore } = await import("../store/medicationStore");
   const { getLocalDateString } = await import("../utils/dateUtils");
 
   const date = getLocalDateString(new Date());
+
+  for (let i = 0; i < 5; i++) {
+    const { medications } = useMedicationStore.getState();
+    if (medications.length > 0) break;
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
 
   if (actionId === ACTION_TAKEN) {
     const med = useMedicationStore
@@ -645,17 +699,10 @@ export async function processNotificationAction(
 }
 
 /* ----------------------- Background handler (cold-start helper) --------- */
-/**
- * Returns the last notification response if the app was launched via a notification action.
- * Call this once at app startup to handle cold-start interactions.
- */
 export function getInitialNotificationResponse(): Notifications.NotificationResponse | null {
   return Notifications.getLastNotificationResponse();
 }
 
-/**
- * Clear the last response so it's not processed again on next launch.
- */
 export function clearInitialNotificationResponse(): void {
   Notifications.clearLastNotificationResponse();
 }

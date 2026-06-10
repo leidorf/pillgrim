@@ -5,9 +5,7 @@ import { Medication } from "../types/medication";
 import * as Crypto from "expo-crypto";
 import { useLogStore } from "./logsStore";
 import {
-  scheduleMedicationNotifications,
   cancelMedicationNotifications,
-  rescheduleMedicationNotifications,
   scheduleLowStockNotification,
 } from "../services/notificationService";
 
@@ -69,19 +67,7 @@ export const useMedicationStore = create<MedicationStore>()(
           updatedAt: now,
           notificationIds: [],
         };
-
         set({ medications: [...medications, newMed], draft: {} });
-
-        try {
-          const notificationIds = await scheduleMedicationNotifications(newMed);
-          set((state) => ({
-            medications: state.medications.map((m) =>
-              m.id === newMed.id ? { ...m, notificationIds } : m,
-            ),
-          }));
-        } catch (error) {
-          console.error("Failed to schedule notifications:", error);
-        }
       },
 
       /* ---------------------------- Delete Medication --------------------------- */
@@ -117,29 +103,13 @@ export const useMedicationStore = create<MedicationStore>()(
           updatedAt: new Date().toISOString(),
         };
 
-        const needsReschedule =
-          updates.notificationSettings !== undefined ||
-          updates.schedule !== undefined ||
-          updates.timeDoses !== undefined ||
-          updates.isActive !== undefined;
-
-        let newNotificationIds: string[] = currentMed.notificationIds ?? [];
-
-        if (needsReschedule) {
-          try {
-            newNotificationIds = await rescheduleMedicationNotifications(
-              updatedMed,
-              currentMed.notificationIds ?? [],
-            );
-          } catch (error) {
-            console.error("Failed to reschedule notifications:", error);
-          }
-        }
-
         set((state) => ({
           medications: state.medications.map((m) =>
             m.id === id
-              ? { ...updatedMed, notificationIds: newNotificationIds }
+              ? {
+                  ...updatedMed,
+                  notificationIds: currentMed.notificationIds ?? [],
+                }
               : m,
           ),
         }));

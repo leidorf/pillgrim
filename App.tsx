@@ -139,28 +139,13 @@ export default function App() {
   const _updateMedicationNotificationIds = useMedicationStore(
     (s) => s._updateMedicationNotificationIds,
   );
-  const hasRescheduled = useRef(false);
   const isRescheduling = useRef(false);
   const pendingReschedule = useRef(false);
+  const prevSchedulingHash = useRef<string>("");
 
   // Setup foreground notification handler (only once)
   useEffect(() => {
     setupNotificationHandler();
-  }, []);
-
-  // Handle cold-start notification interaction (iOS fallback when bg task isn't used)
-  useEffect(() => {
-    const response = getInitialNotificationResponse();
-    if (!response) return;
-    const data = response.notification.request.content.data as
-      | { medicationId?: string; scheduledTime?: string }
-      | undefined;
-    if (!data?.medicationId || !data?.scheduledTime) return;
-    const actionId = response.actionIdentifier;
-    if (actionId === "taken" || actionId === "skip") {
-      processNotificationAction(actionId, data.medicationId, data.scheduledTime);
-    }
-    clearInitialNotificationResponse();
   }, []);
 
   useEffect(() => {
@@ -169,14 +154,18 @@ export default function App() {
         pendingReschedule.current = true;
         return;
       }
-      if (medications.length === 0) return;
+
+      const freshMeds = useMedicationStore.getState().medications;
+      if (freshMeds.length === 0) return;
 
       isRescheduling.current = true;
       pendingReschedule.current = false;
       try {
         await rescheduleAllNotifications(
-          medications,
-          (id) => medications.find((m) => m.id === id)?.notificationIds ?? [],
+          freshMeds,
+          (id) =>
+            useMedicationStore.getState().medications.find((m) => m.id === id)
+              ?.notificationIds ?? [],
           (id, ids) => _updateMedicationNotificationIds(id, ids),
         );
       } catch (error) {
@@ -190,8 +179,21 @@ export default function App() {
       }
     };
 
-    if (!hasRescheduled.current) {
-      hasRescheduled.current = true;
+    // Reschedule only when scheduling-relevant properties change
+    // (avoids infinite loop: notificationIds updates don't trigger re-schedule)
+    const schedulingHash = JSON.stringify(
+      medications
+        .filter((m) => m.isActive && m.notificationSettings?.enabled !== false)
+        .map((m) => ({
+          id: m.id,
+          schedule: m.schedule,
+          timeDoses: m.timeDoses,
+        }))
+        .sort((a, b) => a.id.localeCompare(b.id)),
+    );
+
+    if (schedulingHash !== prevSchedulingHash.current) {
+      prevSchedulingHash.current = schedulingHash;
       if (medications.length > 0) {
         doReschedule();
       }
@@ -213,7 +215,11 @@ export default function App() {
       if (!data?.medicationId || !data?.scheduledTime) return;
 
       if (actionId === "taken" || actionId === "skip") {
-        processNotificationAction(actionId, data.medicationId, data.scheduledTime);
+        processNotificationAction(
+          actionId,
+          data.medicationId,
+          data.scheduledTime,
+        );
       }
     });
     return unsub;
