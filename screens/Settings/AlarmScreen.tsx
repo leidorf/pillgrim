@@ -148,7 +148,8 @@ const AlarmScreen = () => {
           description={t("settings.vibrationPatternDesc")}
           dropdown={{
             selectedLabel: selectedPatternLabel,
-            onPress: () => vibrationEnabled && setPatternDropdownOpen(true),
+            onPress: () => setPatternDropdownOpen(true),
+            disabled: !vibrationEnabled,
           }}
         />
 

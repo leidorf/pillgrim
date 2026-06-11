@@ -8,6 +8,7 @@ import { Theme } from "../../../constants/theme";
 type DropdownProps = {
   selectedLabel: string | undefined;
   onPress: () => void;
+  disabled?: boolean;
 };
 
 type SettingRowProps = {
@@ -29,18 +30,47 @@ export const SettingRow = ({
   return (
     <View style={styles.row}>
       <View style={styles.info}>
-        <Text style={styles.label}>{label}</Text>
-        <Text style={styles.description}>{description}</Text>
+        <Text
+          style={[
+            styles.label,
+            dropdown?.disabled && styles.labelDisabled,
+          ]}
+        >
+          {label}
+        </Text>
+        <Text
+          style={[
+            styles.description,
+            dropdown?.disabled && styles.descriptionDisabled,
+          ]}
+        >
+          {description}
+        </Text>
       </View>
       {dropdown ? (
-        <Pressable style={styles.dropdownTrigger} onPress={dropdown.onPress}>
-          <Text style={styles.dropdownTriggerText}>
+        <Pressable
+          style={[
+            styles.dropdownTrigger,
+            dropdown.disabled && styles.dropdownTriggerDisabled,
+          ]}
+          onPress={dropdown.disabled ? undefined : dropdown.onPress}
+        >
+          <Text
+            style={[
+              styles.dropdownTriggerText,
+              dropdown.disabled && styles.dropdownTriggerTextDisabled,
+            ]}
+          >
             {dropdown.selectedLabel}
           </Text>
           <ArrowDownIcon
             width={16}
             height={16}
-            stroke={theme.textSecondary}
+            stroke={
+              dropdown.disabled
+                ? theme.textSecondary + "40"
+                : theme.textSecondary
+            }
           />
         </Pressable>
       ) : (
@@ -62,11 +92,13 @@ const createStyles = (theme: Theme) =>
     },
     info: { flex: 1, marginRight: 16 },
     label: { color: theme.textPrimary, fontSize: 15, fontWeight: "600" },
+    labelDisabled: { color: theme.textSecondary + "50" },
     description: {
       color: theme.textSecondary,
       fontSize: 13,
       marginTop: 2,
     },
+    descriptionDisabled: { color: theme.textSecondary + "30" },
     dropdownTrigger: {
       flexDirection: "row",
       alignItems: "center",
@@ -82,5 +114,11 @@ const createStyles = (theme: Theme) =>
       color: theme.textPrimary,
       fontSize: 14,
       fontWeight: "500",
+    },
+    dropdownTriggerTextDisabled: {
+      color: theme.textSecondary + "50",
+    },
+    dropdownTriggerDisabled: {
+      backgroundColor: theme.surface + "50",
     },
   });
