@@ -7,12 +7,15 @@ import { SettingRow } from "./components/SettingRow";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
+import { NotificationPermissionBanner } from "./components/NotificationPermissionBanner";
 
 const NotificationsScreen = () => {
   const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
-  const hideNotificationNames = useSettingsStore((s) => s.hideNotificationNames);
+  const hideNotificationNames = useSettingsStore(
+    (s) => s.hideNotificationNames,
+  );
   const setHideNotificationNames = useSettingsStore(
     (s) => s.setHideNotificationNames,
   );
@@ -25,6 +28,8 @@ const NotificationsScreen = () => {
     <ScreenLayout>
       <ScreenHeader title={t("settings.notifications")} />
       <View style={styles.container}>
+        <NotificationPermissionBanner />
+
         <SettingRow
           label={t("settings.hideNotificationNames")}
           description={

@@ -9,6 +9,7 @@ import ScreenLayout from "../../components/ScreenLayout";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { useMemo } from "react";
 import { Theme } from "../../constants/theme";
+import { NotificationPermissionBanner } from "./components/NotificationPermissionBanner";
 
 type SettingEntry = {
   key: keyof SettingsParamList;
@@ -49,6 +50,7 @@ const SettingsScreen = () => {
             onPress={() => handleNavigation(item.key)}
           />
         )}
+        ListHeaderComponent={NotificationPermissionBanner}
         ListFooterComponent={
           <View style={styles.footer}>
             <Text onPress={handlePrivacy} style={styles.footerText}>

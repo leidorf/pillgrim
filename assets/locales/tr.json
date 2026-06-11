@@ -38,7 +38,10 @@
     "vibrationPattern": "Titreşim deseni",
     "vibrationPatternDesc": "Bildirimin nasıl titreyeceğini seç",
     "notificationSound": "Bildirim sesi",
-    "notificationSoundDesc": "İlaç hatırlatıcıları için ses seçin"
+    "notificationSoundDesc": "İlaç hatırlatıcıları için ses seçin",
+    "notificationsDisabled": "Bildirimler devre dışı",
+    "notificationsOpenSettings": "Sistem ayarlarını açmak için dokun",
+    "notificationsGrant": "Bildirimleri açmak için dokun"
   },
   "vibration": {
     "short": "Kısa",

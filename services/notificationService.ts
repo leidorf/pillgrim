@@ -1,5 +1,5 @@
 import * as Notifications from "expo-notifications";
-import { Platform } from "react-native";
+import { Linking, Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
 import i18n from "../utils/i18n";
@@ -156,29 +156,24 @@ export function setupNotificationHandler(): void {
   });
 }
 
+/* ---------------------------- Permission check ---------------------------- */
+export async function checkNotificationPermission(): Promise<boolean> {
+  const { status } = await Notifications.getPermissionsAsync();
+  return status === "granted";
+}
+
 /* ------------------------- Permission request ---------------------------- */
 export async function requestNotificationPermission(): Promise<boolean> {
-  try {
-    const perm: any = await Notifications.requestPermissionsAsync();
-    console.log("[Notifications] Permission status:", perm.granted);
-    if (!perm.granted) {
-      console.warn("[Notifications] Permissions denied by user");
-      return false;
-    }
-  } catch (err) {
-    console.error("[Notifications] Permission request failed:", err);
-  }
+  const { status: current } = await Notifications.getPermissionsAsync();
 
-  if (Platform.OS === "android") {
-    try {
-      await ensureChannel();
-      console.log("[Notifications] Channel ensured:", CHANNEL_ID);
-    } catch (err) {
-      console.error("[Notifications] Channel creation failed:", err);
-    }
-  }
+  if (current === "granted") return true;
 
-  return true;
+  if (current === "denied") {
+    Linking.openSettings();
+    return false;
+  }
+  const { status } = await Notifications.requestPermissionsAsync();
+  return status === "granted";
 }
 
 /* -------------------------- Schedule functions --------------------------- */
@@ -191,7 +186,7 @@ export async function scheduleMedicationNotifications(
     await cancelMedicationNotifications(medication.notificationIds);
   }
 
-  const hasPermission = await requestNotificationPermission();
+  const hasPermission = await checkNotificationPermission();
   if (!hasPermission) {
     console.warn(
       "[Notifications] Permission denied - no notifications scheduled",
@@ -580,7 +575,7 @@ export async function snoozeMedicationNotification(
   minutes: number,
   dose?: string,
 ): Promise<{ id: string | null; title: string; body: string }> {
-  const hasPermission = await requestNotificationPermission();
+  const hasPermission = await checkNotificationPermission();
   if (!hasPermission) return { id: null, title: "", body: "" };
 
   const title = buildTitle(medication);

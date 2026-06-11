@@ -1,5 +1,5 @@
 import { useEffect, useRef } from "react";
-import { Animated, StyleSheet, View } from "react-native";
+import { Animated, StyleSheet } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { Text } from "./Text";
 import CheckIcon from "../assets/icons/check.svg";
@@ -79,10 +79,7 @@ const SuccessToast = ({
 
   return (
     <Animated.View
-      style={[
-        styles.container,
-        { transform: [{ translateY }], opacity },
-      ]}
+      style={[styles.container, { transform: [{ translateY }], opacity }]}
       pointerEvents={visible ? "auto" : "none"}
     >
       <CheckIcon width={18} height={18} stroke={theme.primary} />
