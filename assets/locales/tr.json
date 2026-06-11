@@ -264,7 +264,9 @@
     "emptySubtext": "İlaçlarınızın planlandığı günler burada görünecek"
   },
   "home": {
-    "emptyText": "Bugün için ilaç yok!"
+    "emptyText": "Bugün için ilaç yok!",
+    "noMedsTitle": "Henüz hiçbir ilaç eklenmedi",
+    "noMedsSubtext": "İlk ilacınızı eklemek için + düğmesine dokunun"
   },
   "export": {
     "title": "Dışa aktarma türünü seçin",

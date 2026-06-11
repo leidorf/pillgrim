@@ -46,6 +46,7 @@ const HomeScreen = () => {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { medications, updateStock } = useMedicationStore();
+  const hasMedications = medications.length > 0;
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
   const weekdayMap = useMemo(
     () => buildWeekdayMap(weekStartsOn),
@@ -276,25 +277,38 @@ const HomeScreen = () => {
         )}
         showsVerticalScrollIndicator={false}
         ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <PillBottleIcon
-              height={64}
-              width={64}
-              stroke={theme.textPrimary}
-              strokeWidth={1}
-            />
-            <Text style={styles.emptyText}>{t("home.emptyText")}</Text>
-            <Text style={styles.emptySubtext}>
-              {selectedDate.toLocaleDateString(
-                i18n.language?.split("-")[0] ?? "en",
-                {
-                  weekday: "long",
-                  day: "numeric",
-                  month: "long",
-                },
-              )}
-            </Text>
-          </View>
+          hasMedications ? (
+            <View style={styles.emptyContainer}>
+              <PillBottleIcon
+                height={64}
+                width={64}
+                stroke={theme.textPrimary}
+                strokeWidth={1}
+              />
+              <Text style={styles.emptyText}>{t("home.emptyText")}</Text>
+              <Text style={styles.emptySubtext}>
+                {selectedDate.toLocaleDateString(
+                  i18n.language?.split("-")[0] ?? "en",
+                  {
+                    weekday: "long",
+                    day: "numeric",
+                    month: "long",
+                  },
+                )}
+              </Text>
+            </View>
+          ) : (
+            <View style={styles.emptyContainer}>
+              <PillBottleIcon
+                height={64}
+                width={64}
+                stroke={theme.textPrimary}
+                strokeWidth={1}
+              />
+              <Text style={styles.emptyText}>{t("home.noMedsTitle")}</Text>
+              <Text style={styles.emptySubtext}>{t("home.noMedsSubtext")}</Text>
+            </View>
+          )
         }
       />
 
@@ -348,7 +362,6 @@ const createStyles = (theme: Theme) =>
     emptySubtext: {
       fontSize: 14,
       color: theme.textSecondary,
-      textTransform: "capitalize",
     },
   });
 

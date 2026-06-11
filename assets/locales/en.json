@@ -263,7 +263,9 @@
     "emptySubtext": "The days your medications are scheduled for will appear here"
   },
   "home": {
-    "emptyText": "No medications for today!"
+    "emptyText": "No medications for today!",
+    "noMedsTitle": "No medications added yet",
+    "noMedsSubtext": "Tap the + button to add your first medication"
   },
   "export": {
     "title": "Select export file type",
