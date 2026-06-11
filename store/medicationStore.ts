@@ -14,6 +14,7 @@ type DraftMedication = Partial<Medication>;
 type MedicationStore = {
   medications: Medication[];
   draft: DraftMedication;
+  _softDeleted: Medication | null;
   setDraft: (fields: Partial<Medication>) => void;
   clearDraft: () => void;
   saveMedication: () => Promise<void>;
@@ -24,6 +25,9 @@ type MedicationStore = {
     id: string,
     notificationIds: string[],
   ) => void;
+  softDeleteMedication: (id: string) => void;
+  undoSoftDelete: () => void;
+  commitSoftDelete: () => Promise<void>;
 };
 
 export const useMedicationStore = create<MedicationStore>()(
@@ -31,6 +35,7 @@ export const useMedicationStore = create<MedicationStore>()(
     (set, get) => ({
       medications: [],
       draft: {},
+      _softDeleted: null,
       /* -------------------------------- Set Draft ------------------------------- */
       setDraft: (fields) =>
         set((state) => ({ draft: { ...state.draft, ...fields } })),
@@ -86,6 +91,55 @@ export const useMedicationStore = create<MedicationStore>()(
         set((state) => ({
           medications: state.medications.filter((m) => m.id !== id),
         }));
+      },
+
+      /* -------------------------- Soft Delete (Undo) ------------------------- */
+      softDeleteMedication: (id: string) => {
+        const { medications, _softDeleted } = get();
+
+        // If another soft-delete is pending, commit it first
+        if (_softDeleted) {
+          const prev = _softDeleted;
+          if (prev.notificationIds?.length) {
+            cancelMedicationNotifications(prev.notificationIds).catch(() => {});
+          }
+          useLogStore.getState().deleteLogsByMedication(prev.id);
+        }
+
+        const medication = medications.find((m) => m.id === id);
+        if (!medication) return;
+
+        set({
+          medications: medications.filter((m) => m.id !== id),
+          _softDeleted: medication,
+        });
+      },
+
+      undoSoftDelete: () => {
+        const { _softDeleted, medications } = get();
+        if (!_softDeleted) return;
+
+        set({
+          medications: [...medications, _softDeleted],
+          _softDeleted: null,
+        });
+      },
+
+      commitSoftDelete: async () => {
+        const { _softDeleted } = get();
+        if (!_softDeleted) return;
+
+        if (_softDeleted.notificationIds?.length) {
+          try {
+            await cancelMedicationNotifications(_softDeleted.notificationIds);
+          } catch (error) {
+            console.error("Failed to cancel notifications: ", error);
+          }
+        }
+
+        useLogStore.getState().deleteLogsByMedication(_softDeleted.id);
+
+        set({ _softDeleted: null });
       },
 
       /* ---------------------------- Update Medication --------------------------- */

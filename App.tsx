@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -7,6 +7,8 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import i18n, { getSystemLanguage } from "./utils/i18n";
+import { toast } from "./utils/toast";
+import SuccessToast from "./components/SuccessToast";
 import {
   AddMedicationParamList,
   MainScreenParamList,
@@ -139,6 +141,7 @@ export default function App() {
   const _updateMedicationNotificationIds = useMedicationStore(
     (s) => s._updateMedicationNotificationIds,
   );
+  const [toastMsg, setToastMsg] = useState<string | null>(null);
   const isRescheduling = useRef(false);
   const pendingReschedule = useRef(false);
   const prevSchedulingHash = useRef<string>("");
@@ -146,6 +149,11 @@ export default function App() {
   // Setup foreground notification handler (only once)
   useEffect(() => {
     setupNotificationHandler();
+  }, []);
+
+  // Listen for global toast messages
+  useEffect(() => {
+    toast.onShow(setToastMsg);
   }, []);
 
   useEffect(() => {
@@ -257,6 +265,11 @@ export default function App() {
             </RootStack.Navigator>
           </NavigationContainer>
         </BottomSheetModalProvider>
+        <SuccessToast
+          visible={toastMsg !== null}
+          message={toastMsg ?? ""}
+          onDismiss={() => toast.hide()}
+        />
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );

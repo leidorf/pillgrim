@@ -8,12 +8,13 @@ import AddMedicationButton from "../../components/AddMedicationButton";
 import PillBottleIcon from "../../assets/icons/pill-bottle.svg";
 import MedicationInfoCard from "./components/MedicationInfoCard";
 import MedicationBottomSheet from "./components/MedicationBottomSheet";
+import UndoSnackbar from "../../components/UndoSnackbar";
+import BaseModal from "../../components/BaseModal";
 import { useMedicationStore } from "../../store/medicationStore";
 import { NavProp, MainScreenParamList } from "../../types/navigation";
 import { Medication } from "../../types/medication";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ScreenLayout from "../../components/ScreenLayout";
-import BaseModal from "../../components/BaseModal";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
 
@@ -22,8 +23,14 @@ const MedsScreen = () => {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
-  const { medications, deleteMedication, setDraft, updateMedication } =
-    useMedicationStore();
+  const {
+    medications,
+    softDeleteMedication,
+    undoSoftDelete,
+    commitSoftDelete,
+    setDraft,
+    updateMedication,
+  } = useMedicationStore();
 
   const [isSheetOpen, setIsSheetOpen] = useState(false);
   const bottomSheetRef = useRef<BottomSheet>(null);
@@ -31,6 +38,12 @@ const MedsScreen = () => {
   const [selectedScheduleLabel, setSelectedScheduleLabel] = useState("");
 
   const [deleteModal, setDeleteModal] = useState<{
+    visible: boolean;
+    medicationId?: string;
+    name?: string;
+  }>({ visible: false });
+
+  const [snackbar, setSnackbar] = useState<{
     visible: boolean;
     medicationId?: string;
     name?: string;
@@ -63,16 +76,41 @@ const MedsScreen = () => {
     [medications, setDraft, navigation],
   );
 
-  const handleDelete = useCallback((medicationId: string, name: string) => {
-    setDeleteModal({ visible: true, medicationId, name });
-  }, []);
+  const handleDelete = useCallback(
+    (medicationId: string, name: string) => {
+      setDeleteModal({ visible: true, medicationId, name });
+    },
+    [],
+  );
 
   const confirmDelete = useCallback(() => {
-    if (deleteModal.medicationId) {
-      deleteMedication(deleteModal.medicationId);
+    if (deleteModal.medicationId && deleteModal.name) {
+      softDeleteMedication(deleteModal.medicationId);
+      setSnackbar({
+        visible: true,
+        medicationId: deleteModal.medicationId,
+        name: deleteModal.name,
+      });
     }
     setDeleteModal({ visible: false });
-  }, [deleteModal.medicationId, deleteMedication]);
+  }, [deleteModal.medicationId, deleteModal.name, softDeleteMedication]);
+
+  const handleUndoDelete = useCallback(() => {
+    undoSoftDelete();
+    setSnackbar({ visible: false });
+  }, [undoSoftDelete]);
+
+  const handleCommitDelete = useCallback(() => {
+    commitSoftDelete();
+    setSnackbar({ visible: false });
+  }, [commitSoftDelete]);
+
+  // Commit soft-delete on unmount (user navigated away while snackbar was visible)
+  useEffect(() => {
+    return () => {
+      commitSoftDelete();
+    };
+  }, [commitSoftDelete]);
 
   const handleToggleActive = useCallback(
     (id: string, isActive: boolean) => {
@@ -119,6 +157,8 @@ const MedsScreen = () => {
 
   const handleDeleteFromSheet = useCallback(() => {
     if (selectedMed?.id && selectedMed?.name) {
+      // Close the sheet first, then trigger soft-delete
+      bottomSheetRef.current?.close();
       handleDelete(selectedMed.id, selectedMed.name);
     }
   }, [selectedMed, handleDelete]);
@@ -234,6 +274,13 @@ const MedsScreen = () => {
             variant: "destructive",
           },
         ]}
+      />
+
+      <UndoSnackbar
+        visible={snackbar.visible}
+        name={snackbar.name ?? ""}
+        onUndo={handleUndoDelete}
+        onDismiss={handleCommitDelete}
       />
     </ScreenLayout>
   );

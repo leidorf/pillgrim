@@ -11,6 +11,12 @@
     "loading": "Loading...",
     "remove": "Remove"
   },
+  "toast": {
+    "medicationAdded": "{{name}} added",
+    "medicationUpdated": "{{name}} updated",
+    "medicationDeleted": "{{name}} deleted",
+    "undo": "Undo"
+  },
   "tabs": {
     "home": "Home",
     "meds": "Medications",

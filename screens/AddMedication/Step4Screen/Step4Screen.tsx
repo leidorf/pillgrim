@@ -2,8 +2,9 @@ import { useMemo, useEffect, useState } from "react";
 import { Pressable, ScrollView, StyleSheet, View } from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view";
-
 import { useTranslation } from "react-i18next";
+
+import { toast } from "../../../utils/toast";
 
 import { NavProp } from "../../../types/navigation";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -108,14 +109,22 @@ const Step4Screen = () => {
         notificationSettings: notifications,
       };
 
+      const medName = draft.name?.trim() || "";
+
       setDraft(updates);
 
       setTimeout(() => {
         if (mode === "edit" && medicationId) {
           updateMedication(medicationId, { ...draft, ...updates });
           clearDraft();
+          if (medName) {
+            toast.show(t("toast.medicationUpdated", { name: medName }));
+          }
         } else {
           saveMedication();
+          if (medName) {
+            toast.show(t("toast.medicationAdded", { name: medName }));
+          }
         }
         navigation.getParent()?.goBack();
       }, 100);

@@ -11,6 +11,12 @@
     "loading": "Yükleniyor...",
     "remove": "Kaldır"
   },
+  "toast": {
+    "medicationAdded": "{{name}} eklendi",
+    "medicationUpdated": "{{name}} güncellendi",
+    "medicationDeleted": "{{name}} silindi",
+    "undo": "Geri Al"
+  },
   "tabs": {
     "home": "Ana Ekran",
     "meds": "İlaçlar",
