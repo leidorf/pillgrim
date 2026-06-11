@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
-import { StyleSheet, Switch, View } from "react-native";
+import { useMemo, useRef, useState } from "react";
+import { StyleSheet, Switch, Vibration, View } from "react-native";
 import { useTranslation } from "react-i18next";
+import { Audio } from "expo-av";
 import ScreenHeader from "./components/ScreenHeader";
 import ScreenLayout from "../../components/ScreenLayout";
 import { SettingRow } from "./components/SettingRow";
@@ -8,6 +9,7 @@ import { DropdownModal } from "../../components/DropdownModal";
 import { useSettingsStore } from "../../store/settingsStore";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
+import { VIBRATION_PATTERNS } from "../../services/notificationService";
 import {
   SOUND_OPTIONS,
   NotificationSound,
@@ -36,6 +38,7 @@ const AlarmScreen = () => {
 
   const [patternDropdownOpen, setPatternDropdownOpen] = useState(false);
   const [soundDropdownOpen, setSoundDropdownOpen] = useState(false);
+  const previewingSound = useRef<Audio.Sound | null>(null);
 
   const patternOptions = useMemo(
     () => PATTERN_OPTIONS.map((o) => ({ value: o.value, label: t(o.labelKey) })),
@@ -60,6 +63,64 @@ const AlarmScreen = () => {
   const switchColors = {
     trackColor: { false: theme.textSecondary + "40", true: theme.primary },
     thumbColor: "#fff" as string,
+  };
+
+  /* ------------------------- Sound asset mapping ------------------------- */
+  const soundAssets: Partial<Record<NotificationSound, any>> = {
+    apoc_sound: require("../../assets/sounds/apoc_sound.mp3"),
+    dozer_sound: require("../../assets/sounds/dozer_sound.mp3"),
+    mouse_sound: require("../../assets/sounds/mouse_sound.mp3"),
+    switch_sound: require("../../assets/sounds/switch_sound.mp3"),
+    tank_sound: require("../../assets/sounds/tank_sound.mp3"),
+  };
+
+  /* ------------------------ Preview handlers ------------------------ */
+  const previewVibration = (pattern: VibrationPattern) => {
+    if (!vibrationEnabled) return;
+    const pat = VIBRATION_PATTERNS[pattern];
+    if (pat) Vibration.vibrate(pat);
+  };
+
+  const previewSound = async (sound: NotificationSound) => {
+    // Unload previous preview if still playing
+    if (previewingSound.current) {
+      try {
+        await previewingSound.current.unloadAsync();
+      } catch {}
+      previewingSound.current = null;
+    }
+
+    if (sound === "silent" || sound === "default") return;
+
+    const source = soundAssets[sound];
+    if (!source) return;
+
+    try {
+      const { sound: audio } = await Audio.Sound.createAsync(source, {
+        shouldPlay: true,
+      });
+      previewingSound.current = audio;
+      audio.setOnPlaybackStatusUpdate((status: any) => {
+        if (status.isLoaded && status.didJustFinish) {
+          audio.unloadAsync().catch(() => {});
+          previewingSound.current = null;
+        }
+      });
+    } catch (err) {
+      console.error("[SoundPreview] Failed to play:", sound, err);
+    }
+  };
+
+  const handlePatternSelect = (val: string) => {
+    const pattern = val as VibrationPattern;
+    setVibrationPattern(pattern);
+    previewVibration(pattern);
+  };
+
+  const handleSoundSelect = (val: string) => {
+    const sound = val as NotificationSound;
+    setNotificationSound(sound);
+    previewSound(sound);
   };
 
   return (
@@ -107,7 +168,7 @@ const AlarmScreen = () => {
         title={t("settings.vibrationPattern")}
         options={patternOptions}
         selectedValue={vibrationPattern}
-        onSelect={(val) => setVibrationPattern(val as VibrationPattern)}
+        onSelect={handlePatternSelect}
         onClose={() => setPatternDropdownOpen(false)}
       />
 
@@ -116,7 +177,7 @@ const AlarmScreen = () => {
         title={t("settings.notificationSound")}
         options={soundOptions}
         selectedValue={notificationSound}
-        onSelect={(val) => setNotificationSound(val as NotificationSound)}
+        onSelect={handleSoundSelect}
         onClose={() => setSoundDropdownOpen(false)}
       />
     </ScreenLayout>

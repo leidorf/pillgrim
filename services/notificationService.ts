@@ -12,16 +12,18 @@ const ACTION_TAKEN = "taken";
 const ACTION_SKIP = "skip";
 
 /* ---------------------- Settings helpers (safe outside React) ---------------------- */
+
+export const VIBRATION_PATTERNS: Record<string, number[]> = {
+  short: [10, 150, 100, 150],
+  normal: [10, 250, 250, 250],
+  long: [10, 500, 200, 500, 200, 500],
+  alarm: [10, 500, 200, 500],
+};
+
 const getVibration = (): number[] | undefined => {
   const { vibrationEnabled, vibrationPattern } = useSettingsStore.getState();
   if (!vibrationEnabled) return undefined;
-  const patterns: Record<string, number[]> = {
-    short: [10, 150, 100, 150],
-    normal: [10, 250, 250, 250],
-    long: [10, 500, 200, 500, 200, 500],
-    alarm: [10, 500, 200, 500],
-  };
-  return patterns[vibrationPattern] ?? patterns.normal;
+  return VIBRATION_PATTERNS[vibrationPattern] ?? VIBRATION_PATTERNS.normal;
 };
 
 const getGlobalHideNames = (): boolean =>

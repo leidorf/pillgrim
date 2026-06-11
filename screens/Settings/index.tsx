@@ -31,10 +31,10 @@ const SettingsScreen = () => {
     navigation.navigate("Settings", { screen: screenName });
   };
   const handlePrivacy = () => {
-    Linking.openURL("https://github.com/leidorf/medication-reminder");
+    Linking.openURL("https://40ambar.dev/apps/medication-reminder/privacy");
   };
   const handleAbout = () => {
-    Linking.openURL("https://github.com/leidorf");
+    Linking.openURL("https://40ambar.dev/");
   };
   return (
     <ScreenLayout>
