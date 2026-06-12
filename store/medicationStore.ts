@@ -171,6 +171,8 @@ export const useMedicationStore = create<MedicationStore>()(
         if (
           updates.stock !== undefined &&
           updates.stock <= 5 &&
+          currentMed.stock !== undefined &&
+          currentMed.stock > 5 &&
           updatedMed.notificationSettings?.lowStockAlert
         ) {
           scheduleLowStockNotification(updatedMed).catch((err) =>
@@ -203,6 +205,8 @@ export const useMedicationStore = create<MedicationStore>()(
           newStock !== undefined &&
           newStock <= 5 &&
           delta < 0 &&
+          currentMed?.stock !== undefined &&
+          currentMed.stock > 5 &&
           currentMed?.notificationSettings?.lowStockAlert
         ) {
           const updatedMed = { ...currentMed, stock: newStock };

@@ -1,18 +1,19 @@
 import * as Notifications from "expo-notifications";
-import { Linking, Platform } from "react-native";
+import { Platform } from "react-native";
 import { Medication } from "../types/medication";
 import { Colors } from "../constants/theme";
 import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
 import { resolveNotificationSound } from "../utils/notificationSounds";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CHANNEL_ID = "medication-reminders";
 const CATEGORY_ID = "medication-actions";
 const ACTION_TAKEN = "taken";
 const ACTION_SKIP = "skip";
+const PERM_DENIED_KEY = "notification_permission_denied";
 
 /* ---------------------- Settings helpers (safe outside React) ---------------------- */
-
 export const VIBRATION_PATTERNS: Record<string, number[]> = {
   short: [10, 150, 100, 150],
   normal: [10, 250, 250, 250],
@@ -164,16 +165,30 @@ export async function checkNotificationPermission(): Promise<boolean> {
 
 /* ------------------------- Permission request ---------------------------- */
 export async function requestNotificationPermission(): Promise<boolean> {
-  const { status: current } = await Notifications.getPermissionsAsync();
+  const { status, canAskAgain } = await Notifications.getPermissionsAsync();
 
-  if (current === "granted") return true;
+  if (status === "granted") return true;
+  if (!canAskAgain) return false;
 
-  if (current === "denied") {
-    Linking.openSettings();
+  const wasDenied = await AsyncStorage.getItem(PERM_DENIED_KEY);
+  if (wasDenied === "true") return false;
+
+  const result = await Notifications.requestPermissionsAsync();
+
+  if (result.status !== "granted") {
+    await AsyncStorage.setItem(PERM_DENIED_KEY, "true");
     return false;
   }
-  const { status } = await Notifications.requestPermissionsAsync();
-  return status === "granted";
+
+  if (Platform.OS === "android") {
+    try {
+      await ensureChannel();
+    } catch (err) {
+      console.error("[Notifications] Channel creation failed:", err);
+    }
+  }
+
+  return true;
 }
 
 /* -------------------------- Schedule functions --------------------------- */
@@ -182,11 +197,8 @@ export async function scheduleMedicationNotifications(
 ): Promise<string[]> {
   if (!medication.notificationSettings?.enabled) return [];
   if (!medication.schedule || !medication.timeDoses?.length) return [];
-  if (medication.notificationIds?.length) {
-    await cancelMedicationNotifications(medication.notificationIds);
-  }
 
-  const hasPermission = await checkNotificationPermission();
+  const hasPermission = await requestNotificationPermission();
   if (!hasPermission) {
     console.warn(
       "[Notifications] Permission denied - no notifications scheduled",
@@ -195,7 +207,6 @@ export async function scheduleMedicationNotifications(
   }
 
   await ensureCategory();
-
   const channelId = await ensureChannel();
   const ids: string[] = [];
   const { schedule, timeDoses } = medication;

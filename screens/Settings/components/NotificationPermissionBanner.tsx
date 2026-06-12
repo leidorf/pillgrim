@@ -13,6 +13,7 @@ import { useTranslation } from "react-i18next";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { Text } from "../../../components/Text";
 import BellOffIcon from "../../../assets/icons/bell-off.svg";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 type PermissionStatus = "granted" | "denied" | "undetermined";
 
@@ -22,10 +23,12 @@ export const NotificationPermissionBanner = () => {
   const [permStatus, setPermStatus] = useState<PermissionStatus>("granted");
 
   useEffect(() => {
-    const checkPerm = () => {
-      Notifications.getPermissionsAsync().then(({ status }) => {
-        setPermStatus(status as PermissionStatus);
-      });
+    const checkPerm = async () => {
+      const { status } = await Notifications.getPermissionsAsync();
+      if (status === "granted") {
+        await AsyncStorage.removeItem("notification_permission_denied");
+      }
+      setPermStatus(status as PermissionStatus);
     };
 
     checkPerm();

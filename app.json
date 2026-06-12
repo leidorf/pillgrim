@@ -24,21 +24,21 @@
       },
       "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false,
-      "package": "com.anonymous.medicationreminder"
+      "package": "com.anonymous.medicationreminder",
+      "permissions": [
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.SCHEDULE_EXACT_ALARM",
+        "android.permission.USE_EXACT_ALARM",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.WAKE_LOCK"
+      ]
     },
     "plugins": [
       [
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": false,
-            "permissions": [
-              "android.permission.POST_NOTIFICATIONS",
-              "android.permission.SCHEDULE_EXACT_ALARM",
-              "android.permission.USE_EXACT_ALARM",
-              "android.permission.RECEIVE_BOOT_COMPLETED",
-              "android.permission.WAKE_LOCK"
-            ]
+            "usesCleartextTraffic": false
           }
         }
       ],

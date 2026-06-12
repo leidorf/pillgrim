@@ -305,6 +305,7 @@
     "defaultBody": "İlacınızı alma zamanı",
     "lowStockTitle": "İlacınız Tükeniyor",
     "lowStockTitleWithName": "{{name}} Tükeniyor",
+    "lowStockBody_one": "Sadece {{count}} doz kaldı. Yenileme zamanı.",
     "lowStockBody_other": "Sadece {{count}} doz kaldı. Yenileme zamanı.",
     "actionTaken": "Alındı",
     "actionSkip": "Atla"
