@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Afficher le nom du médicament",
     "hideNotificationNamesDescHidden": "Afficher \"Rappel de prise de médicament\" à la place du nom du médicament",
     "vibration": "Vibration",
-    "vibrationDesc": "Vibrer lorsqu'un rappel de prise de médicament se déclenche",
+    "vibrationDesc": "Vibrer lorsqu'une notification se déclenche",
     "vibrationPattern": "Modèle de vibration",
     "vibrationPatternDesc": "Choisissez le mode de vibration de la notification",
     "notificationSound": "Son de notification",
-    "notificationSoundDesc": "Choisissez le son des rappels de prise de médicaments",
+    "notificationSoundDesc": "Choisissez le son des notifications",
     "notificationsDisabled": "Les notifications sont désactivées",
     "notificationsOpenSettings": "Appuyez pour ouvrir les paramètres système",
     "notificationsGrant": "Appuyez pour activer les notifications"
@@ -300,7 +300,7 @@
     "legendSkipped": "Sauté"
   },
   "notifications": {
-    "defaultTitle": "Rappel de prise de médicament",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "C'est l'heure de prendre votre médicament ",
     "lowStockTitle": "Stock de médicaments faible",
     "lowStockTitleWithName": "Stock de {{name}} faible",

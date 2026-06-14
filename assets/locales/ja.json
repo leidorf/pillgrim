@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "薬の名前を表示する",
     "hideNotificationNamesDescHidden": "薬の名前の代わりに「服薬リマインダー」を表示する",
     "vibration": "バイブレーション",
-    "vibrationDesc": "服薬リマインダーが鳴ったときにバイブレーションをオンにする",
+    "vibrationDesc": "通知時にバイブレーション",
     "vibrationPattern": "バイブレーションパターン",
     "vibrationPatternDesc": "通知時のバイブレーションのパターンを選択する",
     "notificationSound": "通知音",
-    "notificationSoundDesc": "服薬リマインダーの音を設定する",
+    "notificationSoundDesc": "通知音を選択",
     "notificationsDisabled": "通知は無効になっています",
     "notificationsOpenSettings": "タップしてシステム設定を開く",
     "notificationsGrant": "タップして通知を有効にする"
@@ -300,7 +300,7 @@
     "legendSkipped": "スキップ"
   },
   "notifications": {
-    "defaultTitle": "服薬リマインダー",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "服薬時間です",
     "lowStockTitle": "薬の在庫が少ない",
     "lowStockTitleWithName": "{{name}}の在庫が少なくなっています",

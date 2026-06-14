@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Medikamentennamen anzeigen",
     "hideNotificationNamesDescHidden": "„Medikamentenerinnerung“ anstelle des Medikamentennamens anzeigen",
     "vibration": "Vibration",
-    "vibrationDesc": "Bei Medikamentenerinnerung vibrieren",
+    "vibrationDesc": "Bei einer Benachrichtigung vibrieren",
     "vibrationPattern": "Vibrationsmuster",
     "vibrationPatternDesc": "Wähle aus, wie die Benachrichtigung vibriert",
     "notificationSound": "Benachrichtigungston",
-    "notificationSoundDesc": "Wähle den Ton für Medikamentenerinnerungen",
+    "notificationSoundDesc": "Wähle den Ton für Benachrichtigungen",
     "notificationsDisabled": "Benachrichtigungen sind deaktiviert",
     "notificationsOpenSettings": "Tippe hier, um die Systemeinstellungen zu öffnen",
     "notificationsGrant": "Tippen Sie hier, um Benachrichtigungen zu aktivieren"
@@ -300,7 +300,7 @@
     "legendSkipped": "Übersprungen"
   },
   "notifications": {
-    "defaultTitle": "Medikamentenerinnerung",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "Zeit, Ihr Medikament einzunehmen",
     "lowStockTitle": "Geringer Medikamentenvorrat",
     "lowStockTitleWithName": "Geringer Vorrat an {{name}}",

@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "medication-reminder",
-    "slug": "medication-reminder",
+    "name": "Pillgrim",
+    "slug": "pillgrim",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",

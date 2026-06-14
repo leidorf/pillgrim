@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "顯示藥物名稱",
     "hideNotificationNamesDescHidden": "顯示「用藥提醒」取代藥物名稱",
     "vibration": "震動",
-    "vibrationDesc": "藥物提醒觸發時震動",
+    "vibrationDesc": "收到通知時震動",
     "vibrationPattern": "震動模式",
     "vibrationPatternDesc": "選擇通知震動方式",
     "notificationSound": "通知聲音",
-    "notificationSoundDesc": "選擇用藥提醒的聲音",
+    "notificationSoundDesc": "選擇通知的聲音",
     "notificationsDisabled": "通知已停用",
     "notificationsOpenSettings": "點擊開啟系統設定",
     "notificationsGrant": "點擊以啟用通知"
@@ -300,7 +300,7 @@
     "legendSkipped": "跳過"
   },
   "notifications": {
-    "defaultTitle": "服藥提醒",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "該服藥了",
     "lowStockTitle": "藥物庫存不足",
     "lowStockTitleWithName": "{{name}} 庫存不足",

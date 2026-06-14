@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Показать названия лекарств",
     "hideNotificationNamesDescHidden": "Показать 'Напоминание о приеме лекарств' вместо названий лекарств",
     "vibration": "Вибрация",
-    "vibrationDesc": "Вибрировать при срабатывании напоминания о приеме лекарств",
+    "vibrationDesc": "Вибрация при уведомлении",
     "vibrationPattern": "Режим вибрации",
     "vibrationPatternDesc": "Выберите, как будет вибрировать уведомление",
     "notificationSound": "Звук уведомления",
-    "notificationSoundDesc": "Выберите звук для напоминаний о приеме лекарств",
+    "notificationSoundDesc": "Выберите звук уведомлений",
     "notificationsDisabled": "Уведомления отключены",
     "notificationsOpenSettings": "Нажмите, чтобы открыть системные настройки",
     "notificationsGrant": "Нажмите, чтобы включить уведомления"
@@ -300,7 +300,7 @@
     "legendSkipped": "Пропущено"
   },
   "notifications": {
-    "defaultTitle": "Напоминание о приеме лекарства",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "Время приема лекарства",
     "lowStockTitle": "Низкий запас лекарства",
     "lowStockTitleWithName": "Низкий запас {{name}}",

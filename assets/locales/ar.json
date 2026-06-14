@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "إظهار اسم الدواء",
     "hideNotificationNamesDescHidden": "إظهار \"تذكير الدواء\" بدلاً من اسم الدواء",
     "vibration": "الاهتزاز",
-    "vibrationDesc": "الاهتزاز عند تشغيل تذكير الدواء",
+    "vibrationDesc": "الاهتزاز عند وصول إشعار",
     "vibrationPattern": "نمط الاهتزاز",
     "vibrationPatternDesc": "اختر كيفية اهتزاز الإشعار",
     "notificationSound": "صوت الإشعار",
-    "notificationSoundDesc": "اختر الصوت لتذكيرات الدواء",
+    "notificationSoundDesc": "اختر صوت الإشعارات",
     "notificationsDisabled": "الإشعارات معطلة",
     "notificationsOpenSettings": "انقر لفتح إعدادات النظام",
     "notificationsGrant": "انقر لتمكين الإشعارات"
@@ -300,7 +300,7 @@
     "legendSkipped": "تم تخطيه"
   },
   "notifications": {
-    "defaultTitle": "تذكير الدواء",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "حان وقت تناول الدواء",
     "lowStockTitle": "مخزون الدواء منخفض",
     "lowStockTitleWithName": "مخزون {{name}} منخفض",

@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "显示药物名称",
     "hideNotificationNamesDescHidden": "显示\"服药提醒\"代替药物名称",
     "vibration": "振动",
-    "vibrationDesc": "药物提醒触发时振动",
+    "vibrationDesc": "收到通知时振动",
     "vibrationPattern": "振动模式",
     "vibrationPatternDesc": "选择通知的振动方式",
     "notificationSound": "通知声音",
-    "notificationSoundDesc": "选择药物提醒的声音",
+    "notificationSoundDesc": "选择通知的声音",
     "notificationsDisabled": "通知已禁用",
     "notificationsOpenSettings": "点击打开系统设置",
     "notificationsGrant": "点击启用通知"
@@ -300,7 +300,7 @@
     "legendSkipped": "跳过"
   },
   "notifications": {
-    "defaultTitle": "服药提醒",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "该服药了",
     "lowStockTitle": "药物库存不足",
     "lowStockTitleWithName": "{{name}} 库存不足",

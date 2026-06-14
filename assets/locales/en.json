@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Show medication name",
     "hideNotificationNamesDescHidden": "Show \"Medication Reminder\" instead of medication name",
     "vibration": "Vibration",
-    "vibrationDesc": "Vibrate when a medication reminder fires",
+    "vibrationDesc": "Vibrate when a notification fires",
     "vibrationPattern": "Vibration pattern",
     "vibrationPatternDesc": "Choose how the notification vibrates",
     "notificationSound": "Notification sound",
-    "notificationSoundDesc": "Choose the sound for medication reminders",
+    "notificationSoundDesc": "Choose the sound for notifications",
     "notificationsDisabled": "Notifications are disabled",
     "notificationsOpenSettings": "Tap to open system settings",
     "notificationsGrant": "Tap to enable notifications"
@@ -300,7 +300,7 @@
     "legendSkipped": "Skipped"
   },
   "notifications": {
-    "defaultTitle": "Medication Reminder",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "Time to take your medication",
     "lowStockTitle": "Low Medication Stock",
     "lowStockTitleWithName": "Low {{name}} Stock",

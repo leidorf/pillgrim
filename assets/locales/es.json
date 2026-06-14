@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Mostrar nombre de medicamento",
     "hideNotificationNamesDescHidden": "Mostrar 'Recordatorio de medicación' en lugar del nombre del medicamento",
     "vibration": "Vibración",
-    "vibrationDesc": "Vibrar cuando se active un recordatorio de medicación",
+    "vibrationDesc": "Vibrar cuando llegue una notificación",
     "vibrationPattern": "Patrón de vibración",
     "vibrationPatternDesc": "Elige cómo vibra la notificación",
     "notificationSound": "Sonido de notificación",
-    "notificationSoundDesc": "Elige el sonido para los recordatorios de medicación",
+    "notificationSoundDesc": "Elige el sonido para las notificaciones",
     "notificationsDisabled": "Las notificaciones están desactivadas",
     "notificationsOpenSettings": "Toca para abrir los ajustes del sistema",
     "notificationsGrant": "Toca para activar las notificaciones"
@@ -300,7 +300,7 @@
     "legendSkipped": "Saltado"
   },
   "notifications": {
-    "defaultTitle": "Recordatorio de medicación",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "Es hora de tomar tu medicamento",
     "lowStockTitle": "Existencias bajas de medicamento",
     "lowStockTitleWithName": "Stock bajo de {{nombre}}",

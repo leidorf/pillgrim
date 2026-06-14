@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "Mostra i nomi dei farmaci",
     "hideNotificationNamesDescHidden": "Mostra \"Promemoria farmaci\" al posto del nome del farmaco",
     "vibration": "Vibrazione",
-    "vibrationDesc": "Vibra quando scatta un promemoria per un farmaco",
+    "vibrationDesc": "Vibra quando arriva una notifica",
     "vibrationPattern": "Modello di vibrazione",
     "vibrationPatternDesc": "Scegli come vibra la notifica",
     "notificationSound": "Suono di notifica",
-    "notificationSoundDesc": "Scegli il suono per i promemoria dei farmaci",
+    "notificationSoundDesc": "Scegli il suono per le notifiche",
     "notificationsDisabled": "Le notifiche sono disattivate",
     "notificationsOpenSettings": "Tocca per aprire le impostazioni di sistema",
     "notificationsGrant": "Tocca per abilitare le notifiche"
@@ -300,7 +300,7 @@
     "legendSkipped": "Saltato"
   },
   "notifications": {
-    "defaultTitle": "Promemoria farmaco",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "È ora di prendere il farmaco",
     "lowStockTitle": "Scorte di farmaci in esaurimento",
     "lowStockTitleWithName": "Scorte di {{name}} in esaurimento",

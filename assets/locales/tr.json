@@ -34,11 +34,11 @@
     "hideNotificationNamesDesc": "İlaç adını göster",
     "hideNotificationNamesDescHidden": "İlaç adı yerine \"İlaç Hatırlatıcı\" göster",
     "vibration": "Titreşim",
-    "vibrationDesc": "İlaç hatırlatıcısı geldiğinde titreşim yap",
+    "vibrationDesc": "Bildirim geldiğinde titreşim yap",
     "vibrationPattern": "Titreşim deseni",
     "vibrationPatternDesc": "Bildirimin nasıl titreyeceğini seç",
     "notificationSound": "Bildirim sesi",
-    "notificationSoundDesc": "İlaç hatırlatıcıları için ses seçin",
+    "notificationSoundDesc": "Bildirimler için ses seçin",
     "notificationsDisabled": "Bildirimler devre dışı",
     "notificationsOpenSettings": "Sistem ayarlarını açmak için dokun",
     "notificationsGrant": "Bildirimleri açmak için dokun"
@@ -301,7 +301,7 @@
     "legendSkipped": "Atlandı"
   },
   "notifications": {
-    "defaultTitle": "İlaç Hatırlatıcı",
+    "defaultTitle": "Pillgrim",
     "defaultBody": "İlacınızı alma zamanı",
     "lowStockTitle": "İlacınız Tükeniyor",
     "lowStockTitleWithName": "{{name}} Tükeniyor",
