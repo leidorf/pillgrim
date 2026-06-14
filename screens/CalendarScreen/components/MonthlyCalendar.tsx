@@ -29,8 +29,8 @@ type MonthGridProps = {
   weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6;
 };
 
-const INITIAL_INDEX = 100;
-const MONTHS_TO_GENERATE = 200;
+const INITIAL_INDEX = 60;
+const MONTHS_TO_GENERATE = 121;
 
 function getMonthGrid(
   year: number,
