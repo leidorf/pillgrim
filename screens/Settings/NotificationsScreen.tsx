@@ -37,6 +37,7 @@ const NotificationsScreen = () => {
               ? t("settings.hideNotificationNamesDescHidden")
               : t("settings.hideNotificationNamesDesc")
           }
+          onPress={() => setHideNotificationNames(!hideNotificationNames)}
         >
           <Switch
             value={hideNotificationNames}

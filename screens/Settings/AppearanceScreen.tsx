@@ -89,6 +89,9 @@ const AppearanceScreen = () => {
         <SettingRow
           label={t("appearance.timeFormat")}
           description={timePreview}
+          onPress={() =>
+            setTimeFormat(timeFormat === "24h" ? "12h" : "24h")
+          }
         >
           <Switch
             value={timeFormat === "24h"}

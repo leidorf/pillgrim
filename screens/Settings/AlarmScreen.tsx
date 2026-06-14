@@ -94,6 +94,7 @@ const AlarmScreen = () => {
         <SettingRow
           label={t("settings.vibration")}
           description={t("settings.vibrationDesc")}
+          onPress={() => setVibrationEnabled(!vibrationEnabled)}
         >
           <Switch
             value={vibrationEnabled}

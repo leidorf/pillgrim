@@ -16,6 +16,7 @@ type SettingRowProps = {
   description: string;
   children?: React.ReactNode;
   dropdown?: DropdownProps;
+  onPress?: () => void;
 };
 
 export const SettingRow = ({
@@ -23,13 +24,18 @@ export const SettingRow = ({
   description,
   children,
   dropdown,
+  onPress,
 }: SettingRowProps) => {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
   return (
     <View style={styles.row}>
-      <View style={styles.info}>
+      <Pressable
+        style={styles.info}
+        onPress={onPress}
+        disabled={!onPress}
+      >
         <Text
           style={[
             styles.label,
@@ -46,7 +52,7 @@ export const SettingRow = ({
         >
           {description}
         </Text>
-      </View>
+      </Pressable>
       {dropdown ? (
         <Pressable
           style={[
