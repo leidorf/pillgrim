@@ -4,6 +4,7 @@ import { Text } from "../../../components/Text";
 import { useTranslation } from "react-i18next";
 
 import { useTimeFormat } from "../../../hooks/useTimeFormat";
+import { parseScheduledDateTime } from "../../../utils/dateUtils";
 
 import CheckIcon from "../../../assets/icons/check.svg";
 import SkippedIcon from "../../../assets/icons/minus.svg";
@@ -63,11 +64,12 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
       };
     }
 
-    const scheduledDateTime = new Date(
-      `${log.scheduledDate}T${log.scheduledTime}`,
+    const scheduledDateTime = parseScheduledDateTime(
+      log.scheduledDate,
+      log.scheduledTime,
     );
 
-    if (scheduledDateTime < now) {
+    if (scheduledDateTime !== null && scheduledDateTime < now) {
       return {
         icon: <MissedIcon width={16} height={16} stroke={theme.error} />,
         label: t("logStatus.missed"),

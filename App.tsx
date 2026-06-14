@@ -8,7 +8,9 @@ import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
 import i18n, { getSystemLanguage } from "./utils/i18n";
 import { toast } from "./utils/toast";
+import { logger } from "./utils/logger";
 import SuccessToast from "./components/SuccessToast";
+import ErrorBoundary from "./components/ErrorBoundary";
 import {
   AddMedicationParamList,
   MainScreenParamList,
@@ -177,7 +179,7 @@ export default function App() {
           (id, ids) => _updateMedicationNotificationIds(id, ids),
         );
       } catch (error) {
-        console.error("Failed to reschedule notifications:", error);
+        logger.error("Failed to reschedule notifications:", error);
       } finally {
         isRescheduling.current = false;
         if (pendingReschedule.current) {
@@ -234,43 +236,45 @@ export default function App() {
   }, []);
 
   return (
-    <GestureHandlerRootView style={{ flex: 1 }}>
-      <SafeAreaProvider>
-        <BottomSheetModalProvider>
-          <NavigationContainer theme={getNavigationTheme(isDarkMode)}>
-            <StatusBar
-              barStyle={isDarkMode ? "light-content" : "dark-content"}
-            />
-            <RootStack.Navigator>
-              <RootStack.Screen
-                name="MainTabs"
-                component={MainTabs}
-                options={{ headerShown: false }}
+    <ErrorBoundary>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <SafeAreaProvider>
+          <BottomSheetModalProvider>
+            <NavigationContainer theme={getNavigationTheme(isDarkMode)}>
+              <StatusBar
+                barStyle={isDarkMode ? "light-content" : "dark-content"}
               />
-              <RootStack.Screen
-                name="AddMedication"
-                component={AddMedicationNavigator}
-                options={{
-                  presentation: "transparentModal",
-                  headerShown: false,
-                  animation: "fade",
-                  title: "Add Medication",
-                }}
-              />
-              <RootStack.Screen
-                name="Settings"
-                component={SettingsNavigator}
-                options={{ headerShown: false, title: "Settings" }}
-              />
-            </RootStack.Navigator>
-          </NavigationContainer>
-        </BottomSheetModalProvider>
-        <SuccessToast
-          visible={toastMsg !== null}
-          message={toastMsg ?? ""}
-          onDismiss={() => toast.hide()}
-        />
-      </SafeAreaProvider>
-    </GestureHandlerRootView>
+              <RootStack.Navigator>
+                <RootStack.Screen
+                  name="MainTabs"
+                  component={MainTabs}
+                  options={{ headerShown: false }}
+                />
+                <RootStack.Screen
+                  name="AddMedication"
+                  component={AddMedicationNavigator}
+                  options={{
+                    presentation: "transparentModal",
+                    headerShown: false,
+                    animation: "fade",
+                    title: "Add Medication",
+                  }}
+                />
+                <RootStack.Screen
+                  name="Settings"
+                  component={SettingsNavigator}
+                  options={{ headerShown: false, title: "Settings" }}
+                />
+              </RootStack.Navigator>
+            </NavigationContainer>
+          </BottomSheetModalProvider>
+          <SuccessToast
+            visible={toastMsg !== null}
+            message={toastMsg ?? ""}
+            onDismiss={() => toast.hide()}
+          />
+        </SafeAreaProvider>
+      </GestureHandlerRootView>
+    </ErrorBoundary>
   );
 }

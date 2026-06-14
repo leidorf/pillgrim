@@ -8,6 +8,7 @@ import {
   cancelMedicationNotifications,
   scheduleLowStockNotification,
 } from "../services/notificationService";
+import { logger } from "../utils/logger";
 
 type DraftMedication = Partial<Medication>;
 
@@ -48,7 +49,7 @@ export const useMedicationStore = create<MedicationStore>()(
         const { draft, medications } = get();
 
         if (!draft.name) {
-          console.warn("Cannot save medication without a name");
+          logger.warn("Cannot save medication without a name");
           return;
         }
 
@@ -82,7 +83,7 @@ export const useMedicationStore = create<MedicationStore>()(
           try {
             await cancelMedicationNotifications(medication.notificationIds);
           } catch (error) {
-            console.error("Failed to cancel notifications: ", error);
+            logger.error("Failed to cancel notifications: ", error);
           }
         }
 
@@ -133,7 +134,7 @@ export const useMedicationStore = create<MedicationStore>()(
           try {
             await cancelMedicationNotifications(_softDeleted.notificationIds);
           } catch (error) {
-            console.error("Failed to cancel notifications: ", error);
+            logger.error("Failed to cancel notifications: ", error);
           }
         }
 
@@ -146,7 +147,7 @@ export const useMedicationStore = create<MedicationStore>()(
       updateMedication: async (id: string, updates: Partial<Medication>) => {
         const currentMed = get().medications.find((m) => m.id === id);
         if (!currentMed) {
-          console.warn("Medication not found:", id);
+          logger.warn("Medication not found:", id);
           return;
         }
 
@@ -176,7 +177,7 @@ export const useMedicationStore = create<MedicationStore>()(
           updatedMed.notificationSettings?.lowStockAlert
         ) {
           scheduleLowStockNotification(updatedMed).catch((err) =>
-            console.error("Low stock notification failed:", err),
+            logger.error("Low stock notification failed:", err),
           );
         }
       },
@@ -211,7 +212,7 @@ export const useMedicationStore = create<MedicationStore>()(
         ) {
           const updatedMed = { ...currentMed, stock: newStock };
           scheduleLowStockNotification(updatedMed).catch((err) =>
-            console.error("Low stock notification failed:", err),
+            logger.error("Low stock notification failed:", err),
           );
         }
       },

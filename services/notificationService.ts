@@ -5,6 +5,7 @@ import { Colors } from "../constants/theme";
 import i18n from "../utils/i18n";
 import { useSettingsStore } from "../store/settingsStore";
 import { resolveNotificationSound } from "../utils/notificationSounds";
+import { logger } from "../utils/logger";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const CHANNEL_ID = "medication-reminders";
@@ -75,12 +76,6 @@ function buildNotificationContent(params: {
   const showActions = params.withActions !== false;
   const soundPref = useSettingsStore.getState().notificationSound;
   const sound = resolveNotificationSound(soundPref);
-  console.log("[Notifications] buildNotificationContent sound:", {
-    soundPref,
-    resolved: sound,
-    platform: Platform.OS,
-    title: params.title,
-  });
 
   return {
     title: params.title,
@@ -184,7 +179,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
     try {
       await ensureChannel();
     } catch (err) {
-      console.error("[Notifications] Channel creation failed:", err);
+      logger.error("[Notifications] Channel creation failed:", err);
     }
   }
 
@@ -200,7 +195,7 @@ export async function scheduleMedicationNotifications(
 
   const hasPermission = await requestNotificationPermission();
   if (!hasPermission) {
-    console.warn(
+    logger.warn(
       "[Notifications] Permission denied - no notifications scheduled",
     );
     return [];
@@ -326,10 +321,9 @@ async function scheduleDailyDose(params: {
         minute: params.minutes,
       },
     });
-    console.log("[Notifications] Daily trigger:", id);
     return [id];
   } catch (err: any) {
-    console.error("[Notifications] Daily trigger FAILED:", err?.message ?? err);
+    logger.error("[Notifications] Daily trigger FAILED:", err?.message ?? err);
     return [];
   }
 }
@@ -361,10 +355,10 @@ async function scheduleWeeklyDose(params: {
           minute: params.minutes,
         },
       });
-      console.log("[Notifications] Weekly trigger:", id, "weekday:", day + 1);
+      logger.log("[Notifications] Weekly trigger:", id, "weekday:", day + 1);
       ids.push(id);
     } catch (err: any) {
-      console.error(
+      logger.error(
         "[Notifications] Weekly trigger FAILED:",
         err?.message ?? err,
       );
@@ -407,7 +401,7 @@ async function scheduleBiweeklyDose(params: {
       });
       ids.push(id);
     } catch (err: any) {
-      console.error(
+      logger.error(
         "[Notifications] Biweekly trigger FAILED:",
         err?.message ?? err,
       );
@@ -452,7 +446,7 @@ async function scheduleIntervalDose(params: {
       });
       ids.push(id);
     } catch (err: any) {
-      console.error(
+      logger.error(
         "[Notifications] Interval trigger FAILED:",
         err?.message ?? err,
       );
@@ -500,7 +494,7 @@ async function scheduleMonthlyDose(params: {
         });
         ids.push(id);
       } catch (err: any) {
-        console.error(
+        logger.error(
           "[Notifications] Monthly trigger FAILED:",
           err?.message ?? err,
         );

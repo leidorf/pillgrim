@@ -317,5 +317,10 @@
     "xPerWeek": "Haftada {{count}}x",
     "xPerMonth": "Ayda {{count}}x",
     "everyXDays": "Her {{interval}} günde bir"
+  },
+  "error": {
+    "title": "Uygulama çöktü",
+    "subtitle": "Yeniden yüklemek için dokun.",
+    "restart": "Yeniden Yükle"
   }
 }

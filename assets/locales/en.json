@@ -316,5 +316,10 @@
     "xPerWeek": "{{count}}x per week",
     "xPerMonth": "{{count}}x per month",
     "everyXDays": "Every {{interval}} days"
+  },
+  "error": {
+    "title": "App crashed",
+    "subtitle": "Tap reload to try again.",
+    "restart": "Reload"
   }
 }

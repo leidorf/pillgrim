@@ -18,11 +18,11 @@ export const SoundPreviewer = ({
     }
 
     const soundAssets: Record<string, any> = {
-      apoc_sound: require("../../assets/sounds/apoc_sound.mp3"),
-      dozer_sound: require("../../assets/sounds/dozer_sound.mp3"),
-      mouse_sound: require("../../assets/sounds/mouse_sound.mp3"),
-      switch_sound: require("../../assets/sounds/switch_sound.mp3"),
-      tank_sound: require("../../assets/sounds/tank_sound.mp3"),
+      apoc_sound: require("../assets/sounds/apoc_sound.mp3"),
+      dozer_sound: require("../assets/sounds/dozer_sound.mp3"),
+      mouse_sound: require("../assets/sounds/mouse_sound.mp3"),
+      switch_sound: require("../assets/sounds/switch_sound.mp3"),
+      tank_sound: require("../assets/sounds/tank_sound.mp3"),
     };
 
     setSource(() => soundAssets[sound]);

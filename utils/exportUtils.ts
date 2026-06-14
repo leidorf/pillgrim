@@ -7,6 +7,7 @@ import {
   WeekdayMap,
   isMedicationScheduledForDate,
 } from "./medicationScheduleUtils";
+import { parseScheduledDateTime } from "./dateUtils";
 
 /* --------------------------------- Helpers -------------------------------- */
 type TimeFmt = "12h" | "24h";
@@ -44,7 +45,9 @@ const calcDelayMinutes = (
   takenAt?: Date,
 ): number | null => {
   if (!takenAt) return null;
-  const sched = new Date(`${scheduledDate}T${scheduledTime}`).getTime();
+  const schedDate = parseScheduledDateTime(scheduledDate, scheduledTime);
+  if (!schedDate) return null;
+  const sched = schedDate.getTime();
   const actual = takenAt.getTime();
   const diffMin = (actual - sched) / 60_000;
   if (diffMin < 30) return null;
@@ -236,7 +239,6 @@ const generatePDFHtml = (
 ): string => {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-  // Determine if we need compact mode (many columns → smaller font)
   const compact = daysInMonth >= 30;
 
   const dayHeaders = Array.from(

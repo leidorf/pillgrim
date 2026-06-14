@@ -3,7 +3,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { LogFilter, MedicationLog } from "../types/medication";
 import * as Crypto from "expo-crypto";
-import { getLocalDateString } from "../utils/dateUtils";
+import { getLocalDateString, parseScheduledDateTime } from "../utils/dateUtils";
 
 type LogStore = {
   logs: MedicationLog[];
@@ -15,6 +15,7 @@ type LogStore = {
   getLogsByDateRange: (startDate: Date, endDate: Date) => MedicationLog[];
   getLogsByMedication: (medicationId: string) => MedicationLog[];
   getFilteredLogs: (filter: LogFilter) => MedicationLog[];
+  pruneOldLogs: () => void;
 };
 
 export const useLogStore = create<LogStore>()(
@@ -69,8 +70,7 @@ export const useLogStore = create<LogStore>()(
         const startStr = getLocalDateString(startDate);
         const endStr = getLocalDateString(endDate);
         return get().logs.filter(
-          (log) =>
-            log.scheduledDate >= startStr && log.scheduledDate <= endStr,
+          (log) => log.scheduledDate >= startStr && log.scheduledDate <= endStr,
         );
       },
 
@@ -87,8 +87,9 @@ export const useLogStore = create<LogStore>()(
           if (!status || status === "all") return true;
 
           const now = new Date();
-          const scheduledDateTime = new Date(
-            `${log.scheduledDate}T${log.scheduledTime}`,
+          const scheduledDateTime = parseScheduledDateTime(
+            log.scheduledDate,
+            log.scheduledTime,
           );
 
           switch (status) {
@@ -97,12 +98,44 @@ export const useLogStore = create<LogStore>()(
             case "skipped":
               return !!log.skipped;
             case "missed":
-              return !log.takenAt && !log.skipped && scheduledDateTime < now;
+              return (
+                !log.takenAt &&
+                !log.skipped &&
+                scheduledDateTime !== null &&
+                scheduledDateTime < now
+              );
             case "pending":
-              return !log.takenAt && !log.skipped && scheduledDateTime >= now;
+              return (
+                !log.takenAt &&
+                !log.skipped &&
+                (scheduledDateTime === null || scheduledDateTime >= now)
+              );
             default:
               return true;
           }
+        });
+      },
+
+      pruneOldLogs: () => {
+        const cutoff = new Date();
+        cutoff.setFullYear(cutoff.getFullYear() - 5);
+        const cutoffStr = getLocalDateString(cutoff);
+        const MIN_KEEP = 500;
+
+        set((state) => {
+          if (state.logs.length <= MIN_KEEP) return state;
+          const pruned = state.logs.filter(
+            (log) => log.scheduledDate >= cutoffStr,
+          );
+          if (pruned.length >= MIN_KEEP) {
+            return { logs: pruned };
+          }
+          const sorted = [...state.logs].sort(
+            (a, b) =>
+              b.scheduledDate.localeCompare(a.scheduledDate) ||
+              b.scheduledTime.localeCompare(a.scheduledTime),
+          );
+          return { logs: sorted.slice(0, MIN_KEEP) };
         });
       },
     }),
@@ -116,6 +149,9 @@ export const useLogStore = create<LogStore>()(
           ...log,
           takenAt: log.takenAt ? new Date(log.takenAt) : undefined,
         }));
+        setTimeout(() => {
+          useLogStore.getState().pruneOldLogs();
+        }, 0);
       },
     },
   ),

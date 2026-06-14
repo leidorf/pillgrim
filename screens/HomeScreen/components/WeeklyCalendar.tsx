@@ -28,7 +28,7 @@ const getDayKeys = (weekStartsOn: number) => {
   return [...allKeys.slice(weekStartsOn), ...allKeys.slice(0, weekStartsOn)];
 };
 
-const INITIAL_INDEX = 100;
+const INITIAL_INDEX = 104;
 
 function getWeekDates(weekOffset: number, weekStartsOn: WeekStart): Date[] {
   const today = new Date();
@@ -132,7 +132,10 @@ const WeeklyCalendar = ({
   const [currentWeekOffset, setCurrentWeekOffset] = useState(0);
   const locale = i18n.language?.split("-")[0] ?? "en";
 
-  const weeks = Array.from({ length: 200 }, (_, i) => i - INITIAL_INDEX);
+  const weeks = Array.from(
+    { length: INITIAL_INDEX * 2 },
+    (_, i) => i - INITIAL_INDEX,
+  );
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
     if (viewableItems.length > 0) {
@@ -186,48 +189,49 @@ const WeeklyCalendar = ({
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: {
-    paddingBottom: 12,
-  },
-  monthLabel: {
-    fontSize: 24,
-    fontWeight: "500",
-    textAlign: "center",
-    marginBottom: 16,
-    color: theme.textPrimary,
-  },
-  weekRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 24,
-  },
-  dayCol: { alignItems: "center", gap: 4 },
-  dayName: { fontSize: 12, color: theme.textSecondary },
-  dayNum: {
-    width: 34,
-    height: 34,
-    borderRadius: 17,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  dayNumToday: {
-    borderWidth: 2,
-    borderColor: theme.primary,
-  },
-  dayNumSelected: { backgroundColor: theme.successLight, borderRadius: 17 },
-  dayNumText: { fontSize: 14, fontWeight: "500", color: theme.textPrimary },
-  dayNumTextSelected: { color: theme.primaryDark },
-  dot: {
-    top: -9,
-    width: 8,
-    height: 8,
-    borderWidth: 2,
-    borderRadius: 4,
-    borderColor: theme.primary,
-  },
-  dotToday: { borderColor: theme.primary },
-  dotActive: { backgroundColor: theme.background },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: {
+      paddingBottom: 12,
+    },
+    monthLabel: {
+      fontSize: 24,
+      fontWeight: "500",
+      textAlign: "center",
+      marginBottom: 16,
+      color: theme.textPrimary,
+    },
+    weekRow: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      paddingHorizontal: 24,
+    },
+    dayCol: { alignItems: "center", gap: 4 },
+    dayName: { fontSize: 12, color: theme.textSecondary },
+    dayNum: {
+      width: 34,
+      height: 34,
+      borderRadius: 17,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    dayNumToday: {
+      borderWidth: 2,
+      borderColor: theme.primary,
+    },
+    dayNumSelected: { backgroundColor: theme.successLight, borderRadius: 17 },
+    dayNumText: { fontSize: 14, fontWeight: "500", color: theme.textPrimary },
+    dayNumTextSelected: { color: theme.primaryDark },
+    dot: {
+      top: -9,
+      width: 8,
+      height: 8,
+      borderWidth: 2,
+      borderRadius: 4,
+      borderColor: theme.primary,
+    },
+    dotToday: { borderColor: theme.primary },
+    dotActive: { backgroundColor: theme.background },
+  });
 
 export default WeeklyCalendar;

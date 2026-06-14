@@ -5,6 +5,7 @@ import { KeyboardAwareScrollView } from "react-native-keyboard-aware-scroll-view
 import { useTranslation } from "react-i18next";
 
 import { toast } from "../../../utils/toast";
+import { logger } from "../../../utils/logger";
 
 import { NavProp } from "../../../types/navigation";
 import { useMedicationStore } from "../../../store/medicationStore";
@@ -129,7 +130,7 @@ const Step4Screen = () => {
         navigation.getParent()?.goBack();
       }, 100);
     } catch (error) {
-      console.error("Save error:", error);
+      logger.error("Save error:", error);
     } finally {
       setIsSaving(false);
     }

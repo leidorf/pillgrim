@@ -1,4 +1,5 @@
 import { Medication, MedicationLog, LogStatus } from "../types/medication";
+import { parseScheduledDateTime } from "./dateUtils";
 
 // Types
 export type WeekdayMap = Record<number, number>;
@@ -92,7 +93,8 @@ export function deriveStatus(
   if (log?.takenAt && !log.skipped) return "taken";
   if (log?.skipped) return "skipped";
 
-  const scheduledDateTime = new Date(`${scheduledDate}T${scheduledTime}`);
+  const scheduledDateTime = parseScheduledDateTime(scheduledDate, scheduledTime);
+  if (scheduledDateTime === null) return "pending";
   if (scheduledDateTime < now) return "missed";
 
   return "pending";
