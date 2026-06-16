@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { Pressable, StyleSheet, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet } from "react-native";
 import { Text } from "../../components/Text";
 import { useTranslation } from "react-i18next";
 import ScreenHeader from "./components/ScreenHeader";
@@ -33,7 +33,11 @@ const LanguageScreen = () => {
   return (
     <ScreenLayout>
       <ScreenHeader title={t("language.title")} />
-      <View style={styles.list}>
+
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.list}
+      >
         {options.map((option) => {
           const isActive = language === option.value;
           return (
@@ -42,20 +46,18 @@ const LanguageScreen = () => {
               style={[styles.item, isActive && styles.itemActive]}
               onPress={() => setLanguage(option.value)}
             >
-              <Text style={[styles.itemText, isActive && styles.itemTextActive]}>
+              <Text
+                style={[styles.itemText, isActive && styles.itemTextActive]}
+              >
                 {option.label}
               </Text>
               {isActive && (
-                <CheckIcon
-                  width={18}
-                  height={18}
-                  stroke={theme.primary}
-                />
+                <CheckIcon width={18} height={18} stroke={theme.primary} />
               )}
             </Pressable>
           );
         })}
-      </View>
+      </ScrollView>
     </ScreenLayout>
   );
 };
