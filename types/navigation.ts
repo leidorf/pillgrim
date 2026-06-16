@@ -1,4 +1,5 @@
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { NavigatorScreenParams } from "@react-navigation/native";
 
 export type SettingsParamList = {
   SettingsMain: undefined;
@@ -24,7 +25,7 @@ export type MainScreenParamList = {
 
 export type RootStackParamList = {
   MainTabs: { screen?: keyof MainScreenParamList };
-  AddMedication: { screen?: keyof AddMedicationParamList; params?: any };
+  AddMedication: NavigatorScreenParams<AddMedicationParamList>;
   Settings: { screen?: keyof SettingsParamList };
 };
 

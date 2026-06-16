@@ -7,6 +7,7 @@ import { useSettingsStore } from "../store/settingsStore";
 import { resolveNotificationSound } from "../utils/notificationSounds";
 import { logger } from "../utils/logger";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getErrorMessage } from "../utils/errorUtils";
 
 const CHANNEL_ID = "medication-reminders";
 const CATEGORY_ID = "medication-actions";
@@ -179,7 +180,7 @@ export async function requestNotificationPermission(): Promise<boolean> {
     try {
       await ensureChannel();
     } catch (err) {
-      logger.error("[Notifications] Channel creation failed:", err);
+      logger.error("[Notifications] Channel creation failed:", getErrorMessage(err));
     }
   }
 
@@ -322,8 +323,8 @@ async function scheduleDailyDose(params: {
       },
     });
     return [id];
-  } catch (err: any) {
-    logger.error("[Notifications] Daily trigger FAILED:", err?.message ?? err);
+  } catch (err) {
+    logger.error("[Notifications] Daily trigger FAILED:", getErrorMessage(err));
     return [];
   }
 }
@@ -357,10 +358,10 @@ async function scheduleWeeklyDose(params: {
       });
       logger.log("[Notifications] Weekly trigger:", id, "weekday:", day + 1);
       ids.push(id);
-    } catch (err: any) {
+    } catch (err) {
       logger.error(
         "[Notifications] Weekly trigger FAILED:",
-        err?.message ?? err,
+        getErrorMessage(err),
       );
     }
   }
@@ -379,7 +380,7 @@ async function scheduleBiweeklyDose(params: {
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
-  let next = new Date(params.startDate);
+  const next = new Date(params.startDate);
   next.setHours(params.hours, params.minutes, 0, 0);
   while (next <= now) next.setDate(next.getDate() + 14);
 
@@ -400,10 +401,10 @@ async function scheduleBiweeklyDose(params: {
         },
       });
       ids.push(id);
-    } catch (err: any) {
+    } catch (err) {
       logger.error(
         "[Notifications] Biweekly trigger FAILED:",
-        err?.message ?? err,
+        getErrorMessage(err),
       );
     }
   }
@@ -423,7 +424,7 @@ async function scheduleIntervalDose(params: {
 }): Promise<string[]> {
   const ids: string[] = [];
   const now = new Date();
-  let next = new Date(params.startDate);
+  const next = new Date(params.startDate);
   next.setHours(params.hours, params.minutes, 0, 0);
   while (next <= now) next.setDate(next.getDate() + params.intervalDays);
 
@@ -445,10 +446,10 @@ async function scheduleIntervalDose(params: {
         },
       });
       ids.push(id);
-    } catch (err: any) {
+    } catch (err) {
       logger.error(
         "[Notifications] Interval trigger FAILED:",
-        err?.message ?? err,
+        getErrorMessage(err),
       );
     }
   }
@@ -493,10 +494,10 @@ async function scheduleMonthlyDose(params: {
           },
         });
         ids.push(id);
-      } catch (err: any) {
+      } catch (err) {
         logger.error(
           "[Notifications] Monthly trigger FAILED:",
-          err?.message ?? err,
+          getErrorMessage(err),
         );
       }
     }
