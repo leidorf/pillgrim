@@ -140,83 +140,82 @@ export const MonthDayPicker = ({ selected, onToggle }: MonthDayProps) => {
 /* -------------------------------- PRN Info -------------------------------- */
 export const PrnInfo = () => {
   const { t } = useTranslation();
-  return (
-    <InlineContainer containerText={t("addMedication.prnInfo")} />
-  );
+  return <InlineContainer containerText={t("addMedication.prnInfo")} />;
 };
 
 /* --------------------------------- Styles --------------------------------- */
-const createStyles = (theme: Theme) => StyleSheet.create({
-  weekdayRow: {
-    flexDirection: "row",
-    gap: 6,
-    flexWrap: "wrap",
-  },
-  chip: {
-    alignItems: "center",
-    justifyContent: "center",
-    borderWidth: 1.5,
-    borderColor: "transparent",
-    backgroundColor: theme.background,
-  },
-  chipCircle: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  chipSquare: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-  },
-  chipActive: {
-    backgroundColor: theme.primaryDark,
-    borderColor: theme.primaryDark,
-  },
-  chipText: {
-    fontWeight: "600",
-    color: theme.textPrimary,
-    fontSize: 12,
-  },
-  chipTextActive: {
-    color: theme.surfaceElevated,
-  },
-  intervalRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    gap: 10,
-  },
-  stepper: {
-    width: 36,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: theme.surface,
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  stepperText: {
-    color: theme.textPrimary,
-    lineHeight: 24,
-    fontSize: 18,
-  },
-  intervalInput: {
-    minWidth: 52,
-    height: 36,
-    borderRadius: 10,
-    backgroundColor: theme.background,
-    color: theme.textPrimary,
-    fontWeight: "700",
-    textAlign: "center",
-    paddingHorizontal: 6,
-    fontSize: 16,
-  },
-  intervalUnit: {
-    color: theme.textSecondary,
-    fontSize: 14,
-  },
-  monthGrid: {
-    flexDirection: "row",
-    flexWrap: "wrap",
-    gap: 6,
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    weekdayRow: {
+      flexDirection: "row",
+      justifyContent: "space-evenly",
+      flexWrap: "wrap",
+    },
+    chip: {
+      alignItems: "center",
+      justifyContent: "center",
+      borderWidth: 1.5,
+      borderColor: "transparent",
+      backgroundColor: theme.background,
+    },
+    chipCircle: {
+      width: 40,
+      height: 40,
+      borderRadius: 20,
+    },
+    chipSquare: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+    },
+    chipActive: {
+      backgroundColor: theme.primaryDark,
+      borderColor: theme.primaryDark,
+    },
+    chipText: {
+      fontWeight: "600",
+      color: theme.textPrimary,
+      fontSize: 12,
+    },
+    chipTextActive: {
+      color: theme.surfaceElevated,
+    },
+    intervalRow: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    stepper: {
+      width: 36,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: theme.surface,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    stepperText: {
+      color: theme.textPrimary,
+      lineHeight: 24,
+      fontSize: 18,
+    },
+    intervalInput: {
+      minWidth: 52,
+      height: 36,
+      borderRadius: 10,
+      backgroundColor: theme.background,
+      color: theme.textPrimary,
+      fontWeight: "700",
+      textAlign: "center",
+      paddingHorizontal: 6,
+      fontSize: 16,
+    },
+    intervalUnit: {
+      color: theme.textSecondary,
+      fontSize: 14,
+    },
+    monthGrid: {
+      flexDirection: "row",
+      flexWrap: "wrap",
+      gap: 6,
+    },
+  });
