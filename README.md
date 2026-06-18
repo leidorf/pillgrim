@@ -3,7 +3,7 @@
 
 # Pillgrim
 
-An FOSS medication reminder app that runs entirely on the device and contains no ads or analytics.
+A FOSS medication reminder app that runs entirely on the device and contains no ads or analytics.
 
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
