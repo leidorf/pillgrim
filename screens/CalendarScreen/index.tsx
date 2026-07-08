@@ -50,7 +50,10 @@ const CalendarScreen = () => {
   useEffect(() => {
     const firstOfMonth = new Date(currentYear, currentMonth, 1);
     setCurrentMonthLabel(
-      firstOfMonth.toLocaleDateString(locale, { month: "long", year: "numeric" }),
+      firstOfMonth.toLocaleDateString(locale, {
+        month: "long",
+        year: "numeric",
+      }),
     );
   }, [locale]);
 
@@ -114,29 +117,23 @@ const CalendarScreen = () => {
         headerText={currentMonthLabel}
         onExportPress={() => setExportModalVisible(true)}
       />
+      <ScrollView style={styles.logsList} showsVerticalScrollIndicator={false}>
+        {/* ---------------------------- Monthly Calendar ---------------------------- */}
+        <View style={styles.calendarContainer}>
+          <MonthlyCalendar
+            selectedDate={selectedDate}
+            onSelectDate={setSelectedDate}
+            onMonthChange={(label, year, month) => {
+              setCurrentMonthLabel(label);
+              setCurrentYear(year);
+              setCurrentMonth(month);
+            }}
+          />
+        </View>
 
-      {/* ---------------------------- Monthly Calendar ---------------------------- */}
-      <View style={styles.calendarContainer}>
-        <MonthlyCalendar
-          selectedDate={selectedDate}
-          onSelectDate={setSelectedDate}
-          onMonthChange={(label, year, month) => {
-            setCurrentMonthLabel(label);
-            setCurrentYear(year);
-            setCurrentMonth(month);
-          }}
-        />
-      </View>
-
-      {/* ------------------------------ Selected Day ------------------------------ */}
-      <View style={styles.detailContainer}>
-        <SelectedDayHeader selectedDate={formatSelectedDate(selectedDate)} />
-
-        <ScrollView
-          style={styles.logsList}
-          contentContainerStyle={styles.logsListContent}
-          showsVerticalScrollIndicator={false}
-        >
+        {/* ------------------------------ Selected Day ------------------------------ */}
+        <View style={styles.detailContainer}>
+          <SelectedDayHeader selectedDate={formatSelectedDate(selectedDate)} />
           {!dayStats.hasSchedule ? (
             <View style={styles.emptyState}>
               <Text style={styles.emptyText}>{t("calendar.emptyText")}</Text>
@@ -147,8 +144,8 @@ const CalendarScreen = () => {
           ) : (
             dayLogs.map((log) => <MedicationLogCard key={log.id} log={log} />)
           )}
-        </ScrollView>
-      </View>
+        </View>
+      </ScrollView>
       {/* ----------------------------- Export Modal ----------------------------- */}
       <ExportModal
         visible={exportModalVisible}
@@ -197,38 +194,36 @@ const CalendarScreen = () => {
 
 export default CalendarScreen;
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  calendarContainer: {
-    height: 380,
-  },
-  detailContainer: {
-    flex: 1,
-    backgroundColor: theme.surface,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    paddingTop: 20,
-    paddingHorizontal: 24,
-  },
-  logsList: {
-    flex: 1,
-  },
-  logsListContent: {
-    paddingBottom: 24,
-  },
-  emptyState: {
-    alignItems: "center",
-    justifyContent: "center",
-    paddingVertical: 40,
-  },
-  emptyText: {
-    fontSize: 16,
-    fontWeight: "500",
-    color: theme.textPrimary,
-    marginBottom: 8,
-  },
-  emptySubtext: {
-    fontSize: 14,
-    color: theme.textSecondary,
-    textAlign: "center",
-  },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    calendarContainer: {
+      height: 320,
+    },
+    detailContainer: {
+      flex: 1,
+      backgroundColor: theme.surface,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      paddingTop: 20,
+      paddingHorizontal: 24,
+    },
+    logsList: {
+      flex: 1,
+    },
+    emptyState: {
+      alignItems: "center",
+      justifyContent: "center",
+      paddingVertical: 40,
+    },
+    emptyText: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: theme.textPrimary,
+      marginBottom: 8,
+    },
+    emptySubtext: {
+      fontSize: 14,
+      color: theme.textSecondary,
+      textAlign: "center",
+    },
+  });
