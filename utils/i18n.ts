@@ -17,19 +17,19 @@ import ko from "../assets/locales/ko.json";
 import it from "../assets/locales/it.json";
 
 export type LanguageCode =
-  | "en"
-  | "pt"
-  | "tr"
-  | "fr"
-  | "es"
-  | "de"
-  | "ru"
+  | "ar"
   | "zh-CN"
   | "zh-Hant"
-  | "ar"
+  | "en"
+  | "fr"
+  | "de"
+  | "it"
   | "ja"
   | "ko"
-  | "it";
+  | "pt"
+  | "ru"
+  | "es"
+  | "tr";
 
 export type LanguageOption = {
   code: LanguageCode;
@@ -38,48 +38,67 @@ export type LanguageOption = {
 };
 
 export const LANGUAGES: LanguageOption[] = [
-  { code: "en", label: "English", nativeLabel: "English" },
-  { code: "pt", label: "Portugese", nativeLabel: "Português" },
-  { code: "tr", label: "Turkish", nativeLabel: "Türkçe" },
-  { code: "fr", label: "French", nativeLabel: "Français" },
-  { code: "es", label: "Spanish", nativeLabel: "Español" },
-  { code: "de", label: "German", nativeLabel: "Deutsch" },
-  { code: "ru", label: "Russian", nativeLabel: "Русский" },
+  { code: "ar", label: "Arabic", nativeLabel: "العربية" },
   { code: "zh-CN", label: "Simplified Chinese", nativeLabel: "简体中文" },
   { code: "zh-Hant", label: "Traditional Chinese", nativeLabel: "繁體中文" },
-  { code: "ar", label: "Arabic", nativeLabel: "العربية" },
+  { code: "en", label: "English", nativeLabel: "English" },
+  { code: "fr", label: "French", nativeLabel: "Français" },
+  { code: "de", label: "German", nativeLabel: "Deutsch" },
+  { code: "it", label: "Italian", nativeLabel: "Italiano" },
   { code: "ja", label: "Japanese", nativeLabel: "日本語" },
   { code: "ko", label: "Korean", nativeLabel: "한국어" },
-  { code: "it", label: "Italian", nativeLabel: "Italiano" },
+  { code: "pt", label: "Portugese", nativeLabel: "Português" },
+  { code: "ru", label: "Russian", nativeLabel: "Русский" },
+  { code: "es", label: "Spanish", nativeLabel: "Español" },
+  { code: "tr", label: "Turkish", nativeLabel: "Türkçe" },
 ];
 
 export const SYSTEM_DEFAULT = "system" as const;
 
 export function resolveLocale(code: string | null | undefined): LanguageCode {
   if (!code) return "en";
+  if (LANGUAGES.some((l) => l.code === code)) {
+    return code as LanguageCode;
+  }
   const lang = code.split("-")[0].toLowerCase();
-  return (LANGUAGES.some((l) => l.code === lang) ? lang : "en") as LanguageCode;
+  if (lang === "zh") return "zh-CN";
+  if (LANGUAGES.some((l) => l.code === lang)) {
+    return lang as LanguageCode;
+  }
+  return "en";
 }
 
 export function getSystemLanguage(): LanguageCode {
-  const locale = Localization.getLocales()[0]?.languageCode;
-  return resolveLocale(locale);
+  const locale = Localization.getLocales()[0];
+  if (!locale) return "en";
+
+  if (locale.languageCode === "zh") {
+    const tag = locale.languageTag ?? "";
+    if (tag.includes("Hant")) return "zh-Hant";
+    if (tag.includes("Hans")) return "zh-CN";
+
+    const region = locale.regionCode;
+    if (region === "TW" || region === "HK" || region === "MO") return "zh-Hant";
+    return "zh-CN";
+  }
+
+  return resolveLocale(locale.languageTag ?? locale.languageCode);
 }
 
 const resources = {
-  en: { translation: en },
-  pt: { translation: pt },
-  tr: { translation: tr },
-  fr: { translation: fr },
-  es: { translation: es },
-  de: { translation: de },
-  ru: { translation: ru },
+  ar: { translation: ar },
   "zh-CN": { translation: zhCN },
   "zh-Hant": { translation: zhHant },
-  ar: { translation: ar },
+  en: { translation: en },
+  fr: { translation: fr },
+  de: { translation: de },
+  it: { translation: it },
   ja: { translation: ja },
   ko: { translation: ko },
-  it: { translation: it },
+  pt: { translation: pt },
+  ru: { translation: ru },
+  es: { translation: es },
+  tr: { translation: tr },
 };
 
 i18n.use(initReactI18next).init({
