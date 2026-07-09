@@ -26,6 +26,7 @@ import {
 import { WeekStart } from "../../types/schedule";
 import { useAppTheme } from "../../theme/useAppTheme";
 import { Theme } from "../../constants/theme";
+import { responsiveScale } from "../../utils/responsive";
 
 const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
   const map: WeekdayMap = {};
@@ -117,7 +118,11 @@ const CalendarScreen = () => {
         headerText={currentMonthLabel}
         onExportPress={() => setExportModalVisible(true)}
       />
-      <ScrollView style={styles.logsList} showsVerticalScrollIndicator={false}>
+      <ScrollView
+        style={styles.logsList}
+        contentContainerStyle={{ flexGrow: 1 }}
+        showsVerticalScrollIndicator={false}
+      >
         {/* ---------------------------- Monthly Calendar ---------------------------- */}
         <View style={styles.calendarContainer}>
           <MonthlyCalendar
@@ -146,6 +151,7 @@ const CalendarScreen = () => {
           )}
         </View>
       </ScrollView>
+
       {/* ----------------------------- Export Modal ----------------------------- */}
       <ExportModal
         visible={exportModalVisible}
@@ -197,7 +203,8 @@ export default CalendarScreen;
 const createStyles = (theme: Theme) =>
   StyleSheet.create({
     calendarContainer: {
-      height: 320,
+      height: responsiveScale.number(320),
+      marginBottom: responsiveScale.number(12),
     },
     detailContainer: {
       flex: 1,
@@ -211,15 +218,16 @@ const createStyles = (theme: Theme) =>
       flex: 1,
     },
     emptyState: {
+      flex: 1,
+      minHeight: 120,
       alignItems: "center",
       justifyContent: "center",
-      paddingVertical: 40,
+      gap: responsiveScale.number(12),
     },
     emptyText: {
       fontSize: 16,
       fontWeight: "500",
       color: theme.textPrimary,
-      marginBottom: 8,
     },
     emptySubtext: {
       fontSize: 14,

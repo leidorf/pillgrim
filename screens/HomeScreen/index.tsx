@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
+import { useBottomTabBarHeight } from "@react-navigation/bottom-tabs";
 import { useTranslation } from "react-i18next";
 import BottomSheet from "@gorhom/bottom-sheet";
 
@@ -44,6 +45,7 @@ const buildWeekdayMap = (weekStartsOn: WeekStart): WeekdayMap => {
 const HomeScreen = () => {
   const { t, i18n } = useTranslation();
   const theme = useAppTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { medications, updateStock } = useMedicationStore();
   const hasMedications = medications.length > 0;
@@ -257,7 +259,7 @@ const HomeScreen = () => {
 
       <FlatList
         style={styles.medList}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 8 }]}
         data={schedule}
         keyExtractor={(item) => item.logKey}
         renderItem={({ item }) => (
@@ -351,7 +353,7 @@ const createStyles = (theme: Theme) =>
       borderTopRightRadius: 24,
       backgroundColor: theme.surface,
     },
-    listContent: { paddingBottom: 72 },
+    listContent: {},
     emptyContainer: {
       justifyContent: "center",
       alignItems: "center",

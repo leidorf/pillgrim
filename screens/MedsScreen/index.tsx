@@ -1,7 +1,7 @@
 import { useMemo, useRef, useState, useCallback, useEffect } from "react";
 import { BackHandler, FlatList, StyleSheet, View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
+import { useBottomTabBarHeight, BottomTabNavigationProp } from "@react-navigation/bottom-tabs";
 import { useTranslation } from "react-i18next";
 import { Text } from "../../components/Text";
 import AddMedicationButton from "../../components/AddMedicationButton";
@@ -21,6 +21,7 @@ import { Theme } from "../../constants/theme";
 const MedsScreen = () => {
   const { t } = useTranslation();
   const theme = useAppTheme();
+  const tabBarHeight = useBottomTabBarHeight();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
   const {
@@ -209,7 +210,7 @@ const MedsScreen = () => {
       <FlatList
         data={medications}
         keyExtractor={(item) => item.id || Math.random().toString()}
-        contentContainerStyle={styles.listContent}
+        contentContainerStyle={[styles.listContent, { paddingBottom: tabBarHeight + 8 }]}
         renderItem={({ item }) => (
           <MedicationInfoCard
             medication={item}
@@ -289,7 +290,6 @@ const MedsScreen = () => {
 const createStyles = (theme: Theme) => StyleSheet.create({
   listContent: {
     paddingHorizontal: 24,
-    paddingBottom: 56,
   },
   headerContainer: {
     paddingBottom: 24,

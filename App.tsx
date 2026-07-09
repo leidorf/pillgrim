@@ -6,6 +6,7 @@ import { SafeAreaProvider } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
+
 import i18n, { getSystemLanguage } from "./utils/i18n";
 import { toast } from "./utils/toast";
 import { logger } from "./utils/logger";
@@ -21,14 +22,14 @@ import {
 import HouseIcon from "./assets/icons/house.svg";
 import PillIcon from "./assets/icons/pill.svg";
 import CalendarIcon from "./assets/icons/calendar.svg";
-import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
-import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
-import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
-import CalendarScreen from "./screens/CalendarScreen";
 
 import HomeScreen from "./screens/HomeScreen";
 import MedsScreen from "./screens/MedsScreen";
 import Step1Screen from "./screens/AddMedication/Step1Screen/Step1Screen";
+import Step2Screen from "./screens/AddMedication/Step2Screen/Step2Screen";
+import Step3Screen from "./screens/AddMedication/Step3Screen/Step3Screen";
+import Step4Screen from "./screens/AddMedication/Step4Screen/Step4Screen";
+import CalendarScreen from "./screens/CalendarScreen";
 import SettingsScreen from "./screens/Settings";
 
 import { getNavigationTheme } from "./theme/theme";
@@ -38,8 +39,6 @@ import { useMedicationStore } from "./store/medicationStore";
 import {
   rescheduleAllNotifications,
   onForegroundNotificationEvent,
-  getInitialNotificationResponse,
-  clearInitialNotificationResponse,
   setupNotificationHandler,
   processNotificationAction,
 } from "./services/notificationService";
