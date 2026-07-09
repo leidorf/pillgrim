@@ -1,5 +1,6 @@
 import { Pressable, StyleSheet, View, ViewStyle } from "react-native";
 import { Text } from "../../../components/Text";
+import { useTranslation } from "react-i18next";
 import { Medication, MedicationLog } from "../../../types/medication";
 import CheckIcon from "../../../assets/icons/circle-check-big.svg";
 import CircleIcon from "../../../assets/icons/circle.svg";
@@ -17,6 +18,7 @@ type MedicationCardProps = {
   dose: string;
   log?: MedicationLog;
   isMissed?: boolean;
+  isPrn?: boolean;
   onToggle?: (medicationId: string, time: string) => void;
   onOpenSheet?: (
     medication: Medication,
@@ -32,15 +34,23 @@ const MedicationCard = ({
   dose,
   log,
   isMissed,
+  isPrn,
   onToggle,
   onOpenSheet,
 }: MedicationCardProps) => {
+  const { t } = useTranslation();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const isTaken = !!log?.takenAt && !log?.skipped;
   const isSkipped = !!log?.skipped;
 
   const containerStyle = useMemo((): ViewStyle => {
+    if (isPrn && isTaken)
+      return {
+        backgroundColor: theme.successLight,
+        borderColor: theme.primary,
+      };
+    if (isPrn) return {};
     if (isTaken)
       return {
         backgroundColor: theme.successLight,
@@ -56,18 +66,20 @@ const MedicationCard = ({
         borderColor: theme.error,
       };
     return {};
-  }, [isTaken, isSkipped, isMissed]);
+  }, [isTaken, isSkipped, isMissed, isPrn]);
 
   const handleTaken = useCallback(() => {
     onToggle?.(medication.id, time);
   }, [onToggle, medication.id, time]);
 
   const timeTextStyle = useMemo(() => {
+    if (isPrn && isTaken) return styles.takenText;
+    if (isPrn) return undefined;
     if (isTaken) return styles.takenText;
     if (isSkipped) return styles.skippedTimeText;
     if (isMissed) return styles.missedTimeText;
     return undefined;
-  }, [isTaken, isSkipped, isMissed]);
+  }, [isTaken, isSkipped, isMissed, isPrn]);
 
   return (
     <BaseMedicationCard
@@ -78,7 +90,11 @@ const MedicationCard = ({
       dose={dose}
     >
       <View style={styles.timeSection}>
-        <Text style={[styles.timeText, timeTextStyle]}>{displayTime}</Text>
+        <View>
+          {!isPrn && (
+            <Text style={[styles.timeText, timeTextStyle]}>{displayTime}</Text>
+          )}
+        </View>
         <Pressable style={styles.checkButton} onPress={handleTaken} hitSlop={8}>
           {isTaken ? (
             <CheckIcon width={28} height={28} color={theme.primary} />
@@ -100,18 +116,19 @@ const MedicationCard = ({
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  timeSection: { flexDirection: "row", alignItems: "center", gap: 12 },
-  timeText: {
-    fontSize: 20,
-    fontWeight: "700",
-    color: theme.textPrimary,
-    fontVariant: ["tabular-nums"],
-  },
-  takenText: { color: theme.primaryDark },
-  skippedTimeText: { color: theme.textSecondary },
-  missedTimeText: { color: theme.error },
-  checkButton: { padding: 4 },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    timeSection: { flexDirection: "row", alignItems: "center", gap: 12 },
+    timeText: {
+      fontSize: 20,
+      fontWeight: "700",
+      color: theme.textPrimary,
+      fontVariant: ["tabular-nums"],
+    },
+    takenText: { color: theme.primaryDark },
+    skippedTimeText: { color: theme.textSecondary },
+    missedTimeText: { color: theme.error },
+    checkButton: { padding: 4 },
+  });
 
 export default MedicationCard;

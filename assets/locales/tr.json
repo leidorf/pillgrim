@@ -132,6 +132,7 @@
     "lowStockAlertDescNoStock": "Etkinleştirmek için stok girin",
     "next": "İleri",
     "whenHowMuch": "Ne zaman ve ne kadar?",
+    "howMuch":"Ne kadar?",
     "advancedOptions": "Gelişmiş Seçenekler",
     "dayPlaceholder": "GG",
     "monthPlaceholder": "Ay",

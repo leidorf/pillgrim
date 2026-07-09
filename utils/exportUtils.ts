@@ -13,7 +13,9 @@ import { parseScheduledDateTime } from "./dateUtils";
 type TimeFmt = "12h" | "24h";
 
 const formatTimeExport = (time24: string, tf: TimeFmt): string => {
+  if (!time24) return "";
   const [h, m] = time24.split(":").map(Number);
+  if (isNaN(h) || isNaN(m)) return "";
   if (tf === "12h") {
     const d = new Date();
     d.setHours(h, m, 0, 0);
@@ -193,11 +195,14 @@ const buildPDFGrid = (
         if (!entry) {
           cells.set(day, undefined);
         } else if (entry.status === "taken") {
-          const delay = calcDelayMinutes(
-            entry.scheduledDate,
-            entry.scheduledTime,
-            entry.log?.takenAt,
-          );
+          const isPrn = med.schedule?.type === "prn";
+          const delay = isPrn
+            ? null
+            : calcDelayMinutes(
+                entry.scheduledDate,
+                entry.scheduledTime,
+                entry.log?.takenAt,
+              );
           cells.set(day, { kind: "taken", delayMinutes: delay });
         } else if (entry.status === "skipped") {
           cells.set(day, { kind: "skipped" });

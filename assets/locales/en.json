@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "Enter stock to enable",
     "next": "Next",
     "whenHowMuch": "When and how much?",
+    "howMuch":"How much?",
     "advancedOptions": "Advanced Options",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "Month",

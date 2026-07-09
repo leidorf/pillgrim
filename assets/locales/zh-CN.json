@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "输入库存量以启用",
     "next": "下一步",
     "whenHowMuch": "何时服用？服用多少？",
+    "howMuch":"用量",
     "advancedOptions": "高级选项",
     "dayPlaceholder": "日",
     "monthPlaceholder": "月",

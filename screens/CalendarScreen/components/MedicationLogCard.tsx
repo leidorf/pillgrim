@@ -22,6 +22,7 @@ type MedicationLog = {
   skipped?: boolean;
   scheduledDate: string;
   displayTime: string;
+  scheduleType?: string;
 };
 
 type StatusInfo = {
@@ -91,7 +92,9 @@ const MedicationLogCard = ({ log }: MedicationLogCardProps) => {
   return (
     <View style={styles.logItem}>
       <View style={styles.logLeft}>
-        <Text style={styles.logTime}>{log.displayTime}</Text>
+        {log.scheduleType !== "prn" && (
+          <Text style={styles.logTime}>{log.displayTime}</Text>
+        )}
         <View style={styles.timeline} />
       </View>
 

@@ -1,5 +1,6 @@
 import { Medication, MedicationLog, LogStatus } from "../types/medication";
 import { parseScheduledDateTime } from "./dateUtils";
+import { ScheduleType } from "../types/schedule";
 
 // Types
 export type WeekdayMap = Record<number, number>;
@@ -13,6 +14,7 @@ export type DailyScheduleEntry = {
   log: MedicationLog | undefined;
   status: LogStatus;
   logKey: string;
+  scheduleType: ScheduleType;
 };
 
 export type DayStats = {
@@ -76,7 +78,7 @@ export function isMedicationScheduledForDate(
     }
 
     case "prn":
-      return false;
+      return true;
 
     default:
       return false;
@@ -89,9 +91,11 @@ export function deriveStatus(
   scheduledDate: string,
   scheduledTime: string,
   now: Date = new Date(),
+  isPrn: boolean = false,
 ): LogStatus {
   if (log?.takenAt && !log.skipped) return "taken";
   if (log?.skipped) return "skipped";
+  if (isPrn) return "pending";
 
   const scheduledDateTime = parseScheduledDateTime(scheduledDate, scheduledTime);
   if (scheduledDateTime === null) return "pending";
@@ -117,11 +121,13 @@ export function buildDailySchedule(
     if (!isMedicationScheduledForDate(med, date, weekdayMap)) continue;
     if (!med.timeDoses?.length) continue;
 
+    const isPrn = med.schedule?.type === "prn";
+
     for (const td of med.timeDoses) {
       const log = dayLogs.find(
         (l) => l.medicationId === med.id && l.scheduledTime === td.time,
       );
-      const status = deriveStatus(log, dateStr, td.time, now);
+      const status = deriveStatus(log, dateStr, td.time, now, isPrn);
 
       entries.push({
         medication: med,
@@ -132,6 +138,7 @@ export function buildDailySchedule(
         log,
         status,
         logKey: `${med.id}-${dateStr}-${td.time}`,
+        scheduleType: med.schedule?.type ?? "daily",
       });
     }
   }
@@ -155,13 +162,16 @@ export function computeDayStats(entries: DailyScheduleEntry[]): DayStats {
 
   const takenMeds = entries.filter((e) => e.status === "taken").length;
   const skippedMeds = entries.filter((e) => e.status === "skipped").length;
-  const missedMeds = entries.filter((e) => e.status === "missed").length;
+  const missedMeds = entries.filter((e) => e.status === "missed" && e.scheduleType !== "prn").length;
   const pendingMeds = entries.filter((e) => e.status === "pending").length;
   const totalMeds = entries.length;
 
-  const actionable = takenMeds + missedMeds;
+  const scheduleEntries = entries.filter((e) => e.scheduleType !== "prn");
+  const actionableTaken = scheduleEntries.filter((e) => e.status === "taken").length;
+  const actionableMissed = scheduleEntries.filter((e) => e.status === "missed").length;
+  const actionable = actionableTaken + actionableMissed;
   const adherenceRate =
-    actionable > 0 ? Math.round((takenMeds / actionable) * 100) : 100;
+    actionable > 0 ? Math.round((actionableTaken / actionable) * 100) : 100;
 
   return {
     hasSchedule: true,

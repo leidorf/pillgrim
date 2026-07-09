@@ -26,6 +26,7 @@ type Props = {
   displayTime: string;
   isTaken: boolean;
   isSkipped: boolean;
+  isPrn?: boolean;
   onTaken: () => void;
   onSkip: () => void;
   onSnooze: (minutes: number) => void;
@@ -39,6 +40,7 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
       displayTime,
       isTaken,
       isSkipped,
+      isPrn,
       onTaken,
       onSkip,
       onSnooze,
@@ -119,7 +121,9 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
             <View style={styles.viewPane}>
               <View style={styles.header}>
                 <Text style={styles.medName}>{medicationName}</Text>
-                <Text style={styles.medTime}>{displayTime}</Text>
+                <Text style={styles.medTime}>
+                  {isPrn ? t("schedules.prn") : displayTime}
+                </Text>
               </View>
 
               <View style={styles.divider} />
@@ -151,67 +155,71 @@ const MedicationActionSheet = forwardRef<BottomSheet, Props>(
                   </View>
                 </TouchableOpacity>
 
-                {/* --------------------------------- Skipped -------------------------------- */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={[
-                    styles.actionRow,
-                    isSkipped && styles.actionRowSkipped,
-                  ]}
-                  onPress={handleSkip}
-                >
-                  <View
-                    style={[
-                      styles.actionIcon,
-                      {
-                        backgroundColor: theme.textSecondary + "20",
-                      },
-                    ]}
-                  >
-                    <SkipIcon
-                      width={20}
-                      height={20}
-                      stroke={theme.textSecondary}
-                    />
-                  </View>
-                  <View style={styles.actionTexts}>
-                    <Text style={styles.actionLabel}>
-                      {isSkipped ? t("medicationAction.undoSkip") : t("medicationAction.skipDose")}
-                    </Text>
-                    <Text style={styles.actionSub}>
-                      {isSkipped
-                        ? t("medicationAction.markPending")
-                        : t("medicationAction.intentionallySkip")}
-                    </Text>
-                  </View>
-                </TouchableOpacity>
+                {!isPrn && (
+                  <>
+                    {/* --------------------------------- Skipped -------------------------------- */}
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={[
+                        styles.actionRow,
+                        isSkipped && styles.actionRowSkipped,
+                      ]}
+                      onPress={handleSkip}
+                    >
+                      <View
+                        style={[
+                          styles.actionIcon,
+                          {
+                            backgroundColor: theme.textSecondary + "20",
+                          },
+                        ]}
+                      >
+                        <SkipIcon
+                          width={20}
+                          height={20}
+                          stroke={theme.textSecondary}
+                        />
+                      </View>
+                      <View style={styles.actionTexts}>
+                        <Text style={styles.actionLabel}>
+                          {isSkipped ? t("medicationAction.undoSkip") : t("medicationAction.skipDose")}
+                        </Text>
+                        <Text style={styles.actionSub}>
+                          {isSkipped
+                            ? t("medicationAction.markPending")
+                            : t("medicationAction.intentionallySkip")}
+                        </Text>
+                      </View>
+                    </TouchableOpacity>
 
-                {/* --------------------------------- Snooze --------------------------------- */}
-                <TouchableOpacity
-                  activeOpacity={0.7}
-                  style={styles.actionRow}
-                  onPress={goToSnooze}
-                >
-                  <View
-                    style={[
-                      styles.actionIcon,
-                      {
-                        backgroundColor: theme.warning + "20",
-                      },
-                    ]}
-                  >
-                    <ClockIcon width={20} height={20} stroke={theme.warning} />
-                  </View>
-                  <View style={styles.actionTexts}>
-                    <Text style={styles.actionLabel}>{t("medicationAction.snooze")}</Text>
-                    <Text style={styles.actionSub}>{t("medicationAction.remindLater")}</Text>
-                  </View>
-                  <ChevronRightIcon
-                    width={20}
-                    height={20}
-                    stroke={theme.textPrimary}
-                  />
-                </TouchableOpacity>
+                    {/* --------------------------------- Snooze --------------------------------- */}
+                    <TouchableOpacity
+                      activeOpacity={0.7}
+                      style={styles.actionRow}
+                      onPress={goToSnooze}
+                    >
+                      <View
+                        style={[
+                          styles.actionIcon,
+                          {
+                            backgroundColor: theme.warning + "20",
+                          },
+                        ]}
+                      >
+                        <ClockIcon width={20} height={20} stroke={theme.warning} />
+                      </View>
+                      <View style={styles.actionTexts}>
+                        <Text style={styles.actionLabel}>{t("medicationAction.snooze")}</Text>
+                        <Text style={styles.actionSub}>{t("medicationAction.remindLater")}</Text>
+                      </View>
+                      <ChevronRightIcon
+                        width={20}
+                        height={20}
+                        stroke={theme.textPrimary}
+                      />
+                    </TouchableOpacity>
+                  </>
+                )}
               </View>
 
               <TouchableOpacity

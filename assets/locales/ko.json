@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "활성화할 재고량 입력",
     "next": "다음",
     "whenHowMuch": "언제, 얼마나?",
+    "howMuch":"용량",
     "advancedOptions": "고급 옵션",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "월",

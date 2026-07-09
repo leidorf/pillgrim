@@ -270,6 +270,7 @@ const HomeScreen = () => {
             dose={item.dose}
             log={item.log}
             isMissed={item.status === "missed"}
+            isPrn={item.scheduleType === "prn"}
             onToggle={(medId, time) => {
               const amount = parseFloat(item.dose) || 1;
               handleToggle(medId, time, amount);
@@ -322,6 +323,7 @@ const HomeScreen = () => {
         displayTime={selectedItem ? formatTimeString(selectedItem.time) : ""}
         isTaken={!!selectedLog?.takenAt && !selectedLog?.skipped}
         isSkipped={!!selectedLog?.skipped}
+        isPrn={selectedItem?.medication.schedule?.type === "prn"}
         onTaken={() => {
           if (!selectedItem) return;
           const doseStr = selectedItem.medication.timeDoses?.find(

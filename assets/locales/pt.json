@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "Introduzir o stock para ativar",
     "next": "Seguinte",
     "whenHowMuch": "Quando e em que quantidade?",
+    "howMuch":"Quanto?",
     "advancedOptions": "Opções avançadas",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "Mês",

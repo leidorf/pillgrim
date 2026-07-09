@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "有効にするには在庫数を入力してください",
     "next": "次へ",
     "whenHowMuch": "いつ、どのくらい？",
+    "howMuch":"用量",
     "advancedOptions": "詳細設定",
     "dayPlaceholder": "日",
     "monthPlaceholder": "月",

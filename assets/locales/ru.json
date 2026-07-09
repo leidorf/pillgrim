@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "Введите количество, чтобы включить",
     "next": "Далее",
     "whenHowMuch": "Когда и сколько?",
+    "howMuch":"Сколько?",
     "advancedOptions": "Дополнительные настройки",
     "dayPlaceholder": "ДД",
     "monthPlaceholder": "Месяц",

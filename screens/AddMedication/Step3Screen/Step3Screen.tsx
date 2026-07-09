@@ -69,6 +69,7 @@ const Step3Screen = () => {
 
   const mode = route.params?.mode;
   const medicationId = route.params?.medicationId;
+  const isPrn = draft.schedule?.type === "prn";
 
   const is24Hour = useTimeFormat().timeFormat === "24h";
   const availableUnits = DOSE_UNITS_BY_FORM[draft.form || ""] || DEFAULT_UNITS;
@@ -149,7 +150,7 @@ const Step3Screen = () => {
   const handleNext = () => {
     setDraft({
       timeDoses: timeDoses.map((td) => ({
-        time: formatTime24(td.time),
+        time: isPrn ? "" : formatTime24(td.time),
         dose: `${td.amount} ${selectedUnit}`,
       })),
     });
@@ -180,7 +181,10 @@ const Step3Screen = () => {
       <Pressable style={styles.backdrop} onPress={handleClose} />
 
       <View style={styles.modal}>
-        <AddMedicationHeader currentStep={3} title={t("addMedication.step3Title")} />
+        <AddMedicationHeader
+          currentStep={3}
+          title={t("addMedication.step3Title")}
+        />
 
         <ScrollView
           style={styles.content}
@@ -189,7 +193,7 @@ const Step3Screen = () => {
         >
           <View style={styles.dosesSection}>
             <Text style={styles.sectionLabel}>
-              {t("addMedication.whenHowMuch")}
+              {t(isPrn ? "addMedication.howMuch" : "addMedication.whenHowMuch")}
             </Text>
 
             {timeDoses.map((td, index) => (
@@ -206,35 +210,37 @@ const Step3Screen = () => {
                 onAmountChange={(text) => handleAmountChange(td.id, text)}
                 onUnitChange={handleUnitChange}
                 formattedTime={formatTime(td.time)}
+                hideTime={isPrn}
               />
             ))}
-
-            <Pressable
-              style={[
-                styles.addButton,
-                !selectedUnit && styles.addButtonDisabled,
-              ]}
-              onPress={addDose}
-              disabled={!selectedUnit}
-            >
-              <PlusIcon
-                width={20}
-                height={20}
-                stroke={selectedUnit ? theme.primary : theme.textSecondary}
-              />
-              <Text
+            {!isPrn && (
+              <Pressable
                 style={[
-                  styles.addButtonText,
-                  !selectedUnit && styles.addButtonTextDisabled,
+                  styles.addButton,
+                  !selectedUnit && styles.addButtonDisabled,
                 ]}
+                onPress={addDose}
+                disabled={!selectedUnit}
               >
-                {t("addMedication.addAnotherTime")}
-              </Text>
-            </Pressable>
+                <PlusIcon
+                  width={20}
+                  height={20}
+                  stroke={selectedUnit ? theme.primary : theme.textSecondary}
+                />
+                <Text
+                  style={[
+                    styles.addButtonText,
+                    !selectedUnit && styles.addButtonTextDisabled,
+                  ]}
+                >
+                  {t("addMedication.addAnotherTime")}
+                </Text>
+              </Pressable>
+            )}
           </View>
 
           {/* Summary — only visible when all doses are filled */}
-          {allDosesComplete && (
+          {allDosesComplete && !isPrn && (
             <DailySummaryCard
               doses={timeDoses}
               unitLabel={unitLabel}
@@ -257,47 +263,52 @@ const Step3Screen = () => {
   );
 };
 
-const createStyles = (theme: Theme) => StyleSheet.create({
-  container: { flex: 1, justifyContent: "flex-end" },
-  backdrop: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modal: {
-    width: "100%",
-    height: "90%",
-    backgroundColor: theme.background,
-    borderTopLeftRadius: 24,
-    borderTopRightRadius: 24,
-    padding: 24,
-    paddingBottom: 48,
-    overflow: "hidden",
-  },
-  content: { flex: 1, marginBottom: 12 },
-  scrollContent: { paddingBottom: 20, gap: 16 },
-  dosesSection: { gap: 12 },
-  sectionLabel: {
-    color: theme.textPrimary,
-    fontWeight: "600",
-    fontSize: 18,
-    marginTop: 16,
-    marginBottom: 4,
-  },
-  addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    gap: 8,
-    padding: 16,
-    borderRadius: 16,
-    borderWidth: 2,
-    borderColor: theme.primary + "40",
-    borderStyle: "dashed",
-    marginTop: 8,
-  },
-  addButtonDisabled: { borderColor: theme.textSecondary + "30" },
-  addButtonText: { color: theme.primaryDark, fontWeight: "600", fontSize: 16 },
-  addButtonTextDisabled: { color: theme.textSecondary },
-});
+const createStyles = (theme: Theme) =>
+  StyleSheet.create({
+    container: { flex: 1, justifyContent: "flex-end" },
+    backdrop: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modal: {
+      width: "100%",
+      height: "90%",
+      backgroundColor: theme.background,
+      borderTopLeftRadius: 24,
+      borderTopRightRadius: 24,
+      padding: 24,
+      paddingBottom: 48,
+      overflow: "hidden",
+    },
+    content: { flex: 1, marginBottom: 12 },
+    scrollContent: { paddingBottom: 20, gap: 16 },
+    dosesSection: { gap: 12 },
+    sectionLabel: {
+      color: theme.textPrimary,
+      fontWeight: "600",
+      fontSize: 18,
+      marginTop: 16,
+      marginBottom: 4,
+    },
+    addButton: {
+      flexDirection: "row",
+      alignItems: "center",
+      justifyContent: "center",
+      gap: 8,
+      padding: 16,
+      borderRadius: 16,
+      borderWidth: 2,
+      borderColor: theme.primary + "40",
+      borderStyle: "dashed",
+      marginTop: 8,
+    },
+    addButtonDisabled: { borderColor: theme.textSecondary + "30" },
+    addButtonText: {
+      color: theme.primaryDark,
+      fontWeight: "600",
+      fontSize: 16,
+    },
+    addButtonTextDisabled: { color: theme.textSecondary },
+  });
 
 export default Step3Screen;

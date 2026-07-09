@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "輸入庫存量以啟用",
     "next": "下一步",
     "whenHowMuch": "何時及多少？",
+    "howMuch":"用量",
     "advancedOptions": "進階選項",
     "dayPlaceholder": "日",
     "monthPlaceholder": "月",

@@ -17,7 +17,9 @@ export function useTimeFormat() {
   }
 
   function formatTimeString(time: string): string {
+    if (!time) return "";
     const [h, m] = time.split(":").map(Number);
+    if (isNaN(h) || isNaN(m)) return time;
     const date = new Date();
     date.setHours(h, m, 0, 0);
     return formatTime(date);

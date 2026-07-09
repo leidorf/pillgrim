@@ -131,6 +131,7 @@
     "lowStockAlertDescNoStock": "أدخل كمية المخزون لتفعيل التنبيه",
     "next": "التالي",
     "whenHowMuch": "متى وكم؟",
+    "howMuch":"الكمية",
     "advancedOptions": "خيارات متقدمة",
     "dayPlaceholder": "اليوم",
     "monthPlaceholder": "الشهر",

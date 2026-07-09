@@ -92,6 +92,7 @@ const CalendarScreen = () => {
         doseTaken: entry.log?.doseTaken,
         takenAt: entry.log?.takenAt,
         skipped: entry.log?.skipped,
+        scheduleType: entry.scheduleType,
       })),
     [scheduleEntries],
   );
