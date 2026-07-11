@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { useAudioPlayer, useAudioPlayerStatus } from "expo-audio";
 import { NotificationSound } from "../utils/notificationSounds";
 
-import apocSound from "../assets/sounds/apoc_sound.mp3";
-import dozerSound from "../assets/sounds/dozer_sound.mp3";
-import mouseSound from "../assets/sounds/mouse_sound.mp3";
-import switchSound from "../assets/sounds/switch_sound.mp3";
-import tankSound from "../assets/sounds/tank_sound.mp3";
+import apocSound from "../assets/sounds/apoc_sound.wav";
+import dozerSound from "../assets/sounds/dozer_sound.wav";
+import mouseSound from "../assets/sounds/mouse_sound.wav";
+import switchSound from "../assets/sounds/switch_sound.wav";
+import tankSound from "../assets/sounds/tank_sound.wav";
 
 type AudioSource = number | string | null;
 
