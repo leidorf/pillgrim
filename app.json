@@ -2,7 +2,7 @@
   "expo": {
     "name": "Pillgrim",
     "slug": "medication-reminder",
-    "version": "1.0.0",
+    "version": "1.1.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -47,8 +47,8 @@
         {
           "android": {
             "usesCleartextTraffic": false,
-            "enableProguardInReleaseBuilds": true,
-            "enableShrinkResourcesInReleaseBuilds": true
+            "enableProguardInReleaseBuilds": false,
+            "enableShrinkResourcesInReleaseBuilds": false
           }
         }
       ],
@@ -58,11 +58,11 @@
           "icon": "./assets/notification-icon.png",
           "color": "#AED581",
           "sounds": [
-            "./assets/sounds/apoc_sound.mp3",
-            "./assets/sounds/dozer_sound.mp3",
-            "./assets/sounds/mouse_sound.mp3",
-            "./assets/sounds/switch_sound.mp3",
-            "./assets/sounds/tank_sound.mp3"
+            "./assets/sounds/apoc_sound.wav",
+            "./assets/sounds/dozer_sound.wav",
+            "./assets/sounds/mouse_sound.wav",
+            "./assets/sounds/switch_sound.wav",
+            "./assets/sounds/tank_sound.wav"
           ]
         }
       ],

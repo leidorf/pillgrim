@@ -41,6 +41,8 @@ import {
   onForegroundNotificationEvent,
   setupNotificationHandler,
   processNotificationAction,
+  getInitialNotificationResponse,
+  clearInitialNotificationResponse,
 } from "./services/notificationService";
 
 /* ---------------------- Navigators ---------------------- */
@@ -232,6 +234,25 @@ export default function App() {
       }
     });
     return unsub;
+  }, []);
+
+  useEffect(() => {
+    const initial = getInitialNotificationResponse();
+    if (initial) {
+      const actionId = initial.actionIdentifier;
+      const data = initial.notification.request.content.data as
+        | { medicationId?: string; scheduledTime?: string }
+        | undefined;
+  
+      if (
+        (actionId === "taken" || actionId === "skip") &&
+        data?.medicationId &&
+        data?.scheduledTime
+      ) {
+        processNotificationAction(actionId, data.medicationId, data.scheduledTime);
+      }
+      clearInitialNotificationResponse();
+    }
   }, []);
 
   return (

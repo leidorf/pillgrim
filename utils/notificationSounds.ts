@@ -24,5 +24,5 @@ export function resolveNotificationSound(
 ): boolean | string | undefined {
   if (sound === "silent") return false;
   if (sound === "default") return undefined;
-  return Platform.OS === "ios" ? `${sound}.mp3` : sound;
+  return Platform.OS === "ios" ? `${sound}.wav` : sound;
 }
