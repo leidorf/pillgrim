@@ -41,7 +41,9 @@
     "notificationSoundDesc": "Scegli il suono per le notifiche",
     "notificationsDisabled": "Le notifiche sono disattivate",
     "notificationsOpenSettings": "Tocca per aprire le impostazioni di sistema",
-    "notificationsGrant": "Tocca per abilitare le notifiche"
+    "notificationsGrant": "Tocca per abilitare le notifiche",
+    "exactAlarmDisabled": "L'autorizzazione “Allarmi e promemoria” è disabilitata",
+    "exactAlarmOpenSettings": "Senza questa autorizzazione, le notifiche potrebbero non arrivare in tempo. Clicca qui per concedere l'autorizzazione."
   },
   "vibration": {
     "short": "Breve",

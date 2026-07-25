@@ -41,7 +41,9 @@
     "notificationSoundDesc": "Elige el sonido para las notificaciones",
     "notificationsDisabled": "Las notificaciones están desactivadas",
     "notificationsOpenSettings": "Toca para abrir los ajustes del sistema",
-    "notificationsGrant": "Toca para activar las notificaciones"
+    "notificationsGrant": "Toca para activar las notificaciones",
+    "exactAlarmDisabled": "El permiso «Alarmas y recordatorios» está desactivado",
+    "exactAlarmOpenSettings": "Sin este permiso, es posible que las notificaciones no lleguen a tiempo. Haz clic para conceder el permiso."
   },
   "vibration": {
     "short": "Corto",
@@ -131,7 +133,7 @@
     "lowStockAlertDescNoStock": "Introduce el stock para activar",
     "next": "Siguiente",
     "whenHowMuch": "¿Cuándo y en qué cantidad?",
-    "howMuch":"¿Cuánto?",
+    "howMuch": "¿Cuánto?",
     "advancedOptions": "Opciones avanzadas",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "Mes",

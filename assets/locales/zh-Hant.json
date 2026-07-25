@@ -41,7 +41,9 @@
     "notificationSoundDesc": "選擇通知的聲音",
     "notificationsDisabled": "通知已停用",
     "notificationsOpenSettings": "點擊開啟系統設定",
-    "notificationsGrant": "點擊以啟用通知"
+    "notificationsGrant": "點擊以啟用通知",
+    "exactAlarmDisabled": "「鬧鐘與提醒」權限已停用",
+    "exactAlarmOpenSettings": "若未授予此權限，通知可能無法及時送達。請點擊以授予權限。"
   },
   "vibration": {
     "short": "短",
@@ -131,7 +133,7 @@
     "lowStockAlertDescNoStock": "輸入庫存量以啟用",
     "next": "下一步",
     "whenHowMuch": "何時及多少？",
-    "howMuch":"用量",
+    "howMuch": "用量",
     "advancedOptions": "進階選項",
     "dayPlaceholder": "日",
     "monthPlaceholder": "月",

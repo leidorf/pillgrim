@@ -41,7 +41,9 @@
     "notificationSoundDesc": "选择通知的声音",
     "notificationsDisabled": "通知已禁用",
     "notificationsOpenSettings": "点击打开系统设置",
-    "notificationsGrant": "点击启用通知"
+    "notificationsGrant": "点击启用通知",
+    "exactAlarmDisabled": "“闹钟和提醒”权限已禁用",
+    "exactAlarmOpenSettings": "如果没有此权限，通知可能无法及时送达。点击授予权限。"
   },
   "vibration": {
     "short": "短",

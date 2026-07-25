@@ -41,7 +41,9 @@
     "notificationSoundDesc": "اختر صوت الإشعارات",
     "notificationsDisabled": "الإشعارات معطلة",
     "notificationsOpenSettings": "انقر لفتح إعدادات النظام",
-    "notificationsGrant": "انقر لتمكين الإشعارات"
+    "notificationsGrant": "انقر لتمكين الإشعارات",
+    "exactAlarmDisabled": "تم تعطيل إذن «التنبيهات والتذكيرات»",
+    "exactAlarmOpenSettings": "بدون هذا الإذن، قد لا تصل الإشعارات في الوقت المحدد. انقر لمنح الإذن"
   },
   "vibration": {
     "short": "قصير",
@@ -131,7 +133,7 @@
     "lowStockAlertDescNoStock": "أدخل كمية المخزون لتفعيل التنبيه",
     "next": "التالي",
     "whenHowMuch": "متى وكم؟",
-    "howMuch":"الكمية",
+    "howMuch": "الكمية",
     "advancedOptions": "خيارات متقدمة",
     "dayPlaceholder": "اليوم",
     "monthPlaceholder": "الشهر",

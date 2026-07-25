@@ -10,6 +10,7 @@ import { useAppTheme } from "../../theme/useAppTheme";
 import { useMemo } from "react";
 import { Theme } from "../../constants/theme";
 import { NotificationPermissionBanner } from "./components/NotificationPermissionBanner";
+import { ExactAlarmPermissionBanner } from "./components/ExactAlarmPermissionBanner";
 
 type SettingEntry = {
   key: keyof SettingsParamList;
@@ -50,7 +51,12 @@ const SettingsScreen = () => {
             onPress={() => handleNavigation(item.key)}
           />
         )}
-        ListHeaderComponent={NotificationPermissionBanner}
+        ListHeaderComponent={
+          <>
+            <NotificationPermissionBanner />
+            <ExactAlarmPermissionBanner />
+          </>
+        }
         ListFooterComponent={
           <View style={styles.footer}>
             <Text onPress={handlePrivacy} style={styles.footerText}>

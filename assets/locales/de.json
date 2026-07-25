@@ -41,7 +41,9 @@
     "notificationSoundDesc": "Wähle den Ton für Benachrichtigungen",
     "notificationsDisabled": "Benachrichtigungen sind deaktiviert",
     "notificationsOpenSettings": "Tippe hier, um die Systemeinstellungen zu öffnen",
-    "notificationsGrant": "Tippen Sie hier, um Benachrichtigungen zu aktivieren"
+    "notificationsGrant": "Tippen Sie hier, um Benachrichtigungen zu aktivieren",
+    "exactAlarmDisabled": "Die Berechtigung „Alarme und Erinnerungen“ ist deaktiviert",
+    "exactAlarmOpenSettings": "Ohne diese Berechtigung werden Benachrichtigungen möglicherweise nicht rechtzeitig zugestellt. Klicken Sie hier, um die Berechtigung zu erteilen."
   },
   "vibration": {
     "short": "Kurz",
@@ -131,7 +133,7 @@
     "lowStockAlertDescNoStock": "Bestand eingeben, um zu aktivieren",
     "next": "Weiter",
     "whenHowMuch": "Wann und wie viel?",
-    "howMuch":"Wie viel?",
+    "howMuch": "Wie viel?",
     "advancedOptions": "Erweiterte Optionen",
     "dayPlaceholder": "TT",
     "monthPlaceholder": "Monat",

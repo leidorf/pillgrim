@@ -41,7 +41,9 @@
     "notificationSoundDesc": "Choose the sound for notifications",
     "notificationsDisabled": "Notifications are disabled",
     "notificationsOpenSettings": "Tap to open system settings",
-    "notificationsGrant": "Tap to enable notifications"
+    "notificationsGrant": "Tap to enable notifications",
+    "exactAlarmDisabled": "Alarms & Reminders permission is disabled",
+    "exactAlarmOpenSettings": "Without this permission, notifications may not arrive on time. Click to grant permission."
   },
   "vibration": {
     "short": "Short",
@@ -131,7 +133,7 @@
     "lowStockAlertDescNoStock": "Enter stock to enable",
     "next": "Next",
     "whenHowMuch": "When and how much?",
-    "howMuch":"How much?",
+    "howMuch": "How much?",
     "advancedOptions": "Advanced Options",
     "dayPlaceholder": "DD",
     "monthPlaceholder": "Month",

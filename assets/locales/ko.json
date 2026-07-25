@@ -41,7 +41,9 @@
     "notificationSoundDesc": "알림 소리 선택",
     "notificationsDisabled": "알림이 비활성화되었습니다",
     "notificationsOpenSettings": "탭하여 시스템 설정 열기",
-    "notificationsGrant": "알림을 켜려면 탭하세요"
+    "notificationsGrant": "알림을 켜려면 탭하세요",
+    "exactAlarmDisabled": "‘알림 및 리마인더’ 권한이 비활성화되어 있습니다.",
+    "exactAlarmOpenSettings": "이 권한이 없으면 알림이 제때 도착하지 않을 수 있습니다. 클릭하여 권한을 허용해 주세요."
   },
   "vibration": {
     "short": "짧음",

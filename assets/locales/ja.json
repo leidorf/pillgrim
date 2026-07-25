@@ -41,7 +41,9 @@
     "notificationSoundDesc": "通知音を選択",
     "notificationsDisabled": "通知は無効になっています",
     "notificationsOpenSettings": "タップしてシステム設定を開く",
-    "notificationsGrant": "タップして通知を有効にする"
+    "notificationsGrant": "タップして通知を有効にする",
+    "exactAlarmDisabled": "「アラームとリマインダー」の権限が無効になっています",
+    "exactAlarmOpenSettings": "この許可がないと、通知が時間通りに届かない場合があります。クリックして許可を付与してください。"
   },
   "vibration": {
     "short": "短音",

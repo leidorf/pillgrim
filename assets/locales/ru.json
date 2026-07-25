@@ -41,7 +41,9 @@
     "notificationSoundDesc": "Выберите звук уведомлений",
     "notificationsDisabled": "Уведомления отключены",
     "notificationsOpenSettings": "Нажмите, чтобы открыть системные настройки",
-    "notificationsGrant": "Нажмите, чтобы включить уведомления"
+    "notificationsGrant": "Нажмите, чтобы включить уведомления",
+    "exactAlarmDisabled": "Разрешение «Уведомления и напоминания» отключено",
+    "exactAlarmOpenSettings": "Без этого разрешения уведомления могут поступать с задержкой. Нажмите, чтобы предоставить разрешение."
   },
   "vibration": {
     "short": "Короткий",
