@@ -9,7 +9,7 @@ import { logger } from "../utils/logger";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getErrorMessage } from "../utils/errorUtils";
 
-const CHANNEL_ID = "medication-reminders";
+const CHANNEL_ID = "pillgrim-notifications-v1.1.2";
 const CATEGORY_ID = "medication-actions";
 const ACTION_TAKEN = "taken";
 const ACTION_SKIP = "skip";
