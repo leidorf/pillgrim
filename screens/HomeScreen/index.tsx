@@ -11,6 +11,8 @@ import { WeekStart } from "../../types/schedule";
 import { useMedicationStore } from "../../store/medicationStore";
 import { useLogStore } from "../../store/logsStore";
 import { useSettingsStore } from "../../store/settingsStore";
+import { buildTabBarStyle } from "../../constants/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { useTimeFormat } from "../../hooks/useTimeFormat";
 
@@ -46,6 +48,7 @@ const HomeScreen = () => {
   const { t, i18n } = useTranslation();
   const theme = useAppTheme();
   const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { medications, updateStock } = useMedicationStore();
   const hasMedications = medications.length > 0;
@@ -210,28 +213,18 @@ const HomeScreen = () => {
     navigation.setOptions({
       tabBarStyle: isSheetOpen
         ? { display: "none" }
-        : {
-            backgroundColor: "rgba(0, 0, 0, 0)",
-            borderTopWidth: 0,
-            boxShadow: "none",
-            elevation: 0,
-          },
+        : buildTabBarStyle(insets.bottom),
     });
-  }, [isSheetOpen, navigation]);
+  }, [isSheetOpen, navigation, insets.bottom]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       navigation.setOptions({
-        tabBarStyle: {
-          backgroundColor: "rgba(0, 0, 0, 0)",
-          borderTopWidth: 0,
-          boxShadow: "none",
-          elevation: 0,
-        },
+        tabBarStyle: buildTabBarStyle(insets.bottom),
       });
     });
     return unsubscribe;
-  }, [navigation]);
+  }, [navigation, insets.bottom]);
 
   useEffect(() => {
     if (!isSheetOpen) return;

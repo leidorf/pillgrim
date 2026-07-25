@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { SafeAreaProvider } from "react-native-safe-area-context";
+import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -36,6 +36,7 @@ import { getNavigationTheme } from "./theme/theme";
 import { useAppTheme } from "./theme/useAppTheme";
 import { useSettingsStore } from "./store/settingsStore";
 import { useMedicationStore } from "./store/medicationStore";
+import { buildTabBarStyle, TAB_BAR_ICON_SIZE } from "./constants/layout";
 import {
   rescheduleAllNotifications,
   onForegroundNotificationEvent,
@@ -52,18 +53,14 @@ const AddMedStack = createNativeStackNavigator<AddMedicationParamList>();
 
 const MainTabs = () => {
   const theme = useAppTheme();
+  const insets = useSafeAreaInsets();
   return (
     <Tab.Navigator
       screenOptions={{
         headerShown: false,
         tabBarShowLabel: false,
         tabBarActiveTintColor: theme.primary,
-        tabBarStyle: {
-          backgroundColor: "rgba(0, 0, 0, 0)",
-          borderTopWidth: 0,
-          boxShadow: "none",
-          elevation: 0,
-        },
+        tabBarStyle: buildTabBarStyle(insets.bottom),
       }}
     >
       <Tab.Screen
@@ -71,7 +68,7 @@ const MainTabs = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <HouseIcon height={24} width={24} stroke={color} />
+            <HouseIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
           ),
         }}
       />
@@ -80,7 +77,7 @@ const MainTabs = () => {
         component={MedsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <PillIcon height={24} width={24} stroke={color} />
+            <PillIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
           ),
         }}
       />
@@ -89,7 +86,7 @@ const MainTabs = () => {
         component={CalendarScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <CalendarIcon height={24} width={24} stroke={color} />
+            <CalendarIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
           ),
         }}
       />

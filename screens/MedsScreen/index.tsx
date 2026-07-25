@@ -13,6 +13,8 @@ import BaseModal from "../../components/BaseModal";
 import { useMedicationStore } from "../../store/medicationStore";
 import { NavProp, MainScreenParamList } from "../../types/navigation";
 import { Medication } from "../../types/medication";
+import { buildTabBarStyle } from "../../constants/layout";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
 import BottomSheet from "@gorhom/bottom-sheet";
 import ScreenLayout from "../../components/ScreenLayout";
 import { useAppTheme } from "../../theme/useAppTheme";
@@ -22,6 +24,7 @@ const MedsScreen = () => {
   const { t } = useTranslation();
   const theme = useAppTheme();
   const tabBarHeight = useBottomTabBarHeight();
+  const insets = useSafeAreaInsets();
   const styles = useMemo(() => createStyles(theme), [theme]);
   const navigation = useNavigation<NavProp>();
   const {
@@ -167,26 +170,24 @@ const MedsScreen = () => {
   const tabNavigation =
     useNavigation<BottomTabNavigationProp<MainScreenParamList>>();
 
-  const visibleTabBarStyle = {
-    backgroundColor: "rgba(0, 0, 0, 0)",
-    borderTopWidth: 0,
-    boxShadow: "none",
-    elevation: 0,
-  } as const;
+  const visibleTabBarStyle = useMemo(
+    () => buildTabBarStyle(insets.bottom),
+    [insets.bottom],
+  );
 
   // Hide tab bar when sheet is open
   useEffect(() => {
     tabNavigation.setOptions({
       tabBarStyle: isSheetOpen ? { display: "none" } : visibleTabBarStyle,
     });
-  }, [isSheetOpen, tabNavigation]);
+  }, [isSheetOpen, tabNavigation, visibleTabBarStyle]);
 
   useEffect(() => {
     const unsubscribe = navigation.addListener("focus", () => {
       tabNavigation.setOptions({ tabBarStyle: visibleTabBarStyle });
     });
     return unsubscribe;
-  }, [navigation, tabNavigation]);
+  }, [navigation, tabNavigation, visibleTabBarStyle]);
 
   useEffect(() => {
     if (!isSheetOpen) return;

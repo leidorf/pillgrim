@@ -28,7 +28,7 @@ const createStyles = (theme: Theme) =>
   StyleSheet.create({
     container: {
       position: "absolute",
-      bottom: "6%",
+      bottom: "7%",
       right: "3%",
       flexDirection: "row",
       alignItems: "center",
