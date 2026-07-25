@@ -42,7 +42,7 @@
     "notificationsDisabled": "Les notifications sont désactivées",
     "notificationsOpenSettings": "Appuyez pour ouvrir les paramètres système",
     "notificationsGrant": "Appuyez pour activer les notifications",
-    "exactAlarmDisabled": "L'autorisation « Alarmes et rappels » est désactivée",
+    "exactAlarmDisabled": "L'autorisation \"Alarmes et rappels\" est désactivée",
     "exactAlarmOpenSettings": "Sans cette autorisation, les notifications risquent de ne pas vous parvenir à temps. Cliquez ici pour accorder l'autorisation."
   },
   "vibration": {

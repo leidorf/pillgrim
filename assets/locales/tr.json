@@ -42,7 +42,7 @@
     "notificationsDisabled": "Bildirimler devre dışı",
     "notificationsOpenSettings": "Sistem ayarlarını açmak için dokun",
     "notificationsGrant": "Bildirimleri açmak için dokun",
-    "exactAlarmDisabled": " « Alarmlar & hatırlatıcılar » izni devre dışı",
+    "exactAlarmDisabled": "\"Alarmlar & hatırlatıcılar\" izni devre dışı",
     "exactAlarmOpenSettings": "Bu izin verilmezse bildirimler zamanında gönderilmeyebilir. İzin vermek için tıklayın."
   },
   "vibration": {

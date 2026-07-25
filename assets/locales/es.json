@@ -42,7 +42,7 @@
     "notificationsDisabled": "Las notificaciones están desactivadas",
     "notificationsOpenSettings": "Toca para abrir los ajustes del sistema",
     "notificationsGrant": "Toca para activar las notificaciones",
-    "exactAlarmDisabled": "El permiso «Alarmas y recordatorios» está desactivado",
+    "exactAlarmDisabled": "El permiso \"Alarmas y recordatorios\" está desactivado",
     "exactAlarmOpenSettings": "Sin este permiso, es posible que las notificaciones no lleguen a tiempo. Haz clic para conceder el permiso."
   },
   "vibration": {

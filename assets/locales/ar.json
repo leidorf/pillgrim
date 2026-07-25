@@ -42,7 +42,7 @@
     "notificationsDisabled": "الإشعارات معطلة",
     "notificationsOpenSettings": "انقر لفتح إعدادات النظام",
     "notificationsGrant": "انقر لتمكين الإشعارات",
-    "exactAlarmDisabled": "تم تعطيل إذن «التنبيهات والتذكيرات»",
+    "exactAlarmDisabled": "تم تعطيل إذن \"التنبيهات والتذكيرات\"",
     "exactAlarmOpenSettings": "بدون هذا الإذن، قد لا تصل الإشعارات في الوقت المحدد. انقر لمنح الإذن"
   },
   "vibration": {
