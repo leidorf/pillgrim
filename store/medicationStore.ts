@@ -110,6 +110,12 @@ export const useMedicationStore = create<MedicationStore>()(
         const medication = medications.find((m) => m.id === id);
         if (!medication) return;
 
+        if (medication.notificationIds?.length) {
+          cancelMedicationNotifications(medication.notificationIds).catch(
+            () => {},
+          );
+        }
+
         set({
           medications: medications.filter((m) => m.id !== id),
           _softDeleted: medication,
