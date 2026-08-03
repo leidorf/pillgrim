@@ -1,3 +1,1 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources xmlns:tools="http://schemas.android.com/tools"
-    tools:keep="@raw/apoc_sound,@raw/dozer_sound,@raw/mouse_sound,@raw/switch_sound,@raw/tank_sound" />
+<resources xmlns:tools="http://schemas.android.com/tools" tools:keep="@drawable/node_modules_reactnavigation_elements_lib_module_assets_backicon,@drawable/node_modules_reactnavigation_elements_lib_module_assets_backiconmask,@drawable/node_modules_reactnavigation_elements_lib_module_assets_clearicon,@drawable/node_modules_reactnavigation_elements_lib_module_assets_closeicon,@drawable/node_modules_reactnavigation_elements_lib_module_assets_searchicon,@raw/assets_sounds_apoc_sound,@raw/assets_sounds_dozer_sound,@raw/assets_sounds_mouse_sound,@raw/assets_sounds_switch_sound,@raw/assets_sounds_tank_sound" />

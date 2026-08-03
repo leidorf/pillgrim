@@ -92,8 +92,8 @@ android {
         applicationId 'com.ambar40.pillgrim'
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.1.1"
+        versionCode 19
+        versionName "1.1.2"
 
         buildConfigField "String", "REACT_NATIVE_RELEASE_LEVEL", "\"${findProperty('reactNativeReleaseLevel') ?: 'stable'}\""
     }
@@ -104,15 +104,26 @@ android {
             keyAlias 'androiddebugkey'
             keyPassword 'android'
         }
+        release {
+            if (project.hasProperty('PILLGRIM_UPLOAD_STORE_FILE')) {
+                storeFile file(PILLGRIM_UPLOAD_STORE_FILE)
+                storePassword PILLGRIM_UPLOAD_STORE_PASSWORD
+                keyAlias PILLGRIM_UPLOAD_KEY_ALIAS
+                keyPassword PILLGRIM_UPLOAD_KEY_PASSWORD
+            }
+        }
     }
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
         }
         release {
-            // Caution! In production, you need to generate your own keystore file.
-            // see https://reactnative.dev/docs/signed-apk-android.
-            signingConfig signingConfigs.debug
+            // Sign only when keystore properties are provided (e.g. via
+            // gradle.properties or -P flags). Without them the build stays
+            // unsigned so F-Droid can sign it with its own key.
+            if (project.hasProperty('PILLGRIM_UPLOAD_STORE_FILE')) {
+                signingConfig signingConfigs.release
+            }
             def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'
             shrinkResources enableShrinkResources.toBoolean()
             minifyEnabled enableMinifyInReleaseBuilds
