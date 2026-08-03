@@ -17,6 +17,7 @@
       "bundleIdentifier": "com.ambar40.pillgrim"
     },
     "android": {
+      "versionCode": 19,
       "newArchEnabled": true,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
