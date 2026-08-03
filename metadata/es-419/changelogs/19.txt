@@ -1,0 +1,7 @@
+¡Bienvenido a Pillgrim! 🎉 
+Esta app de código abierto y sin anuncios ofrece programación flexible, seguimiento de dosis/adherencia/stock, notificaciones personalizadas y privacidad local.
+
+Últimas actualizaciones:
+- Medicamentos "Para usar cuando sea necesario" ahora son interactivos.
+- Problemas de notificaciones (sonidos, botones, fiabilidad) completamente arreglados.
+- Calendario desplazable, idiomas ordenados, cuadro de información de permisos, barra inferior adaptable.

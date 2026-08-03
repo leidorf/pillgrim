@@ -1,0 +1,21 @@
+Pillgrim, ilaçlarınızı doğru zamanda, doğru dozda almanızı hatırlatan, stoklarınızı takip eden ve tamamen gizliliğinize önem veren ücretsiz, reklamsız bir ilaç hatırlatma uygulamasıdır.
+
+İlaçlarınızı Kaçırmayın
+Her ilaç için kendi zamanlama düzeninizi oluşturun: günlük, haftalık, iki haftalık, aylık, belirli bir ayda veya esnek aralıklarla. Doz miktarını ve ilacın şeklini istediğiniz gibi kaydedin. Ayrıca her ilaç için yemekle ilişkisini belirtin: aç karnına, tok karnına, yemekten önce, yemekten sonra veya size özel bir alım tavsiyesi — Pillgrim hatırlatmasını buna göre düzenler.
+
+İİlacınız Azaldığında Haberdar Olun
+Stok miktarını girin, gerisini Pillgrim halletsin. İlacınız azaldığında anında bildirim alır, ilacınızı yenilemeyi asla unutmazsınız.
+
+Özelleştirilebilir Bildirimler
+Bildirimleri tamamen size göre ayarlayın: açıp kapatabilir, ilaç isminin bildirimlerde gizlenmesini tercih edebilir, farklı alarm sesleri arasından size en uygun olanı seçebilir veya titreşimle sessiz hatırlatmalar alabilirsiniz
+
+Alım Geçmişinizi Dışa Aktarın
+Aylık ilaç alımlarınızı PDF veya CSV olarak dışa aktarın. Doktor ziyaretlerinizde veya kişisel takibinizde kullanmak üzere düzenli raporlar oluşturun.
+
+Herkes İçin Erişilebilir
+Yazı boyutunu küçükten büyüğe ayarlayabilir, uygulamanın görünümünü kendi alışkanlıklarınıza göre kişiselleştirebilir ve farklı diller arasından tercihinizi yapabilirsiniz.
+
+Verileriniz Sizde Kalır
+Pillgrim, ilaç ve sağlık bilgilerinizi yalnızca cihazınızda saklar. Hiçbir sunucuya gönderilmez, hiçbir yerle paylaşılmaz ve hiçkimseye satılmaz. Bilgileriniz yalnızca size aittir.
+
+Not: Pillgrim bir tıbbi tavsiye aracı değildir. İlaç kullanım kararlarınızı her zaman doktorunuz veya eczacınızla birlikte verin.

@@ -1,0 +1,8 @@
+Bem-vindo ao Pillgrim! 🎉 
+Este aplicativo open-source e sem anúncios oferece agendamento flexível, monitoramento de doses/adesão/estoque, notificações personalizadas e privacidade local.
+
+Últimas atualizações:
+- Medicamentos "Usar quando necessário" agora interativos.
+- Problemas de notificação (sons, botões, confiabilidade) totalmente corrigidos.
+- Calendário rolável, idiomas ordenados, caixa de informação de permissões, barra inferior adaptável.
+

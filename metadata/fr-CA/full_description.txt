@@ -1,0 +1,21 @@
+Pillgrim est une application gratuite et sans publicité qui vous rappelle de prendre vos médicaments au bon moment et à la bonne dose, suit vos stocks et respecte totalement votre vie privée.
+
+Ne manquez jamais vos médicaments
+Créez votre propre planification pour chaque médicament : quotidienne, hebdomadaire, bimensuelle, mensuelle, un jour précis du mois, ou à intervalles flexibles. Enregistrez le dosage et la forme. De plus, pour chaque médicament, indiquez sa relation avec les repas : à jeun, avec de la nourriture, avant les repas, après les repas, ou un conseil de prise personnalisé – Pillgrim ajuste ses rappels en conséquence.
+
+Sachez quand votre médicament s'épuise
+Saisissez la quantité en stock et laissez Pillgrim gérer le reste. Vous recevrez une notification instantanée lorsque votre médicament est en faible quantité, pour ne jamais oublier de le réapprovisionner.
+
+Notifications personnalisables
+Adaptez les notifications à vos préférences : activer/désactiver, masquer le nom du médicament dans les notifications, choisir parmi plusieurs sons d'alarme ou recevoir des rappels silencieux avec vibration.
+
+Exporter votre historique de prise
+Exportez votre historique mensuel de prise de médicaments au format PDF ou CSV. Générez des rapports structurés pour les visites chez le médecin ou le suivi personnel.
+
+Accessible à tous
+Ajustez la taille du texte de petit à grand, personnalisez l'apparence de l'application selon vos habitudes et choisissez parmi plusieurs langues.
+
+Vos données restent chez vous
+Pillgrim stocke vos données de médicaments et de santé uniquement sur votre appareil. Elles ne sont jamais envoyées à un serveur, partagées avec quiconque ou vendues. Vos informations vous appartiennent uniquement.
+
+Note : Pillgrim n'est pas un outil de conseil médical. Prenez toujours vos décisions concernant les médicaments en consultant votre médecin ou votre pharmacien.

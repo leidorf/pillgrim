@@ -1,0 +1,8 @@
+Pillgrim'e hoş geldiniz! 🎉 
+Bu açık kaynak, reklamsız uygulama; esnek zamanlama, doz/uyum/stok takibi, özel bildirimler ve cihaz içi gizlilik sunar.
+
+Son güncellemeler:
+- "Gerektiğinde Kullan" ilaçları artık etkileşimli.
+- Bildirim sorunları (sesler, butonlar, güvenilirlik) tamamen düzeltildi.
+- Takvim kaydırma, diller sıralandı, izin bilgi kutusu eklendi, alt gezinme çubuğu duyarlı hale geldi.
+

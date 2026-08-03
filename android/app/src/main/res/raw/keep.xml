@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:keep="@raw/apoc_sound,@raw/dozer_sound,@raw/mouse_sound,@raw/switch_sound,@raw/tank_sound" />

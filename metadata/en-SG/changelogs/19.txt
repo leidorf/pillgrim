@@ -1,0 +1,8 @@
+Welcome to Pillgrim! 🎉 
+This open-source ad‑free app offers flexible scheduling, dose & adherence tracking, stock alerts, custom notifications and total on‑device privacy.
+
+Latest updates:
+- "Use as Needed" meds are now interactive.
+- Notification issues (sounds, buttons, reliability) are fully fixed.
+- Calendar scrolls, languages sorted, permission info box added, nav bar responsive.
+

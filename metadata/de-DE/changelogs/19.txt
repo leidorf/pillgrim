@@ -1,0 +1,7 @@
+Willkommen bei Pillgrim! 🎉 
+Diese quelloffene, werbefreie App bietet flexible Planung, Dosis- & Bestandsverfolgung, anpassbare Benachrichtigungen und lokale Privatsphäre.
+
+Neueste Updates:
+- "Bei Bedarf"-Medikamente sind jetzt interaktiv.
+- Benachrichtigungsprobleme (Töne, Buttons, Zuverlässigkeit) vollständig behoben.
+- Kalender scrollbar, Sprachen sortiert, Infofeld für Berechtigung, Navigationsleiste responsiv.

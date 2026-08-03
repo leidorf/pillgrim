@@ -1,0 +1,21 @@
+Pillgrim is a free, ad‑free medication reminder app that helps you take the right dose at the right time, tracks your stock, and respects your privacy completely.
+
+Never Miss a Dose
+Create your own schedule for each medication: daily, weekly, bi‑weekly, monthly, on a specific date, or at flexible intervals. Record the dosage and the form of the medication. You can also specify food‑related instructions – on an empty stomach, with food, before or after meals, or a custom advice – and Pillgrim will tailor its reminders accordingly.
+
+Stay Ahead of Low Stock
+Enter your stock quantity and let Pillgrim handle the rest. You will receive an instant notification when your medication is running low, so you never forget to refill.
+
+Customisable Notifications
+Tune notifications exactly to your liking: enable or disable them, hide the medication name in alerts, pick from various alarm sounds, or choose silent vibration reminders.
+
+Export Your History
+Export your monthly medication log as a PDF or CSV. Generate clear reports for doctor visits or personal tracking.
+
+Accessible for Everyone
+Adjust the font size from small to extra large, customise the look and feel of the app to match your habits, and choose from multiple languages.
+
+Your Data Stays with You
+Pillgrim stores your medication and health information only on your device. It is never sent to any server, never shared with anyone, and never sold. Your data belongs to you alone.
+
+Note: Pillgrim is not a medical advice tool. Always make medication decisions together with your doctor or pharmacist.

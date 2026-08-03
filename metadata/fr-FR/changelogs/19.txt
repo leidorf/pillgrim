@@ -1,0 +1,7 @@
+Bienvenue sur Pillgrim ! 🎉 
+Cette application open-source et sans publicité offre une planification flexible, un suivi des doses/observance/stocks, des notifications personnalisées et une vie privée locale.
+
+Dernières mises à jour :
+- Médicaments "À utiliser en cas de besoin" désormais interactifs.
+- Problèmes de notifications (sons, boutons, fiabilité) entièrement corrigés.
+- Calendrier défilable, langues triées, fenêtre d'info sur les autorisations, barre de navigation adaptative.
