@@ -530,7 +530,14 @@ export async function rescheduleAllNotifications(
   saveIds: (medicationId: string, ids: string[]) => void,
 ): Promise<void> {
   for (const med of medications) {
-    if (!med.isActive) continue;
+    if (!med.isActive) {
+      const previousIds = getStoredIds(med.id);
+      if (previousIds.length > 0) {
+        await cancelMedicationNotifications(previousIds);
+        saveIds(med.id, []);
+      }
+      continue;
+    }
     const previousIds = getStoredIds(med.id);
     const newIds = await rescheduleMedicationNotifications(med, previousIds);
     saveIds(med.id, newIds);
