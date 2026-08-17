@@ -105,7 +105,6 @@ const Step4Screen = () => {
         ...(finalNote && { note: finalNote as any }),
         ...(stock && { stock: parseInt(stock, 10) }),
         ...(photoUri && { photoUri }),
-        isActive: true,
         updatedAt: new Date().toISOString(),
         notificationSettings: notifications,
       };
