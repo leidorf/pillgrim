@@ -300,7 +300,11 @@
     "legendTaken": "تم تناوله في الوقت المحدد",
     "legendTakenLate": "تم تناوله متأخرًا",
     "legendMissed": "تم نسيانه",
-    "legendSkipped": "تم تخطيه"
+    "legendSkipped": "تم تخطيه",
+    "fromLabel": "من",
+    "toLabel": "إلى",
+    "selectFromMonth": "اختر شهر البداية",
+    "selectToMonth": "اختر شهر النهاية"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

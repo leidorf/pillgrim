@@ -300,7 +300,11 @@
     "legendTaken": "按时服用",
     "legendTakenLate": "延迟服用",
     "legendMissed": "漏服",
-    "legendSkipped": "跳过"
+    "legendSkipped": "跳过",
+    "fromLabel": "从",
+    "toLabel": "到",
+    "selectFromMonth": "选择开始月份",
+    "selectToMonth": "选择结束月份"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

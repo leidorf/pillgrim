@@ -301,7 +301,11 @@
     "legendTaken": "Zamanında alındı",
     "legendTakenLate": "Geç alındı",
     "legendMissed": "Kaçırıldı",
-    "legendSkipped": "Atlandı"
+    "legendSkipped": "Atlandı",
+    "fromLabel": "Başlangıç",
+    "toLabel": "Bitiş",
+    "selectFromMonth": "Başlangıç ayını seçin",
+    "selectToMonth": "Bitiş ayını seçin"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

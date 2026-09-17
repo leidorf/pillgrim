@@ -300,7 +300,11 @@
     "legendTaken": "Pris à l'heure",
     "legendTakenLate": "Pris en retard",
     "legendMissed": "Oublié",
-    "legendSkipped": "Sauté"
+    "legendSkipped": "Sauté",
+    "fromLabel": "De",
+    "toLabel": "À",
+    "selectFromMonth": "Sélectionnez le mois de début",
+    "selectToMonth": "Sélectionnez le mois de fin"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

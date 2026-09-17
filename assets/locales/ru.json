@@ -300,7 +300,11 @@
     "legendTaken": "Принято вовремя",
     "legendTakenLate": "Принято с опозданием",
     "legendMissed": "Пропущено",
-    "legendSkipped": "Пропущено"
+    "legendSkipped": "Пропущено",
+    "fromLabel": "С",
+    "toLabel": "По",
+    "selectFromMonth": "Выберите начальный месяц",
+    "selectToMonth": "Выберите конечный месяц"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",
