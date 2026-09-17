@@ -300,7 +300,11 @@
     "legendTaken": "제시간에 복용",
     "legendTakenLate": "늦게 복용",
     "legendMissed": "놓침",
-    "legendSkipped": "건너뜀"
+    "legendSkipped": "건너뜀",
+    "fromLabel": "시작",
+    "toLabel": "종료",
+    "selectFromMonth": "시작 월 선택",
+    "selectToMonth": "종료 월 선택"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

@@ -300,7 +300,11 @@
     "legendTaken": "Pünktlich eingenommen",
     "legendTakenLate": "Zu spät eingenommen",
     "legendMissed": "Ausgelassen",
-    "legendSkipped": "Übersprungen"
+    "legendSkipped": "Übersprungen",
+    "fromLabel": "Von",
+    "toLabel": "Bis",
+    "selectFromMonth": "Startmonat wählen",
+    "selectToMonth": "Endmonat wählen"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",

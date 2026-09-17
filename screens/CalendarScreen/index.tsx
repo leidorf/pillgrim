@@ -15,7 +15,10 @@ import LogsHeader from "./components/LogsHeader";
 import SelectedDayHeader from "./components/SelectedDayHeader";
 import MedicationLogCard from "./components/MedicationLogCard";
 import ExportModal from "./components/ExportModal";
-import { exportCSV, exportPDF } from "../../utils/exportUtils";
+import { exportCSV } from "../../services/csvExport";
+import { exportPDF } from "../../services/pdfExport";
+import { MonthRange, normalizeMonthRange } from "../../utils/monthRange";
+import { ExportKind } from "../../utils/exportFormatting";
 
 import {
   buildDailySchedule,
@@ -47,6 +50,7 @@ const CalendarScreen = () => {
   const [currentYear, setCurrentYear] = useState(now.getFullYear());
   const [currentMonth, setCurrentMonth] = useState(now.getMonth());
   const [exportModalVisible, setExportModalVisible] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
 
   useEffect(() => {
     const firstOfMonth = new Date(currentYear, currentMonth, 1);
@@ -109,6 +113,39 @@ const CalendarScreen = () => {
       month: "long",
     });
 
+  const runExport = async (kind: ExportKind, range: MonthRange) => {
+    setIsExporting(true);
+    try {
+      const { from, to } = normalizeMonthRange(range);
+      const scheduleMap = buildScheduleForDateRange(
+        medications,
+        logs,
+        new Date(from.year, from.month, 1),
+        new Date(to.year, to.month + 1, 0),
+        weekdayMap,
+        formatTimeString,
+      );
+      if (kind === "csv") {
+        await exportCSV({ scheduleMap, range, timeFormat, t });
+      } else {
+        await exportPDF({
+          scheduleMap,
+          medications,
+          range,
+          weekdayMap,
+          timeFormat,
+          t,
+          locale,
+        });
+      }
+    } catch (error) {
+      console.warn("Export failed", error);
+    } finally {
+      setIsExporting(false);
+      setExportModalVisible(false);
+    }
+  };
+
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
 
@@ -156,44 +193,11 @@ const CalendarScreen = () => {
       {/* ----------------------------- Export Modal ----------------------------- */}
       <ExportModal
         visible={exportModalVisible}
+        defaultYear={currentYear}
+        defaultMonth={currentMonth}
+        busy={isExporting}
         onClose={() => setExportModalVisible(false)}
-        onExportCSV={() => {
-          setExportModalVisible(false);
-          const monthStart = new Date(currentYear, currentMonth, 1);
-          const monthEnd = new Date(currentYear, currentMonth + 1, 0);
-          const scheduleMap = buildScheduleForDateRange(
-            medications,
-            logs,
-            monthStart,
-            monthEnd,
-            weekdayMap,
-            formatTimeString,
-          );
-          exportCSV(scheduleMap, currentYear, currentMonth, timeFormat, t);
-        }}
-        onExportPDF={() => {
-          setExportModalVisible(false);
-          const monthStart = new Date(currentYear, currentMonth, 1);
-          const monthEnd = new Date(currentYear, currentMonth + 1, 0);
-          const scheduleMap = buildScheduleForDateRange(
-            medications,
-            logs,
-            monthStart,
-            monthEnd,
-            weekdayMap,
-            formatTimeString,
-          );
-          exportPDF(
-            scheduleMap,
-            medications,
-            currentYear,
-            currentMonth,
-            currentMonthLabel,
-            weekdayMap,
-            timeFormat,
-            t,
-          );
-        }}
+        onExport={runExport}
       />
     </ScreenLayout>
   );
