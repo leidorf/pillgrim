@@ -13,6 +13,13 @@
 
 # Add any project specific keep options here:
 
+# expo-task-manager boots the app's JS in a headless process to handle notification
+# actions while the app is killed; both names below are resolved via Class.forName at
+# runtime, so R8 must not rename or remove them.
+-keep class expo.modules.taskManager.** { *; }
+-keep class expo.modules.ExpoModulesPackageList { *; }
+-keep class expo.modules.adapters.react.apploader.** { *; }
+
 # @generated begin expo-build-properties - expo prebuild (DO NOT MODIFY)
 -keep class expo.modules.notifications.** { *; }
 -keep class * extends android.content.BroadcastReceiver { *; }

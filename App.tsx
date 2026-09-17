@@ -2,7 +2,10 @@ import { useEffect, useRef, useState } from "react";
 import { AppState, StatusBar } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { SafeAreaProvider, useSafeAreaInsets } from "react-native-safe-area-context";
+import {
+  SafeAreaProvider,
+  useSafeAreaInsets,
+} from "react-native-safe-area-context";
 import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { BottomSheetModalProvider } from "@gorhom/bottom-sheet";
@@ -41,7 +44,7 @@ import {
   rescheduleAllNotifications,
   onForegroundNotificationEvent,
   setupNotificationHandler,
-  processNotificationAction,
+  handleNotificationResponse,
   getInitialNotificationResponse,
   clearInitialNotificationResponse,
 } from "./services/notificationService";
@@ -68,7 +71,11 @@ const MainTabs = () => {
         component={HomeScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <HouseIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
+            <HouseIcon
+              height={TAB_BAR_ICON_SIZE}
+              width={TAB_BAR_ICON_SIZE}
+              stroke={color}
+            />
           ),
         }}
       />
@@ -77,7 +84,11 @@ const MainTabs = () => {
         component={MedsScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <PillIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
+            <PillIcon
+              height={TAB_BAR_ICON_SIZE}
+              width={TAB_BAR_ICON_SIZE}
+              stroke={color}
+            />
           ),
         }}
       />
@@ -86,7 +97,11 @@ const MainTabs = () => {
         component={CalendarScreen}
         options={{
           tabBarIcon: ({ color }) => (
-            <CalendarIcon height={TAB_BAR_ICON_SIZE} width={TAB_BAR_ICON_SIZE} stroke={color} />
+            <CalendarIcon
+              height={TAB_BAR_ICON_SIZE}
+              width={TAB_BAR_ICON_SIZE}
+              stroke={color}
+            />
           ),
         }}
       />
@@ -146,12 +161,10 @@ export default function App() {
   const pendingReschedule = useRef(false);
   const prevSchedulingHash = useRef<string>("");
 
-  // Setup foreground notification handler (only once)
   useEffect(() => {
     setupNotificationHandler();
   }, []);
 
-  // Listen for global toast messages
   useEffect(() => {
     toast.onShow(setToastMsg);
   }, []);
@@ -187,8 +200,6 @@ export default function App() {
       }
     };
 
-    // Reschedule only when scheduling-relevant properties change
-    // (avoids infinite loop: notificationIds updates don't trigger re-schedule)
     const schedulingHash = JSON.stringify(
       medications
         .filter((m) => m.isActive && m.notificationSettings?.enabled !== false)
@@ -216,19 +227,8 @@ export default function App() {
   }, [medications]);
 
   useEffect(() => {
-    const unsub = onForegroundNotificationEvent((actionId, response) => {
-      const data = response.notification.request.content.data as
-        | { medicationId?: string; scheduledTime?: string }
-        | undefined;
-      if (!data?.medicationId || !data?.scheduledTime) return;
-
-      if (actionId === "taken" || actionId === "skip") {
-        processNotificationAction(
-          actionId,
-          data.medicationId,
-          data.scheduledTime,
-        );
-      }
+    const unsub = onForegroundNotificationEvent((response) => {
+      void handleNotificationResponse(response);
     });
     return unsub;
   }, []);
@@ -236,18 +236,7 @@ export default function App() {
   useEffect(() => {
     const initial = getInitialNotificationResponse();
     if (initial) {
-      const actionId = initial.actionIdentifier;
-      const data = initial.notification.request.content.data as
-        | { medicationId?: string; scheduledTime?: string }
-        | undefined;
-  
-      if (
-        (actionId === "taken" || actionId === "skip") &&
-        data?.medicationId &&
-        data?.scheduledTime
-      ) {
-        processNotificationAction(actionId, data.medicationId, data.scheduledTime);
-      }
+      void handleNotificationResponse(initial);
       clearInitialNotificationResponse();
     }
   }, []);

@@ -131,12 +131,12 @@ export async function ensureCategory(): Promise<void> {
     {
       identifier: ACTION_TAKEN,
       buttonTitle: i18n.t("notifications.actionTaken"),
-      options: { opensAppToForeground: true },
+      options: { opensAppToForeground: false },
     },
     {
       identifier: ACTION_SKIP,
       buttonTitle: i18n.t("notifications.actionSkip"),
-      options: { opensAppToForeground: true },
+      options: { opensAppToForeground: false },
     },
   ]);
   categoryEnsured = true;
@@ -180,7 +180,10 @@ export async function requestNotificationPermission(): Promise<boolean> {
     try {
       await ensureChannel();
     } catch (err) {
-      logger.error("[Notifications] Channel creation failed:", getErrorMessage(err));
+      logger.error(
+        "[Notifications] Channel creation failed:",
+        getErrorMessage(err),
+      );
     }
   }
 
@@ -614,10 +617,7 @@ export async function snoozeMedicationNotification(
 
 /* -------------------------- Foreground listener ------------------------- */
 export function onForegroundNotificationEvent(
-  callback: (
-    actionIdentifier: string,
-    response: Notifications.NotificationResponse,
-  ) => void,
+  callback: (response: Notifications.NotificationResponse) => void,
 ): () => void {
   const subscription = Notifications.addNotificationResponseReceivedListener(
     (response) => {
@@ -627,30 +627,63 @@ export function onForegroundNotificationEvent(
         actionId === ACTION_TAKEN ||
         actionId === ACTION_SKIP
       ) {
-        callback(actionId, response);
+        callback(response);
       }
     },
   );
   return () => subscription.remove();
 }
 
+/* ---------------------------- Store hydration --------------------------- */
+type HydratableStore = {
+  persist: {
+    hasHydrated: () => boolean;
+    onFinishHydration: (listener: () => void) => () => void;
+  };
+};
+
+async function whenHydrated(
+  store: HydratableStore,
+  timeoutMs = 5000,
+): Promise<void> {
+  if (store.persist.hasHydrated()) return;
+
+  await new Promise<void>((resolve) => {
+    let unsubscribe = () => {};
+    const finish = () => {
+      clearTimeout(timer);
+      unsubscribe();
+      resolve();
+    };
+    const timer = setTimeout(finish, timeoutMs);
+    unsubscribe = store.persist.onFinishHydration(finish);
+    if (store.persist.hasHydrated()) finish();
+  });
+}
+
 /* ----------------------- Shared action processor ------------------------ */
-export async function processNotificationAction(
+async function processNotificationAction(
   actionId: string,
   medicationId: string,
   scheduledTime: string,
+  firedAt?: Date,
 ): Promise<void> {
   const { useLogStore } = await import("../store/logsStore");
   const { useMedicationStore } = await import("../store/medicationStore");
   const { getLocalDateString } = await import("../utils/dateUtils");
 
-  const date = getLocalDateString(new Date());
+  await Promise.all([
+    whenHydrated(useLogStore),
+    whenHydrated(useMedicationStore),
+    whenHydrated(useSettingsStore),
+  ]);
 
-  for (let i = 0; i < 5; i++) {
-    const { medications } = useMedicationStore.getState();
-    if (medications.length > 0) break;
-    await new Promise((resolve) => setTimeout(resolve, 100));
+  const { language } = useSettingsStore.getState();
+  if (language && language !== "system") {
+    await i18n.changeLanguage(language);
   }
+
+  const date = getLocalDateString(firedAt ?? new Date());
 
   if (actionId === ACTION_TAKEN) {
     const med = useMedicationStore
@@ -668,6 +701,9 @@ export async function processNotificationAction(
         l.scheduledDate === date &&
         l.scheduledTime === scheduledTime,
     );
+
+    if (existing?.takenAt && !existing.skipped) return;
+
     if (existing) {
       updateLog(existing.id, {
         takenAt: new Date(),
@@ -695,8 +731,17 @@ export async function processNotificationAction(
         l.scheduledDate === date &&
         l.scheduledTime === scheduledTime,
     );
+
+    if (existing?.skipped) return;
+
     if (existing) {
-      updateLog(existing.id, { skipped: true });
+      const wasTaken = !!existing.takenAt;
+      updateLog(existing.id, { takenAt: undefined, skipped: true });
+      if (wasTaken && existing.doseAmount) {
+        useMedicationStore
+          .getState()
+          .updateStock(medicationId, existing.doseAmount);
+      }
     } else {
       addLog({
         medicationId,
@@ -705,6 +750,72 @@ export async function processNotificationAction(
         skipped: true,
       });
     }
+  }
+}
+
+/* ------------------------ Notification response ------------------------- */
+const inFlightResponses = new Set<string>();
+
+function dismissQuietly(identifier: string): Promise<void> {
+  return Notifications.dismissNotificationAsync(identifier).catch(() => {});
+}
+
+function normalizeResponse(response: Notifications.NotificationResponse) {
+  const content = response.notification?.request?.content as
+    | (Notifications.NotificationContent & { dataString?: string })
+    | undefined;
+
+  if (content && !content.data && typeof content.dataString === "string") {
+    try {
+      content.data = JSON.parse(content.dataString);
+    } catch {
+      logger.warn("[Notifications] Could not parse notification data");
+    }
+  }
+
+  const data = content?.data as
+    | { medicationId?: string; scheduledTime?: string }
+    | undefined;
+  const originDate = (response.notification as { date?: number } | undefined)
+    ?.date;
+
+  return {
+    actionId: response.actionIdentifier,
+    identifier: response.notification?.request?.identifier,
+    medicationId: data?.medicationId,
+    scheduledTime: data?.scheduledTime,
+    firedAt: typeof originDate === "number" ? new Date(originDate) : undefined,
+  };
+}
+
+export async function handleNotificationResponse(
+  response: Notifications.NotificationResponse,
+): Promise<void> {
+  const { actionId, identifier, medicationId, scheduledTime, firedAt } =
+    normalizeResponse(response);
+
+  if (actionId !== ACTION_TAKEN && actionId !== ACTION_SKIP) return;
+
+  if (identifier) await dismissQuietly(identifier);
+
+  const key = `${identifier ?? medicationId}:${scheduledTime}:${actionId}`;
+
+  if (!medicationId || !scheduledTime || inFlightResponses.has(key)) {
+    return;
+  }
+
+  inFlightResponses.add(key);
+  try {
+    await processNotificationAction(
+      actionId,
+      medicationId,
+      scheduledTime,
+      firedAt,
+    );
+  } catch (err) {
+    logger.error("[Notifications] Action failed:", getErrorMessage(err));
+  } finally {
+    inFlightResponses.delete(key);
   }
 }
 
