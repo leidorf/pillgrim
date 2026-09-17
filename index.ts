@@ -1,8 +1,9 @@
-import { registerRootComponent } from 'expo';
+import { registerRootComponent } from "expo";
 
-import App from './App';
+import App from "./App";
+import { registerNotificationResponseTask } from "./services/notificationBackgroundTask";
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
 registerRootComponent(App);
+
+// Defined in the module above, which the background runtime loads on its own.
+registerNotificationResponseTask();
