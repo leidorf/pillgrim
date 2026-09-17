@@ -300,7 +300,11 @@
     "legendTaken": "時間通りに服用",
     "legendTakenLate": "遅れて服用",
     "legendMissed": "服用し忘れた",
-    "legendSkipped": "スキップ"
+    "legendSkipped": "スキップ",
+    "fromLabel": "開始",
+    "toLabel": "終了",
+    "selectFromMonth": "開始月を選択",
+    "selectToMonth": "終了月を選択"
   },
   "notifications": {
     "defaultTitle": "Pillgrim",
