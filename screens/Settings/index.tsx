@@ -7,10 +7,12 @@ import ScreenHeader from "./components/ScreenHeader";
 import NavigationButton from "./components/NavigationButton";
 import ScreenLayout from "../../components/ScreenLayout";
 import { useAppTheme } from "../../theme/useAppTheme";
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Theme } from "../../constants/theme";
 import { NotificationPermissionBanner } from "./components/NotificationPermissionBanner";
 import { ExactAlarmPermissionBanner } from "./components/ExactAlarmPermissionBanner";
+import { useSettingsStore } from "../../store/settingsStore";
+import BaseModal, { ModalButton } from "../../components/BaseModal";
 
 type SettingEntry = {
   key: keyof SettingsParamList;
@@ -29,15 +31,42 @@ const SettingsScreen = () => {
   const navigation = useNavigation<NavProp>();
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const resetOnboarding = useSettingsStore((s) => s.resetOnboarding);
+  const [replayModalVisible, setReplayModalVisible] = useState(false);
+
+  const handleReplayTutorial = () => setReplayModalVisible(true);
+
+  const handleConfirmReplay = () => {
+    setReplayModalVisible(false);
+    resetOnboarding();
+  };
+
+  const handleCancelReplay = () => setReplayModalVisible(false);
+
+  const replayModalButtons: ModalButton[] = [
+    {
+      text: t("common.cancel"),
+      onPress: handleCancelReplay,
+    },
+    {
+      text: t("common.yes"),
+      onPress: handleConfirmReplay,
+      variant: "primary",
+    },
+  ];
+
   const handleNavigation = (screenName: keyof SettingsParamList) => {
     navigation.navigate("Settings", { screen: screenName });
   };
+
   const handlePrivacy = () => {
-    Linking.openURL("https://40ambar.dev/apps/medication-reminder/privacy");
+    Linking.openURL("https://40ambar.dev/apps/pillgrim/privacy");
   };
+
   const handleAbout = () => {
     Linking.openURL("https://40ambar.dev/");
   };
+
   return (
     <ScreenLayout>
       <ScreenHeader title={t("settings.title")} />
@@ -59,15 +88,28 @@ const SettingsScreen = () => {
         }
         ListFooterComponent={
           <View style={styles.footer}>
-            <Text onPress={handlePrivacy} style={styles.footerText}>
-              {t("settings.privacy")}
+            <Text onPress={handleReplayTutorial} style={styles.footerText}>
+              {t("onboarding.title")}
             </Text>
-            <Text style={styles.footerText}> - </Text>
-            <Text onPress={handleAbout} style={styles.footerText}>
-              {t("settings.about")}
-            </Text>
+
+            <View style={styles.footerRow}>
+              <Text onPress={handlePrivacy} style={styles.footerText}>
+                {t("settings.privacy")}
+              </Text>
+              <Text style={styles.footerText}> - </Text>
+              <Text onPress={handleAbout} style={styles.footerText}>
+                {t("settings.about")}
+              </Text>
+            </View>
           </View>
         }
+      />
+      <BaseModal
+        visible={replayModalVisible}
+        title={t("onboarding.title")}
+        message={t("onboarding.desc")}
+        buttons={replayModalButtons}
+        onDismiss={handleCancelReplay}
       />
     </ScreenLayout>
   );
@@ -80,9 +122,14 @@ const createStyles = (theme: Theme) =>
       gap: 8,
     },
     footer: {
-      justifyContent: "center",
       alignItems: "center",
+      justifyContent: "center",
+      marginTop: 8,
+      gap: 12,
+    },
+    footerRow: {
       flexDirection: "row",
+      alignItems: "center",
     },
     footerText: {
       color: theme.textPrimary,

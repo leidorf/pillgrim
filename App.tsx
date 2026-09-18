@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { AppState, StatusBar } from "react-native";
+import { AppState, StatusBar, View } from "react-native";
 import { NavigationContainer } from "@react-navigation/native";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import {
@@ -126,6 +126,7 @@ import NotificationsScreen from "./screens/Settings/NotificationsScreen";
 import AlarmScreen from "./screens/Settings/AlarmScreen";
 import AppearanceScreen from "./screens/Settings/AppearanceScreen";
 import LanguageScreen from "./screens/Settings/LanguageScreen";
+import OnboardingScreen from "./screens/OnboardingScreen";
 
 function SettingsNavigator() {
   return (
@@ -142,15 +143,21 @@ function SettingsNavigator() {
   );
 }
 
-export default function App() {
+function AppContent() {
   const theme = useAppTheme();
   const isDarkMode = theme.background === "#101410";
+
+  const hasHydrated = useSettingsStore((s) => s._hasHydrated);
+  const isOnboardCompleted = useSettingsStore((s) => s.isOnboardCompleted);
+  const setIsOnboardCompleted = useSettingsStore(
+    (s) => s.setIsOnboardCompleted,
+  );
 
   const language = useSettingsStore((s) => s.language);
   useEffect(() => {
     const resolved = language === "system" ? getSystemLanguage() : language;
     i18n.changeLanguage(resolved);
-  }, []);
+  }, [language]);
 
   const medications = useMedicationStore((s) => s.medications);
   const _updateMedicationNotificationIds = useMedicationStore(
@@ -241,44 +248,63 @@ export default function App() {
     }
   }, []);
 
+  if (!hasHydrated) {
+    return <View style={{ flex: 1, backgroundColor: theme.background }} />;
+  }
+
+  if (!isOnboardCompleted) {
+    return (
+      <>
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <OnboardingScreen onDone={() => setIsOnboardCompleted(true)} />
+      </>
+    );
+  }
+
+  return (
+    <>
+      <NavigationContainer theme={getNavigationTheme(isDarkMode)}>
+        <StatusBar barStyle={isDarkMode ? "light-content" : "dark-content"} />
+        <RootStack.Navigator>
+          <RootStack.Screen
+            name="MainTabs"
+            component={MainTabs}
+            options={{ headerShown: false }}
+          />
+          <RootStack.Screen
+            name="AddMedication"
+            component={AddMedicationNavigator}
+            options={{
+              presentation: "transparentModal",
+              headerShown: false,
+              animation: "fade",
+              title: "Add Medication",
+            }}
+          />
+          <RootStack.Screen
+            name="Settings"
+            component={SettingsNavigator}
+            options={{ headerShown: false, title: "Settings" }}
+          />
+        </RootStack.Navigator>
+      </NavigationContainer>
+      <SuccessToast
+        visible={toastMsg !== null}
+        message={toastMsg ?? ""}
+        onDismiss={() => toast.hide()}
+      />
+    </>
+  );
+}
+
+export default function App() {
   return (
     <ErrorBoundary>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <SafeAreaProvider>
           <BottomSheetModalProvider>
-            <NavigationContainer theme={getNavigationTheme(isDarkMode)}>
-              <StatusBar
-                barStyle={isDarkMode ? "light-content" : "dark-content"}
-              />
-              <RootStack.Navigator>
-                <RootStack.Screen
-                  name="MainTabs"
-                  component={MainTabs}
-                  options={{ headerShown: false }}
-                />
-                <RootStack.Screen
-                  name="AddMedication"
-                  component={AddMedicationNavigator}
-                  options={{
-                    presentation: "transparentModal",
-                    headerShown: false,
-                    animation: "fade",
-                    title: "Add Medication",
-                  }}
-                />
-                <RootStack.Screen
-                  name="Settings"
-                  component={SettingsNavigator}
-                  options={{ headerShown: false, title: "Settings" }}
-                />
-              </RootStack.Navigator>
-            </NavigationContainer>
+            <AppContent />
           </BottomSheetModalProvider>
-          <SuccessToast
-            visible={toastMsg !== null}
-            message={toastMsg ?? ""}
-            onDismiss={() => toast.hide()}
-          />
         </SafeAreaProvider>
       </GestureHandlerRootView>
     </ErrorBoundary>
