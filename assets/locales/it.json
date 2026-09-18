@@ -9,7 +9,11 @@
     "yes": "Sì",
     "no": "No",
     "loading": "Caricamento in corso...",
-    "remove": "Rimuovi"
+    "remove": "Rimuovi",
+    "skip": "Salta",
+    "previous": "Precedente",
+    "finish": "Fine",
+    "next": "Successivo"
   },
   "toast": {
     "medicationAdded": "{{name}} aggiunto",
@@ -328,5 +332,30 @@
     "title": "L'app si è bloccata",
     "subtitle": "Tocca Ricarica per riprovare.",
     "restart": "Ricarica"
+  },
+  "onboarding": {
+    "title": "Riproduci il tutorial",
+    "desc": "Vuoi rivedere il tutorial?",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "Benvenuto su Pillgrim!",
+      "desc": "Pillgrim semplifica la tua routine terapeutica e i tuoi dati rimangono di tua proprietà"
+    },
+    "addMedication": {
+      "title": "Aggiungi un farmaco",
+      "desc": "Puoi aggiungere un farmaco cliccando sul pulsante nell’angolo in basso a destra della schermata iniziale e della schermata dei farmaci"
+    },
+    "manage": {
+      "title": "Tieni traccia di ogni dose",
+      "desc": "Contrassegna ogni dose come assunta, saltata o posticipata: la tua cronologia si aggiorna automaticamente"
+    },
+    "history": {
+      "title": "Visualizza la tua cronologia a colpo d’occhio",
+      "desc": "Scopri con quanta regolarità hai assunto i tuoi farmaci, giorno per giorno"
+    },
+    "permission": {
+      "title": "Attiva allarmi e promemoria",
+      "desc": "Senza questa autorizzazione, i promemoria potrebbero arrivare in ritardo o non arrivare affatto. Puoi modificarla in qualsiasi momento"
+    }
   }
 }

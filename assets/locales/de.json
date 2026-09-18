@@ -9,7 +9,11 @@
     "yes": "Ja",
     "no": "Nein",
     "loading": "Wird geladen...",
-    "remove": "Entfernen"
+    "remove": "Entfernen",
+    "skip": "Überspringen",
+    "previous": "Zurück",
+    "finish": "Beenden",
+    "next": "Weiter"
   },
   "toast": {
     "medicationAdded": "{{name}} hinzugefügt",
@@ -328,5 +332,30 @@
     "title": "App abgestürzt",
     "subtitle": "Tippe auf „Neu laden“, um es erneut zu versuchen.",
     "restart": "Neu laden"
+  },
+  "onboarding": {
+    "title": "Tutorial erneut abspielen",
+    "desc": "Möchtest du das Tutorial noch einmal abspielen?",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "Willkommen bei Pillgrim!",
+      "desc": "Pillgrim vereinfacht Ihre Medikamenteneinnahme und Ihre Daten bleiben ganz bei Ihnen"
+    },
+    "addMedication": {
+      "title": "Medikamente hinzufügen",
+      "desc": "Sie können Medikamente hinzufügen, indem Sie auf die Schaltfläche in der unteren rechten Ecke des Startbildschirms und des Medikamentenbildschirms klicken"
+    },
+    "manage": {
+      "title": "Jede Dosis nachverfolgen",
+      "desc": "Markieren Sie jede Dosis als eingenommen, ausgelassen oder verschoben – Ihr Verlauf wird automatisch aktualisiert"
+    },
+    "history": {
+      "title": "Ihren Verlauf auf einen Blick sehen",
+      "desc": "Sehen Sie Tag für Tag, wie konsequent Sie Ihre Medikamente eingenommen haben"
+    },
+    "permission": {
+      "title": "Alarme und Erinnerungen aktivieren",
+      "desc": "Ohne diese Berechtigung können Erinnerungen verspätet oder gar nicht ankommen. Sie können dies jederzeit ändern"
+    }
   }
 }

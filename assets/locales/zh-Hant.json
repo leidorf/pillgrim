@@ -9,7 +9,11 @@
     "yes": "是",
     "no": "否",
     "loading": "載入中...",
-    "remove": "移除"
+    "remove": "移除",
+    "skip": "跳過",
+    "previous": "上一頁",
+    "finish": "完成",
+    "next": "下一頁"
   },
   "toast": {
     "medicationAdded": "已新增 {{name}}",
@@ -328,5 +332,30 @@
     "title": "應用程式當機",
     "subtitle": "點擊重新載入以再次嘗試。",
     "restart": "重新載入"
+  },
+  "onboarding": {
+    "title": "重新觀看教學",
+    "desc": "您要重新觀看教學嗎？",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "歡迎使用 Pillgrim！",
+      "desc": "Pillgrim 讓您的用藥流程更簡單，且您的資料完全屬於您"
+    },
+    "addMedication": {
+      "title": "新增藥物",
+      "desc": "您可點擊主畫面及「藥物」畫面的右下角按鈕來新增藥物"
+    },
+    "manage": {
+      "title": "追蹤每次服藥",
+      "desc": "將每次服藥標記為「已服用」、「跳過」或「暫緩」，您的用藥紀錄會自動更新"
+    },
+    "history": {
+      "title": "一目瞭然查看用藥紀錄",
+      "desc": "逐日查看您的用藥規律性"
+    },
+    "permission": {
+      "title": "開啟鬧鐘與提醒",
+      "desc": "若未授予此權限，提醒可能會延遲或完全無法送達。您可隨時變更此設定"
+    }
   }
 }
