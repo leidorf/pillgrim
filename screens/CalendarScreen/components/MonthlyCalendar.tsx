@@ -6,12 +6,16 @@ import {
   useWindowDimensions,
 } from "react-native";
 import { Text } from "../../../components/Text";
-import { useRef, useState, useMemo, useCallback } from "react";
+import { useRef, useMemo, useCallback } from "react";
 import { useLogStore } from "../../../store/logsStore";
 import { useSettingsStore } from "../../../store/settingsStore";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { Theme } from "../../../constants/theme";
 import { useTranslation } from "react-i18next";
+import { useMedicationStore } from "../../../store/medicationStore";
+import { useTimeFormat } from "../../../hooks/useTimeFormat";
+import { buildScheduleForDateRange } from "../../../utils/medicationScheduleUtils";
+import { getLocalDateString } from "../../../utils/dateUtils";
 
 type Props = {
   selectedDate: Date;
@@ -23,7 +27,6 @@ type MonthGridProps = {
   year: number;
   month: number;
   selectedDate: Date;
-  currentMonth: number;
   onSelectDate: (date: Date) => void;
   width: number;
   weekStartsOn: 0 | 1 | 2 | 3 | 4 | 5 | 6;
@@ -57,13 +60,16 @@ const MonthGrid = ({
   year,
   month,
   selectedDate,
-  currentMonth,
   onSelectDate,
   width,
   weekStartsOn,
 }: MonthGridProps) => {
   const theme = useAppTheme();
   const styles = useMemo(() => createStyles(theme), [theme]);
+  const logs = useLogStore((s) => s.logs);
+  const medications = useMedicationStore((s) => s.medications);
+  const { formatTimeString } = useTimeFormat();
+
   const today = useMemo(() => {
     const d = new Date();
     d.setHours(0, 0, 0, 0);
@@ -74,46 +80,113 @@ const MonthGrid = ({
     () => getMonthGrid(year, month, weekStartsOn),
     [year, month, weekStartsOn],
   );
-  const logs = useLogStore((state) => state.logs);
+
+  const weekdayMap = useMemo(() => {
+    const map: Record<number, number> = {};
+    for (let i = 0; i < 7; i++) map[(weekStartsOn + i) % 7] = i + 1;
+    return map;
+  }, [weekStartsOn]);
+
+  const statsByDate = useMemo(() => {
+    const firstDate = dates[0];
+    const lastDate = dates[dates.length - 1];
+
+    const scheduleMap = buildScheduleForDateRange(
+      medications,
+      logs,
+      firstDate,
+      lastDate,
+      weekdayMap,
+      formatTimeString,
+    );
+    const now = new Date();
+    const todayStr = getLocalDateString(now);
+    const nowTimeStr = `${String(now.getHours()).padStart(2, "0")}:${String(
+      now.getMinutes(),
+    ).padStart(2, "0")}`;
+
+    type Counters = {
+      taken: number;
+      skipped: number;
+      missed: number;
+      pending: number;
+    };
+    const counters: Record<string, Counters> = {};
+
+    for (const entries of scheduleMap.values()) {
+      for (const entry of entries) {
+        const dateStr = entry.scheduledDate;
+        if (!counters[dateStr]) {
+          counters[dateStr] = { taken: 0, skipped: 0, missed: 0, pending: 0 };
+        }
+
+        const log = entry.log;
+
+        if (log?.takenAt && !log.skipped) {
+          counters[dateStr].taken++;
+        } else if (log?.skipped) {
+          counters[dateStr].skipped++;
+        } else {
+          const isPast =
+            dateStr < todayStr ||
+            (dateStr === todayStr && entry.scheduledTime < nowTimeStr);
+
+          if (isPast) {
+            counters[dateStr].missed++;
+          } else {
+            counters[dateStr].pending++;
+          }
+        }
+      }
+    }
+
+    const result: Record<string, { hasLogs: boolean; adherenceColor: string }> =
+      {};
+
+    for (const [dateStr, c] of Object.entries(counters)) {
+      const actionable = c.taken + c.missed;
+      const adherenceRate =
+        actionable > 0 ? Math.round((c.taken / actionable) * 100) : 100;
+
+      let adherenceColor: string;
+      if (actionable === 0) {
+        adherenceColor =
+          c.skipped > 0 ? theme.textSecondary : theme.textDisabled;
+      } else if (adherenceRate === 100) {
+        adherenceColor = theme.success;
+      } else if (adherenceRate > 0) {
+        adherenceColor = theme.warning;
+      } else {
+        adherenceColor = theme.error;
+      }
+
+      const hasLogs = c.taken + c.skipped + c.missed > 0;
+
+      result[dateStr] = { hasLogs, adherenceColor };
+    }
+
+    return result;
+  }, [dates, medications, logs, weekdayMap, formatTimeString, theme]);
 
   const getDayStats = useCallback(
-    (dVal: Date) => {
-      const y = dVal.getFullYear();
-      const m = String(dVal.getMonth() + 1).padStart(2, "0");
-      const d = String(dVal.getDate()).padStart(2, "0");
-      const dateStr = `${y}-${m}-${d}`;
-
-      const dayLogs = logs.filter((log) => log.scheduledDate === dateStr);
-      const hasLogs = dayLogs.length > 0;
-
-      const takenMeds = dayLogs.filter(
-        (log) => log.takenAt && !log.skipped,
-      ).length;
-      const missedMeds = dayLogs.filter(
-        (log) => !log.takenAt && !log.skipped,
-      ).length;
-      const actionable = takenMeds + missedMeds;
-      const adherenceRate =
-        actionable > 0 ? Math.round((takenMeds / actionable) * 100) : 100;
-
-      return { hasLogs, adherenceRate };
+    (date: Date) => {
+      const key = getLocalDateString(date);
+      return (
+        statsByDate[key] ?? {
+          hasLogs: false,
+          adherenceColor: theme.textDisabled,
+        }
+      );
     },
-    [logs],
+    [statsByDate, theme],
   );
-
-  const getAdherenceColor = (rate: number) => {
-    if (rate === 100) return theme.success;
-    if (rate > 0) return theme.warning;
-    return theme.error;
-  };
 
   const renderDay = useCallback(
     (date: Date, index: number) => {
       const isToday = date.getTime() === today.getTime();
       const isSelected = date.toDateString() === selectedDate.toDateString();
-      const isCurrentMonth = date.getMonth() === currentMonth;
-      const stats = getDayStats(date);
-      const adherenceColor = getAdherenceColor(stats.adherenceRate);
+      const isCurrentMonth = date.getMonth() === month;
+      const { hasLogs, adherenceColor } = getDayStats(date);
 
       return (
         <Pressable
@@ -139,7 +212,7 @@ const MonthGrid = ({
               {date.getDate()}
             </Text>
 
-            {stats.hasLogs && (
+            {hasLogs && (
               <View
                 style={[
                   styles.adherenceDot,
@@ -151,11 +224,10 @@ const MonthGrid = ({
         </Pressable>
       );
     },
-    [today, selectedDate, currentMonth, getDayStats, onSelectDate, logs],
+    [today, selectedDate, month, getDayStats, onSelectDate, styles],
   );
 
-  const { t, i18n } = useTranslation();
-  const locale = i18n.language?.split("-")[0] ?? "en";
+  const { t } = useTranslation();
 
   const DAYS = useMemo(() => {
     const allDays = [
@@ -168,7 +240,7 @@ const MonthGrid = ({
       t("weekdays.satShort"),
     ];
     return [...allDays.slice(weekStartsOn), ...allDays.slice(0, weekStartsOn)];
-  }, [weekStartsOn]);
+  }, [weekStartsOn, t]);
 
   return (
     <View style={[styles.monthContainer, { width }]}>
@@ -196,10 +268,8 @@ const MonthlyCalendar = ({
   const styles = useMemo(() => createStyles(theme), [theme]);
   const { width: screenWidth } = useWindowDimensions();
   const weekStartsOn = useSettingsStore((s) => s.weekStartsOn);
-  const flatListRef = useRef<FlatList>(null);
-  const [currentIndex, setCurrentIndex] = useState(INITIAL_INDEX);
   const { i18n } = useTranslation();
-  const locale = i18n.language?.split("-")[0] ?? "en";
+  const didMountRef = useRef(false);
 
   const months = useMemo(() => {
     const today = new Date();
@@ -215,9 +285,12 @@ const MonthlyCalendar = ({
   }, []);
 
   const onViewableItemsChanged = useRef(({ viewableItems }: any) => {
+    if (!didMountRef.current) {
+      didMountRef.current = true;
+      return;
+    }
     if (viewableItems.length > 0) {
       const index = viewableItems[0].index;
-      setCurrentIndex(index);
 
       if (onMonthChange && months[index]) {
         const monthData = months[index];
@@ -238,7 +311,6 @@ const MonthlyCalendar = ({
         year={item.year}
         month={item.month}
         selectedDate={selectedDate}
-        currentMonth={item.month}
         onSelectDate={onSelectDate}
         width={screenWidth}
         weekStartsOn={weekStartsOn}
@@ -250,7 +322,6 @@ const MonthlyCalendar = ({
   return (
     <View style={styles.container}>
       <FlatList
-        ref={flatListRef}
         data={months}
         keyExtractor={(item) => `${item.year}-${item.month}`}
         horizontal
@@ -316,7 +387,7 @@ const createStyles = (theme: Theme) =>
       borderColor: theme.primary,
     },
     daySelected: {
-      backgroundColor: theme.successLight,
+      backgroundColor: theme.primary + "20",
       borderRadius: 32,
     },
     dayOtherMonth: {
