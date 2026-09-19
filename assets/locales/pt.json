@@ -9,7 +9,11 @@
     "yes": "Sim",
     "no": "Não",
     "loading": "A carregar...",
-    "remove": "Remover"
+    "remove": "Remover",
+    "skip": "Ignorar",
+    "previous": "Anterior",
+    "finish": "Concluir",
+    "next": "Seguinte"
   },
   "toast": {
     "medicationAdded": "{{name}} adicionado",
@@ -328,5 +332,30 @@
     "title": "A aplicação falhou",
     "subtitle": "Toque em recarregar para tentar novamente.",
     "restart": "Recarregar"
+  },
+  "onboarding": {
+    "title": "Repetir o tutorial",
+    "desc": "Quer repetir o tutorial?",
+    "mockMedication": "Vitamina",
+    "welcome": {
+      "title": "Bem-vindo ao Pillgrim!",
+      "desc": "O Pillgrim simplifica a sua rotina de medicação e os seus dados permanecem confidenciais"
+    },
+    "addMedication": {
+      "title": "Adicionar medicação",
+      "desc": "Pode adicionar medicação clicando no botão no canto inferior direito do ecrã inicial e do ecrã de medicamentos"
+    },
+    "manage": {
+      "title": "Acompanhar cada dose",
+      "desc": "Marque cada dose como tomada, ignorada ou adiada; o seu histórico é atualizado automaticamente"
+    },
+    "history": {
+      "title": "Veja o seu histórico num relance",
+      "desc": "Veja com que regularidade tem tomado os seus medicamentos, dia a dia"
+    },
+    "permission": {
+      "title": "Ativar alarmes e lembretes",
+      "desc": "Sem esta autorização, os lembretes podem chegar atrasados ou nem chegar. Pode alterar esta configuração a qualquer momento"
+    }
   }
 }

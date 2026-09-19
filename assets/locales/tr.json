@@ -9,7 +9,11 @@
     "yes": "Evet",
     "no": "Hayır",
     "loading": "Yükleniyor...",
-    "remove": "Kaldır"
+    "remove": "Kaldır",
+    "skip": "Atla",
+    "previous": "Önceki",
+    "finish": "Bitir",
+    "next": "Sonraki"
   },
   "toast": {
     "medicationAdded": "{{name}} eklendi",
@@ -134,7 +138,7 @@
     "lowStockAlertDescNoStock": "Etkinleştirmek için stok girin",
     "next": "İleri",
     "whenHowMuch": "Ne zaman ve ne kadar?",
-    "howMuch":"Ne kadar?",
+    "howMuch": "Ne kadar?",
     "advancedOptions": "Gelişmiş Seçenekler",
     "dayPlaceholder": "GG",
     "monthPlaceholder": "Ay",
@@ -329,5 +333,30 @@
     "title": "Uygulama çöktü",
     "subtitle": "Yeniden yüklemek için dokun.",
     "restart": "Yeniden Yükle"
+  },
+  "onboarding": {
+    "title": "Öğreticiyi Tekrarla",
+    "desc": "Öğreticiyi tekrarlamak istiyor musun?",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "Pillgrim'e hoş geldin!",
+      "desc": "Pillgrim, ilaç rutinini basitleştirir ve verileriniz size ait kalır"
+    },
+    "addMedication": {
+      "title": "İlaç ekle",
+      "desc": "Ana ekranın ve ilaç ekranının sağ alt köşesindeki düğmeye tıklayarak ilaç ekleyebilirsin"
+    },
+    "manage": {
+      "title": "Her dozu takip et",
+      "desc": "Her dozu “alındı”, ‘atlandı’ veya “ertelendi” olarak işaretle; geçmişin otomatik olarak güncellenir"
+    },
+    "history": {
+      "title": "Geçmişini bir bakışta gör",
+      "desc": "İlaçlarınızı gün gün ne kadar düzenli aldığınızı görün"
+    },
+    "permission": {
+      "title": "Alarmlar ve Hatırlatıcıları etkinleştir",
+      "desc": "Bu izin verilmezse, hatırlatıcılar geç gelebilir veya hiç gelmeyebilir. Bu ayarı istediğiniz zaman değiştirebilirsiniz"
+    }
   }
 }

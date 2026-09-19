@@ -9,7 +9,11 @@
     "yes": "是",
     "no": "否",
     "loading": "正在加载...",
-    "remove": "移除"
+    "remove": "移除",
+    "skip": "跳过",
+    "previous": "上一页",
+    "finish": "完成",
+    "next": "下一页"
   },
   "toast": {
     "medicationAdded": "已添加 {{name}}",
@@ -133,7 +137,7 @@
     "lowStockAlertDescNoStock": "输入库存量以启用",
     "next": "下一步",
     "whenHowMuch": "何时服用？服用多少？",
-    "howMuch":"用量",
+    "howMuch": "用量",
     "advancedOptions": "高级选项",
     "dayPlaceholder": "日",
     "monthPlaceholder": "月",
@@ -328,5 +332,30 @@
     "title": "应用崩溃",
     "subtitle": "点击刷新重试。",
     "restart": "刷新"
+  },
+  "onboarding": {
+    "title": "重新播放教程",
+    "desc": "您想重新播放教程吗？",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "欢迎使用 Pillgrim！",
+      "desc": "Pillgrim 让您的用药流程变得简单，您的数据始终由您掌控"
+    },
+    "addMedication": {
+      "title": "添加药物",
+      "desc": "您可以在主屏幕和药物屏幕的右下角点击按钮来添加药物"
+    },
+    "manage": {
+      "title": "记录每次服药",
+      "desc": "将每次服药标记为“已服”、“跳过”或“延后”，您的记录会自动更新"
+    },
+    "history": {
+      "title": "一目了然地查看您的记录",
+      "desc": "逐日查看您的服药规律"
+    },
+    "permission": {
+      "title": "开启闹钟与提醒",
+      "desc": "若未授予此权限，提醒可能会延迟或无法送达。您可以随时更改此设置"
+    }
   }
 }

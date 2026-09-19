@@ -9,7 +9,11 @@
     "yes": "Oui",
     "no": "Non",
     "loading": "Chargement en cours...",
-    "remove": "Supprimer"
+    "remove": "Supprimer",
+    "skip": "Passer",
+    "previous": "Précédent",
+    "finish": "Terminer",
+    "next": "Suivant"
   },
   "toast": {
     "medicationAdded": "{{name}} ajouté",
@@ -328,5 +332,30 @@
     "title": "L'application a planté",
     "subtitle": "Appuyez sur Recharger pour réessayer.",
     "restart": "Recharger"
+  },
+  "onboarding": {
+    "title": "Revoir le tutoriel",
+    "desc": "Souhaitez-vous revoir le tutoriel ?",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "Bienvenue sur Pillgrim !",
+      "desc": "Pillgrim simplifie la prise de vos médicaments, et vos données restent confidentielles"
+    },
+    "addMedication": {
+      "title": "Ajouter un médicament",
+      "desc": "Vous pouvez ajouter un médicament en cliquant sur le bouton situé dans le coin inférieur droit de l'écran d'accueil et de l'écran des médicaments"
+    },
+    "manage": {
+      "title": "Suivre chaque prise",
+      "desc": "Marquez chaque prise comme prise, oubliée ou reportée ; votre historique se met automatiquement à jour"
+    },
+    "history": {
+      "title": "Consultez votre historique en un coup d'œil",
+      "desc": "Voyez à quel point vous avez pris vos médicaments de manière régulière, jour après jour"
+    },
+    "permission": {
+      "title": "Activer les alarmes et les rappels",
+      "desc": "Sans cette autorisation, les rappels risquent d’arriver en retard, voire de ne pas arriver du tout. Vous pouvez modifier ce paramètre à tout moment"
+    }
   }
 }

@@ -9,7 +9,11 @@
     "yes": "Yes",
     "no": "No",
     "loading": "Loading...",
-    "remove": "Remove"
+    "remove": "Remove",
+    "skip": "Skip",
+    "previous": "Previous",
+    "finish": "Finish",
+    "next": "Next"
   },
   "toast": {
     "medicationAdded": "{{name}} added",
@@ -328,5 +332,30 @@
     "title": "App crashed",
     "subtitle": "Tap reload to try again.",
     "restart": "Reload"
+  },
+  "onboarding": {
+    "title": "Replay Tutorial",
+    "desc": "Do you want to replay the tutorial?",
+    "mockMedication": "Vitamin",
+    "welcome": {
+      "title": "Welcome to Pillgrim!",
+      "desc": "Pillgrim keeps your medication routine simple, and your data stays yours"
+    },
+    "addMedication": {
+      "title": "Add medication",
+      "desc": "You can add medication by clicking the button in the lower-right corner of the home screen and the medications screen"
+    },
+    "manage": {
+      "title": "Track every dose",
+      "desc": "Mark each dose as taken, skipped, or snoozed, your history updates automatically"
+    },
+    "history": {
+      "title": "See your history at a glance",
+      "desc": "See how consistently you've taken your medications, day by day"
+    },
+    "permission": {
+      "title": "Turn on Alarms & Reminders",
+      "desc": "Without this permission, reminders may arrive late or not at all. You can change it anytime in Settings"
+    }
   }
 }

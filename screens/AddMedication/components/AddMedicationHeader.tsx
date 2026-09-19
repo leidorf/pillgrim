@@ -6,9 +6,9 @@ import { useMedicationStore } from "../../../store/medicationStore";
 
 import BackIcon from "../../../assets/icons/arrow-left.svg";
 import CloseIcon from "../../../assets/icons/close.svg";
-import ProgressBar from "./ProgressBar";
 import { useAppTheme } from "../../../theme/useAppTheme";
 import { Theme } from "../../../constants/theme";
+import { ProgressBar } from "./ProgressBar";
 
 type AddMedicationHeaderProps = {
   currentStep: 1 | 2 | 3 | 4;
@@ -64,7 +64,7 @@ const AddMedicationHeader = ({
         </Pressable>
       </View>
 
-      <ProgressBar currentStep={currentStep} />
+      <ProgressBar count={4} currentStep={currentStep} />
     </>
   );
 };
